@@ -1,18 +1,17 @@
-# MALAMAXING 麻辣烫
+# Xiaotong Malatang 麻辣烫
 
-A playable low-poly 3D malatang shop game for desktop and mobile.
-Walk into the shop, pick ingredients from the display fridge, weigh your
-basket on the scale, choose broth and spice level, and try to hit each
-guest's target weight without going over their budget.
+A playable low-poly 3D malatang shop game for desktop and mobile. Xiaotong manages the store; Lukas / 卢卡斯 is the cashier. Use tongs to pick one piece at a time, guess the hidden weight, commit to the scale, choose broth and spice, and pay with a simulated game card or cash.
 
 **Play:** https://lukaswall.github.io/malamaxing/
 
 ## How to play
-- WASD / arrow keys or the on-screen joystick to walk, drag to look around
-- Click / tap the door to enter, click trays to add ingredients to your basket
-- The scale and basket bar show live weight and price (charged per gram)
-- Hit "Weigh & Serve", choose the broth + spice the guest asked for
-- Receipt scores your order accuracy, weight accuracy and speed, plus tip
+- Tap **Open the shop**, then **Enter shop** (WASD/arrows, joystick and drag-to-look also work)
+- Tap **+ Ingredients** for easy one-piece picking, or tap trays with the tongs
+- Tap **Drinks** for a separate drinks fridge; drinks are not weighed
+- Tap **Talk** to use scripted English/Chinese commands, recommendations, and browser speech. Recognition support and installed voices vary by device; typed commands and manual picking remain available. The game does not record or store audio.
+- Guess the grams before the reveal. The shop minimum is enforced after locking.
+- Minimize the guest ticket, basket and receipt to clear the view. Zoom with mouse wheel, pinch, or +/-.
+- **Music** opens real official recordings in a visible YouTube player. Playback, ads, regional availability and autoplay depend on YouTube and the browser.
 
 ## Realism notes (prices researched, Nov 2026)
 Pay-by-weight rates from real malatang shops, selectable on the title screen:
@@ -21,10 +20,7 @@ Pay-by-weight rates from real malatang shops, selectable on the title screen:
 - YGF Malatang, New York: USD 15 / lb = USD 3.31 / 100 g - Eater NY (https://ny.eater.com/2024/2/29/24086100/ygf-malatang-hot-pot-east-village-opening)
 - Bone Soup Malatang, Toronto: CAD 3.50 / 100 g, ~400 g minimum - menusca.com 2026 price guide (https://menusca.com/mala-tang-menu-prices-canada/)
 
-Typical real bowls are 450-600 g; guest target weights use a 380-600 g range.
-Ingredient pick weights are best estimates per piece / small portion
-(e.g. fish ball ~20 g, quail egg ~10 g, instant noodle pack ~85 g) -
-estimates, not measured values.
+Ingredient pick weights and drink prices are best estimates per piece / small portion, not measured values. Drinks list uses recognizable examples from Chinese drink guides, not an exhaustive stock list. Song metadata and official URLs are in `music.json`; no recordings are downloaded or hosted here.
 
 ## Tech
-Plain HTML + Three.js (r160, via jsdelivr CDN). No build step.
+Plain HTML + Three.js (r160, via jsdelivr CDN). No build step, no paid API and no real payments. `main.js` is the preserved first preview; the current root build is inline for reliable deployment.
