@@ -244,6 +244,12 @@
 <div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close ×</button></div></div>
 <div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
 <div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
+<div id="livevoice" hidden style="background:#fff3d6;border:1px solid #e0b84f;border-radius:8px;padding:8px;margin:8px 0">
+<b style="font-size:13px">Live AI voice · owner preview</b>
+<p class="sub" style="margin:4px 0">A real AI conversation with Lukas: your microphone streams to Deepgram through our server and replies are AI-generated speech. It knows your current bowl and order stage and remembers this session. It cannot see the hidden weight before you commit. Sessions cap at 3 minutes; the game does not store audio.</p>
+<button class="cta" id="lv-start"> Start live voice</button> <button class="vbtn" id="lv-stop" disabled>End session ×</button>
+<p class="sub" id="lv-status" style="margin:4px 0"></p>
+</div>
 <label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">中文普通话</option></select></label>
 <label>Guest voice <select id="guest-voice"></select></label><label>Lukas / 卢卡斯 voice <select id="cashier-voice"></select></label>
 <p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "两个鱼丸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / 输入指令" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div><button class="vbtn" id="voice-close">Close ×</button></div></div>
@@ -847,7 +853,7 @@ function updateTicket() {
 }
 function basketWeight() { return G.basket.reduce((s, id) => s + ING[id].g, 0); }
 function basketPrice() { return basketWeight() / 100 * rate(); }
-function updateBasketBar() {
+function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
   const w = basketWeight(), p = basketPrice();
   $('btotal').textContent = G.committed ? `${w} g · ${fmtDual(p)}` : `${G.basket.length} pieces · weight hidden`;
   const counts = {};
@@ -924,7 +930,7 @@ function act(a) {
     if (!G.chiliOil) { G.chiliOil = true; blip(760, 0.08); showPrompt('Chili oil added 加辣油了 - free!', 2200); updateTicket(); }
     else showPrompt('Chili oil already in 辣油已加', 1600);
   }
-  else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; say(cashierLine()); }
+  else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; updateVoices(); lvProbe(); say(cashierLine()); }
   else if (a.type === 'pick') {
     if (G.area !== 'interior') return;
     if (G.committed) { showPrompt('Basket committed - finish this guest first', 1500); return; }
@@ -1283,9 +1289,67 @@ $('mic').onclick=()=>{
  try{recognizer.start();$('mic').textContent='Listening... tap to stop';}catch(e){recognizer=null;$('voice-status').textContent='Microphone could not start. Type or pick manually.';}
 };
 $('enable-voices').onclick=()=>{G.voiceEnabled=true;G.muted=false;$('enable-voices').textContent='Voices enabled';say(`Hello, welcome to Xiaotong Malatang. Xiaotong is the store manager, and I am Lukas, your cashier. Our ${G.shop.city} ingredient rate is ${G.shop.rate} per one hundred grams, minimum ${G.shop.min} grams. Pick one piece at a time, guess the target, then commit to weighing. Touch Talk to order in English or Chinese. Turn up your device volume if needed.`);};
-$('voice-open').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();};
-$('voice-start').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();};
-$('voice-close').onclick=()=>{if(recognizer)recognizer.abort();window.speechSynthesis?.cancel();$('voicemodal').style.display='none';};
+$('voice-open').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();lvProbe();};
+$('voice-start').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();lvProbe();};
+
+// ---- Live AI voice (owner preview; available only when served by the voice origin) ----
+let LV = null;
+function lvStatus(t){ $('lv-status').textContent = t; }
+function lvCleanup(msg){
+  if (LV) {
+    try{ LV.proc && LV.proc.disconnect(); }catch(e){}
+    try{ LV.src && LV.src.disconnect(); }catch(e){}
+    try{ LV.stream && LV.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+    try{ LV.ac && LV.ac.state!=='closed' && LV.ac.close(); }catch(e){}
+    try{ LV.ws && LV.ws.readyState<2 && LV.ws.close(); }catch(e){}
+    LV = null;
+  }
+  $('lv-start').disabled=false; $('lv-stop').disabled=true; $('lv-start').textContent=' Start live voice';
+  if (msg) lvStatus(msg);
+}
+function lvCtx(){
+  const stage = !G.basket.length ? 'browsing the shelves' : !G.committed ? 'building the bowl' : !G.paid ? 'bowl weighed, paying' : 'eating at a table';
+  const c = { type:'GameContext', stage, city: G.shop.city, cur: G.shop.cur, ingredients: G.basket.slice(0,40).map(id=>ING[id].name), broth: G.selBroth, spice: G.selSpice, revealed: !!G.committed };
+  if (G.committed) { c.weightG = basketWeight(); c.totalCents = Math.round(basketPrice()*100); if (G.guess!=null) c.guess = G.guess; }
+  return c;
+}
+function lvPushCtx(){ if (LV && LV.ws.readyState===1) { try{ LV.ws.send(JSON.stringify(lvCtx())); }catch(e){} } }
+async function lvStart(){
+  lvCleanup(); $('lv-start').disabled=true; lvStatus('Connecting…');
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio:{ channelCount:1, echoCancellation:true, noiseSuppression:true } }); }
+  catch(e){ lvStatus('Microphone unavailable - allow mic access, or use the scripted chat below.'); $('lv-start').disabled=false; return; }
+  const ws = new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/voice');
+  ws.binaryType='arraybuffer';
+  LV = { ws, stream, playAt:0, ac:null, proc:null, src:null };
+  ws.onerror=()=>lvCleanup('Connection failed.');
+  ws.onclose=(e)=>lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':e.reason==='unauthorized'?'Owner login needed: open /unlock on this same site first.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.'));
+  ws.onmessage=(ev)=>{
+    if (typeof ev.data==='string'){ try{ const j=JSON.parse(ev.data); const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
+    const L=LV; if(!L||!L.ac)return; const i16=new Int16Array(ev.data); const f=new Float32Array(i16.length);
+    for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
+    const buf=L.ac.createBuffer(1,f.length,16000); buf.copyToChannel(f,0);
+    const n=L.ac.createBufferSource(); n.buffer=buf; n.connect(L.ac.destination);
+    const t0=Math.max(L.ac.currentTime,L.playAt); n.start(t0); L.playAt=t0+buf.duration;
+  };
+  ws.onopen=()=>{
+    try{
+      const ac=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+      LV.ac=ac; LV.playAt=ac.currentTime;
+      const src=ac.createMediaStreamSource(stream); LV.src=src;
+      const proc=ac.createScriptProcessor(4096,1,1); LV.proc=proc;
+      proc.onaudioprocess=(e)=>{ if(ws.readyState!==1)return; const f=e.inputBuffer.getChannelData(0); const i16=new Int16Array(f.length); for(let i=0;i<f.length;i++){const v=Math.max(-1,Math.min(1,f[i])); i16[i]=v*32767;} ws.send(i16.buffer); };
+      src.connect(proc); proc.connect(ac.destination);
+      ws.send(JSON.stringify({type:'Settings'}));
+      ws.send(JSON.stringify(lvCtx()));
+      $('lv-stop').disabled=false; $('lv-start').textContent='● Live - listening';
+      lvStatus('Live. Just talk - Lukas can hear you. Tap End session when done.');
+    }catch(e){ lvCleanup('Audio setup failed on this device.'); }
+  };
+}
+$('lv-start').onclick=lvStart; $('lv-stop').onclick=()=>lvCleanup('Session ended.');
+function lvProbe(){ fetch('/health',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{ $('livevoice').hidden = !(j && j.voice); }).catch(()=>{ $('livevoice').hidden = true; }); }
+$('voice-close').onclick=()=>{if(recognizer)recognizer.abort();lvCleanup();window.speechSynthesis?.cancel();$('voicemodal').style.display='none';};
 
 $('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.isInteger(n)||n<1||n>5000){$('guess-help').textContent='Enter a whole-number guess from 1 to 5000 g.';return;}G.guess=n;$('guessmodal').style.display='none';openServe();};
 $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
