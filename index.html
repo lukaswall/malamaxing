@@ -587,11 +587,11 @@ function drawLCD(weightG, priceE) {
   [-1, 1].forEach(sg => { const cheek = box(0.14, fH, fD, 0xe4d2b2); cheek.position.set(sg * (fW / 2 - 0.07), fH / 2 + 0.12, 0); fridge.add(cheek); });
   const fIn = box(fW - 0.3, fH - 0.35, 0.06, 0xe8f0e2, { emissive: 0xdcefe0, emissiveIntensity: 0.45, cast:false });
   fIn.position.set(0, fH / 2 + 0.16, -0.21); fridge.add(fIn);
-  const fStrip = box(fW, 0.34, fD + 0.05, C.terra); fStrip.position.set(0, fH + 0.3, 0); fridge.add(fStrip);
+  const fStrip = box(fW, 0.34, fD + 0.05, C.terra); fStrip.position.set(0, 3.42, 0); fridge.add(fStrip);
   const fStripT = planeWith(textTexture(['XIAOTONG MALATANG 麻辣烫', 'fresh ingredients 新鲜食材 · pay by weight'], { w: 1024, h: 160, bg: '#c1502f', fg: '#f7ecda', font: 'bold 62px "Trebuchet MS"', small: '38px "Trebuchet MS"' }), 6.8, 0.32, { emissive: 0xffffff, ei: 0.25 });
-  fStripT.scale.set(0.85,1,1); fStripT.position.set(0, fH + 0.3, fD / 2 + 0.04); fridge.add(fStripT);
+  fStripT.scale.set(0.85,1,1); fStripT.position.set(0, 3.42, fD / 2 + 0.04); fridge.add(fStripT);
 
-  const shelfYs = [0.42, 0.94, 1.46, 1.98, 2.5, 3.02];
+  const shelfYs = [0.4, 0.78, 1.16, 1.54, 1.92, 2.3, 2.68];
   const trayW = 0.92, trayD = 0.62, trayH = 0.14;
   shelfYs.forEach((sy, si) => {
     const shelf = box(fW - 0.24, 0.05, fD - 0.16, 0xb08d5e); shelf.position.set(0, sy - 0.155, 0.1); fridge.add(shelf);
