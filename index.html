@@ -1199,6 +1199,7 @@ function playTrack(t){
  if(!MUSIC)return;const ids=MUSIC.ids;
  $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;
  const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+ frame.addEventListener('load',()=>{setTimeout(()=>ytCmd('setVolume',[MUSIC_VOLUME]),1200);});
  $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
 }
 function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; loadMusic().then(M=>{ if(M)playTrack(M.tracks[0]); }); }
@@ -1210,7 +1211,8 @@ $('music-open').onclick=async()=>{
 };
 $('music-close').onclick=()=>{$('musicmodal').style.display='none';};
 $('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;$('music-chip').hidden=true;};
-function ytCmd(func){$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func,args:[]}),'https://www.youtube.com');}
+function ytCmd(func,args=[]){$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func,args}),'https://www.youtube.com');}
+const MUSIC_VOLUME=35; // background level: softer than effects, user can raise it in the player
 $('music-min').onclick=()=>{ytCmd('pauseVideo');$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
 $('music-chip').onclick=()=>{$('music-chip').hidden=true;$('music-player').hidden=false;ytCmd('playVideo');};
 
