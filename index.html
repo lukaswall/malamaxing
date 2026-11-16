@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Xiaotong Malatang 麻辣烫 - Malatang Shop Game</title>
+<title>Xiaotong Malatang éº»è¾£ç« - Malatang Shop Game</title>
 <style>
   :root{
     --cream:#f7ecda; --cream2:#f2e2c8; --terra:#c1502f; --terra-d:#a03e22;
@@ -157,7 +157,8 @@
  #voicemodal label{display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:6px;margin:9px 0}#voicemodal select{max-width:65%;padding:6px;border:1px solid #dac3a4;border-radius:6px;background:white;color:var(--ink)}.chatlog{padding:12px;background:#f1e3cb;border-radius:8px;font-size:13px;line-height:1.5;margin:10px 0}#voice-status{margin-top:12px}#voice-start{margin-top:6px}
  @media(max-width:600px){#views{gap:5px}.vbtn{padding:7px 10px}#zoomtools{bottom:162px}}
  #greeting{position:absolute;top:60px;left:12px;max-width:210px;background:var(--paper);border:1px solid #dfc69f;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;pointer-events:none;z-index:25} @media(orientation:landscape) and (max-height:600px){#greeting{top:72px;max-width:180px;font-size:10px}#title .sign h2{display:none}#title .sign{margin-bottom:3px}#loading{margin-top:4px}#voice-start,#enable-voices{font-size:10px;padding:5px 10px}}
-#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:240px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px}#music-chip{position:fixed;left:12px;bottom:12px;z-index:27;max-width:180px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#music-chip{top:65px;bottom:auto}#views{max-width:150px}}
+#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:200px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px}#music-chip{position:fixed;left:12px;bottom:12px;z-index:27;max-width:180px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#music-chip{top:65px;bottom:auto}#views{max-width:150px}}
+#eatpanel{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:26;background:var(--paper);border-radius:12px;padding:12px 16px;width:min(430px,92vw);box-shadow:0 6px 24px #0005;font-size:14px}
 #wheel-wrap{text-align:center;margin:14px 0}#wheel{width:150px;height:150px;border-radius:50%;border:7px solid var(--terra);background:conic-gradient(#f8d795 0 60deg,#c1502f 60deg 120deg,#f8d795 120deg 180deg,#c1502f 180deg 240deg,#f8d795 240deg 300deg,#c1502f 300deg 360deg);position:relative;margin:auto;transition:transform 3s cubic-bezier(.12,.65,.08,1)}#wheel i{position:absolute;left:50%;top:50%;font-style:normal;font-size:9px;transform-origin:0 0;color:white;text-shadow:0 1px 1px #0008}#wheel i:nth-child(1){transform:rotate(30deg) translate(46px,-4px)}#wheel i:nth-child(2){transform:rotate(90deg) translate(42px,-4px)}#wheel i:nth-child(3){transform:rotate(150deg) translate(50px,-4px)}#wheel i:nth-child(4){transform:rotate(210deg) translate(47px,-4px)}#wheel i:nth-child(5){transform:rotate(270deg) translate(50px,-4px)}#wheel i:nth-child(6){transform:rotate(330deg) translate(36px,-4px)}#spin{margin-top:12px}
 </style>
 </head>
@@ -166,52 +167,51 @@
 
 <div id="hud">
   <div class="ticket" id="ticket" style="display:none">
-    <button id="ticket-toggle" class="panel-toggle" aria-expanded="true"> <span id="order-summary">Guest order</span> <span>− / +</span></button><div class="panel-content">
-    <div class="row"><span>Guest</span><b id="tname">-</b></div>
-    <div class="row"><span>Budget</span><b id="tbudget">-</b></div>
-    <div class="row"><span>Target weight</span><b id="ttarget">-</b></div>
+    <button id="ticket-toggle" class="panel-toggle" aria-expanded="true"> <span id="order-summary">Your bowl</span> <span>â / +</span></button><div class="panel-content">
     <div class="row"><span>Shop rate</span><b id="trate">-</b></div>
     <div class="row"><span>Broth</span><b id="tbroth">-</b></div>
     <div class="row"><span>Spice</span><b id="tspice">-</b></div>
+    <div class="row"><span>Chili oil</span><b id="toil">-</b></div>
     <div class="req" id="treq"></div></div>
   </div>
 
-  <div id="earnings" style="display:none"> €0.00</div>
+  <div id="earnings" style="display:none"> â¬0.00</div>
 
   <div id="views">
     <button class="vbtn" id="v-fridge"> Fridge</button>
     <button class="vbtn" id="v-counter"> Counter</button>
-    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open">Music</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-door"> Door</button>
+    <button class="vbtn" id="v-ingredients">ï¼ Ingredients</button><button class="vbtn" id="music-open">Music</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-door"> Door</button>
     <button class="vbtn serve" id="v-serve"> Commit &amp; weigh</button>
   </div>
 
   <div id="basketbar">
     <div class="bhead">
-      <button id="basket-toggle" class="panel-toggle" aria-expanded="true"> Basket − / +</button>
+      <button id="basket-toggle" class="panel-toggle" aria-expanded="true"> Basket â / +</button>
       <span class="btotal" id="btotal">weight hidden</span>
     </div>
     <div class="panel-content"><div id="basketitems"></div>
     <div id="baskethint">One piece per tap. Weights are estimates. Tap to remove before committing.</div></div>
   </div>
 
-  <button class="vbtn easy-enter" id="enter-easy" hidden>Enter shop →</button>
-  <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">−</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">＋</button><button class="vbtn" id="sound"> Sound on</button></div>
+  <button class="vbtn easy-enter" id="enter-easy" hidden>Enter shop â</button>
+  <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">â</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">ï¼</button><button class="vbtn" id="sound"> Sound on</button></div>
   <button id="receipt-tab" class="vbtn" hidden> Show receipt</button>
-  <div id="ingredient-drawer" hidden><button id="close-ingredients" class="vbtn">Close ingredients ×</button><div id="ingredient-list"></div></div>
+  <div id="ingredient-drawer" hidden><button id="close-ingredients" class="vbtn">Close ingredients Ã</button><div id="ingredient-list"></div></div>
   <div id="greeting" hidden></div><div id="prompt"></div>
 
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
-<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Music tries to start by itself when you open the shop; some browsers still need one tap on a song. Minimize (–) pauses the song and shrinks the player to a chip - tap the chip to resume. Stop ends playback. Availability, ads and playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
-<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-min" class="vbtn" title="Minimize - music keeps playing">–</button> <button id="music-stop" class="vbtn">Stop ×</button></span></div><div id="music-frame"></div></div>
-<button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - paused, tap to resume</button>
+<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Music tries to start by itself when you open the shop; some browsers still need one tap on a song. Minimize (â) pauses the song and shrinks the player to a chip - tap the chip to resume. Stop ends playback. Availability, ads and playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
+<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-mute" class="vbtn" title="Mute music"> </button> <button id="music-min" class="vbtn" title="Minimize - music keeps playing">â</button> <button id="music-stop" class="vbtn">Stop Ã</button></span></div><div id="music-frame"></div></div>
+<div id="eatpanel" hidden><div id="eatline" style="font-size:15px;min-height:40px"></div><div class="bar" style="margin:8px 0"><i id="eatbar" style="width:0%"></i></div><p class="sub" style="margin:6px 0">Scripted chat preview - a real AI conversation with Lukas (Deepgram) is coming. Tap Talk for the current voice chat.</p><button class="cta" id="eat-next">Next guest â</button> <button class="vbtn" id="eat-skip">Finish Ã</button></div>
+<button id="music-chip" class="vbtn" hidden>âª <span id="music-chip-title"></span> - paused, tap to resume</button>
 <div class="modal" id="exitmodal"><div class="card"><h2>Step outside?</h2><p class="sub">Your basket and current guest stay as they are. This just prevents accidental exits.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="cta" id="exit-cancel">Stay inside</button><button class="vbtn" id="exit-confirm">Exit shop</button></div></div></div>
 <div class="modal" id="guessmodal"><div class="card"><h2>What does your bowl weigh?</h2><p class="sub" id="guess-help">Enter your own estimate before the scale reveals the answer. This locks the basket, even if it is below the shop minimum.</p><label for="guess-input">Your guess, in grams</label><input id="guess-input" type="number" inputmode="numeric" min="1" max="5000" step="1" style="width:100%;padding:14px;margin:12px 0;font-size:20px"><button class="cta" id="lock-guess">Lock guess &amp; weigh</button><button class="vbtn" id="cancel-guess" style="margin-top:12px">Keep picking</button></div></div>
 <div class="modal" id="brothmodal">
   <div class="card">
     <div class="sub" id="reveal"></div><h2>Choose the broth</h2>
-    <div class="sub" id="brothreq">The guest asked for…</div>
+    <div class="sub" id="brothreq">The guest asked forâ¦</div>
     <div class="optgrid" id="brothopts"></div>
     <h2 style="font-size:16px">Spice level </h2>
     <div class="optgrid" id="spiceopts" style="grid-template-columns:1fr 1fr 1fr"></div>
@@ -221,49 +221,48 @@
 
 <div class="modal" id="receipt">
   <div class="card" style="position:relative">
-    <button class="vbtn" id="min-receipt" style="margin-bottom:12px">Minimize receipt ↑</button><div class="stamp" id="rstamp">PAID</div>
-    <h2>Xiaotong Malatang 麻辣烫</h2>
+    <button class="vbtn" id="min-receipt" style="margin-bottom:12px">Minimize receipt â</button><div class="stamp" id="rstamp">PAID</div>
+    <h2>Xiaotong Malatang éº»è¾£ç«</h2>
     <div class="sub">*** GUEST RECEIPT ***</div>
     <div id="sticker"></div>
     <div class="rline"><span>Weight</span><b id="rweight">-</b></div>
-    <div class="rline"><span>Your guess / error</span><b id="rguess">-</b></div><div class="rline"><span>Guest target</span><b id="rtarget">-</b></div>
+    <div class="rline"><span>Your guess / error</span><b id="rguess">-</b></div>
     <div class="rline"><span>Error</span><b id="rerror">-</b></div>
     <div class="rline"><span>Price</span><b id="rprice">-</b></div>
-    <div class="rline"><span>Budget</span><b id="rbudget">-</b></div>
     <div style="margin-top:10px">
       <div class="blabel"><span>ORDER</span><span id="sorder">0</span></div><div class="bar"><i id="border"></i></div>
       <div class="blabel"><span>WEIGHT</span><span id="sweight">0</span></div><div class="bar"><i id="bweight"></i></div>
       <div class="blabel"><span>SPEED</span><span id="sspeed">0</span></div><div class="bar"><i id="bspeed"></i></div>
     </div>
-    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div><div class="rline"><span>Tip</span><b id="rtip">-</b></div>
+    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="rline"><span>Chili oil</span><b id="roil">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">â</b></div>
     <div class="rline big"><span>TOTAL EARNED</span><b id="rtotal">-</b></div>
     <div class="sub" id="rcomment" style="text-align:center;margin-top:10px"></div>
-    <div id="wheel-wrap"><div id="wheel"><i>Again</i><i>Drink</i><i>5%</i><i>10%</i><i>20%</i><i>Free bowl</i></div><button class="cta" id="spin" hidden>Spin the wheel</button><p class="sub" id="spin-result">Guess close to unlock better odds. Fictional rewards only.</p></div><button class="cta" id="nextguest">Next guest →</button>
+    <div id="wheel-wrap"><div id="wheel"><i>Again</i><i>Drink</i><i>5%</i><i>10%</i><i>20%</i><i>Free bowl</i></div><button class="cta" id="spin" hidden>Spin the wheel</button><p class="sub" id="spin-result">Guess close to unlock better odds. Fictional rewards only.</p></div><button class="cta" id="nextguest">Next guest â</button><button class="cta" id="eatbtn" style="margin-top:8px;background:#8a5f3a">Sit &amp; eat ð</button>
   </div>
 </div>
 
-<div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close ×</button></div></div>
-<div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
-<div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
-<label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">中文普通话</option></select></label>
-<label>Guest voice <select id="guest-voice"></select></label><label>Lukas / 卢卡斯 voice <select id="cashier-voice"></select></label>
-<p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "两个鱼丸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / 输入指令" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div><button class="vbtn" id="voice-close">Close ×</button></div></div>
+<div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close Ã</button></div></div>
+<div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY â</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
+<div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / å¢å¡æ¯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
+<label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">ä¸­ææ®éè¯</option></select></label>
+<label>Guest voice <select id="guest-voice"></select></label><label>Lukas / å¢å¡æ¯ voice <select id="cashier-voice"></select></label>
+<p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "ä¸¤ä¸ªé±¼ä¸¸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / è¾å¥æä»¤" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div><button class="vbtn" id="voice-close">Close Ã</button></div></div>
 <div id="title">
-  <div class="sign"><h1>Xiaotong Malatang</h1><h2>麻 辣 烫</h2></div>
+  <div class="sign"><h1>Xiaotong Malatang</h1><h2>éº» è¾£ ç«</h2></div>
   <p>Guess the bowl weight, one piece at a time. Fill the basket without seeing the grams. Commit to the scale, choose broth and spice, then pay at the terminal.</p>
-  <p style="font-size:12.5px;color:#a08362;margin:0 0 8px">Pick your city's shop - real pay-by-weight rates:</p>
+  <p style="font-size:12.5px;color:#a08362;margin:0 0 8px">Pick your city's shop - real pay-by-weight rates. EUR conversions are approximate (Banque de France, 16 Nov 2026):</p>
   <div class="optgrid" id="shopopts" style="width:min(420px,90vw)"></div>
-  <p style="font-size:10.5px;color:#b09a7c;margin:2px 0 14px">Rates from real shops: YGF Barcelona €2.19/100 g · Yangguofu Berlin €3.19/100 g · YGF NYC $15/lb · Bone Soup Toronto CA$3.50/100 g</p>
+  <p style="font-size:10.5px;color:#b09a7c;margin:2px 0 14px">Rates from real shops: YGF Barcelona â¬2.19/100 g Â· Yangguofu Berlin â¬3.19/100 g Â· YGF NYC $15/lb Â· Bone Soup Toronto CA$3.50/100 g</p>
   <button class="cta" id="startbtn">Open the shop </button>
-  <p style="font-size:12px;margin-top:16px;color:#b0906c">Tap Enter shop and Ingredients for easy controls. Drag to look, pinch / scroll or ± to zoom. Rotate your phone for landscape.</p>
-  <p style="font-size:12px;margin:6px 0">Xiaotong is the manager. Lukas / 卢卡斯 is your cashier.<br>Turn up your volume for optional voices.</p><button class="vbtn" id="enable-voices">Enable voices &amp; welcome</button><button class="vbtn" id="voice-start"> Voice &amp; language</button><div id="loading">loading…</div>
+  <p style="font-size:12px;margin-top:16px;color:#b0906c">Tap Enter shop and Ingredients for easy controls. Drag to look, pinch / scroll or Â± to zoom. Rotate your phone for landscape.</p>
+  <p style="font-size:12px;margin:6px 0">Xiaotong is the manager. Lukas / å¢å¡æ¯ is your cashier.<br>Turn up your volume for optional voices.</p><button class="vbtn" id="enable-voices">Enable voices &amp; welcome</button><button class="vbtn" id="voice-start"> Voice &amp; language</button><div id="loading">loadingâ¦</div>
 </div>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
 
 /* ============================================================
-   Xiaotong Malatang 麻辣烫 - a playable low-poly 3D malatang shop
+   Xiaotong Malatang éº»è¾£ç« - a playable low-poly 3D malatang shop
    Realism grounding (from public sources):
    - by-weight malatang shops charge ~S$2.4-2.98 / 100 g
    - Zhang Liang: S$2.88/100 g with a 300 g minimum bowl
@@ -286,74 +285,97 @@ const C = {
 //  - Yangguofu Malatang Berlin: EUR 3.19/100 g (official menu)
 //  - YGF Malatang NYC: USD 15/lb = USD 3.31/100 g (Eater NY, 2024)
 //  - Bone Soup Malatang Toronto: CAD 3.50/100 g, ~400 g minimum (2026 report)
+//  - YGF Malatang China: CNY 23.8/jin (500 g) = 4.76/100 g (Beijing Business Daily chain report)
+//  - Zhang Liang Malatang China: CNY 28.8/jin = 5.76/100 g (same report)
+//  - Khao-Sen & Mala Tang, Chiang Mai: THB 39/100 g (2026 reviews; local range THB 30-39/100 g)
+// EUR conversions use Banque de France daily parities 2026-11-16 (EUR/CNY 7.3425, EUR/THB 37.326, EUR/USD 1.1014) - approximate game FX.
 const SHOPS = [
-  { id:'es', flag:'', city:'Barcelona', name:'YGF Malatang', rate:2.19, cur:'€', min:400 },
-  { id:'de', flag:'', city:'Berlin',    name:'Yangguofu Malatang', rate:3.19, cur:'€', min:300 },
-  { id:'us', flag:'', city:'New York',  name:'YGF Malatang', rate:3.31, cur:'$', min:340 },
+  { id:'es', flag:'', city:'Barcelona', name:'YGF Malatang', rate:2.19, cur:'â¬', min:400, fx:1 },
+  { id:'de', flag:'', city:'Berlin',    name:'Yangguofu Malatang', rate:3.19, cur:'â¬', min:300, fx:1 },
+  { id:'us', flag:'', city:'New York',  name:'YGF Malatang', rate:3.31, cur:'$', min:340, fx:1.1014 },
   { id:'ca', flag:'', city:'Toronto',   name:'Bone Soup Malatang', rate:3.50, cur:'CA$', min:400 },
+  { id:'sh', flag:'', city:'Shanghai',  name:'YGF Malatang æ¨å½ç¦', rate:4.76, cur:'Â¥', min:250, fx:7.3425 },
+  { id:'xm', flag:'', city:'Xiamen',    name:'Zhang Liang å¼ äº®', rate:5.76, cur:'Â¥', min:250, fx:7.3425 },
+  { id:'cm', flag:'', city:'Chiang Mai', name:'Khao-Sen & Mala Tang', rate:39, cur:'à¸¿', min:200, fx:37.326 },
 ];
 function rate() { return G.shop.rate; }
 function minG() { return G.shop.min; }
 function fmt(p) { return G.shop.cur + p.toFixed(2); }
+function eurOf(p) { return G.shop.fx && G.shop.fx !== 1 ? p / G.shop.fx : null; }
+function fmtDual(p) { const e = eurOf(p); return e == null ? fmt(p) : fmt(p) + ' (â â¬' + e.toFixed(2) + ')'; }
 
-// ---------- ingredients (5 shelves x 6 trays) ----------
+// ---------- ingredients (6 fridge shelves x 6 trays + noodle table) ----------
 const SHELVES = [
   [ // greens & veg
-    { id:'bokchoy',  name:'Bok Choy',    cn:'上海青', color:0x4f9b4f, g:25, shape:'leaf'  },
-    { id:'napa',     name:'Napa Cabbage',cn:'白菜',   color:0x9cc47a, g:18, shape:'leaf'  },
-    { id:'broccoli', name:'Broccoli',    cn:'西兰花', color:0x3f7d3a, g:15, shape:'ball'  },
-    { id:'corn',     name:'Corn',        cn:'玉米',   color:0xf2c14e, g:30, shape:'stick' },
-    { id:'potato',   name:'Potato',      cn:'土豆',   color:0xd9b06a, g:10, shape:'slice' },
-    { id:'lotus',    name:'Lotus Root',  cn:'藕片',   color:0xe8d9c0, g:8, shape:'slice' },
+    { id:'bokchoy',  name:'Bok Choy',    cn:'ä¸æµ·é', color:0x4f9b4f, g:25, shape:'leaf'  },
+    { id:'napa',     name:'Napa Cabbage',cn:'ç½è',   color:0x9cc47a, g:18, shape:'leaf'  },
+    { id:'broccoli', name:'Broccoli',    cn:'è¥¿å°è±', color:0x3f7d3a, g:15, shape:'ball'  },
+    { id:'corn',     name:'Corn',        cn:'çç±³',   color:0xf2c14e, g:30, shape:'stick' },
+    { id:'potato',   name:'Potato',      cn:'åè±',   color:0xd9b06a, g:10, shape:'slice' },
+    { id:'lotus',    name:'Lotus Root',  cn:'èç',   color:0xe8d9c0, g:8, shape:'slice' },
   ],
   [ // mushrooms & tofu
-    { id:'enoki',    name:'Enoki',       cn:'金针菇', color:0xf0e6d0, g:5, shape:'stick' },
-    { id:'woodear',  name:'Wood Ear',    cn:'木耳',   color:0x4a3a30, g:3, shape:'leaf'  },
-    { id:'kelp',     name:'Kelp',        cn:'海带',   color:0x2f5d4a, g:5, shape:'slice' },
-    { id:'tofupuff', name:'Tofu Puff',   cn:'油豆腐', color:0xe8b45a, g:8, shape:'cube'  },
-    { id:'frozentofu',name:'Frozen Tofu',cn:'冻豆腐', color:0xf5efdf, g:12, shape:'cube'  },
-    { id:'porkblood',name:'Beef Tendon', cn:'牛筋', color:0xd9c299, g:12, shape:'tendon'  },
+    { id:'enoki',    name:'Enoki',       cn:'ééè', color:0xf0e6d0, g:5, shape:'stick' },
+    { id:'woodear',  name:'Wood Ear',    cn:'æ¨è³',   color:0x4a3a30, g:3, shape:'leaf'  },
+    { id:'kelp',     name:'Kelp',        cn:'æµ·å¸¦',   color:0x2f5d4a, g:5, shape:'slice' },
+    { id:'tofupuff', name:'Tofu Puff',   cn:'æ²¹è±è', color:0xe8b45a, g:8, shape:'cube'  },
+    { id:'frozentofu',name:'Frozen Tofu',cn:'å»è±è', color:0xf5efdf, g:12, shape:'cube'  },
+    { id:'porkblood',name:'Beef Tendon', cn:'çç­', color:0xd9c299, g:12, shape:'tendon'  },
   ],
   [ // noodles & staples
-    { id:'glass',    name:'Sweet Potato Noodles',cn:'红薯粉', color:0xeef2f0, g:5, shape:'nest'  },
-    { id:'instant',  name:'Instant Noodles',cn:'方便面',color:0xf0cf7a, g:85, shape:'nest' },
-    { id:'ricecake', name:'Rice Cake',   cn:'年糕',   color:0xf8f4ec, g:8, shape:'stick' },
-    { id:'quail',    name:'Quail Egg',   cn:'鹌鹑蛋', color:0xf3e9d8, g:10, shape:'ball'  },
-    { id:'luncheon', name:'Luncheon Meat',cn:'午餐肉',color:0xd98a86, g:12, shape:'slice' },
-    { id:'sausage',  name:'Sausage',     cn:'香肠',   color:0xb4503c, g:20, shape:'stick' },
+    { id:'glass',    name:'Sweet Potato Noodles',cn:'çº¢è¯ç²', color:0xeef2f0, g:5, shape:'nest'  },
+    { id:'instant',  name:'Instant Noodles',cn:'æ¹ä¾¿é¢',color:0xf0cf7a, g:85, shape:'nest' },
+    { id:'ricecake', name:'Rice Cake',   cn:'å¹´ç³',   color:0xf8f4ec, g:8, shape:'stick' },
+    { id:'quail',    name:'Quail Egg',   cn:'é¹é¹è', color:0xf3e9d8, g:10, shape:'ball'  },
+    { id:'luncheon', name:'Luncheon Meat',cn:'åé¤è',color:0xd98a86, g:12, shape:'slice' },
+    { id:'sausage',  name:'Sausage',     cn:'é¦è ',   color:0xb4503c, g:20, shape:'stick' },
   ],
   [ // seafood 1
-    { id:'fishtofu', name:'Fish Tofu',   cn:'鱼豆腐', color:0xf2e3b3, g:15, shape:'cube'  },
-    { id:'crab',     name:'Crab Stick',  cn:'蟹棒',   color:0xf08a6a, g:15, shape:'stick' },
-    { id:'fishball', name:'Fish Ball',   cn:'鱼丸',   color:0xf0e8dc, g:20, shape:'ball'  },
-    { id:'cuttlefish',name:'Frog Leg Cut', cn:'牛蛙', color:0xc4ae92, g:22, shape:'frog'  },
-    { id:'shrimp',   name:'Shrimp',      cn:'虾',     color:0xf28a5a, g:12, shape:'ball'  },
-    { id:'octopus', name:'Crab Piece', cn:'螃蟹', color:0xde743f, g:25, shape:'crab'  },
+    { id:'fishtofu', name:'Fish Tofu',   cn:'é±¼è±è', color:0xf2e3b3, g:15, shape:'cube'  },
+    { id:'crab',     name:'Crab Stick',  cn:'è¹æ£',   color:0xf08a6a, g:15, shape:'stick' },
+    { id:'fishball', name:'Fish Ball',   cn:'é±¼ä¸¸',   color:0xf0e8dc, g:20, shape:'ball'  },
+    { id:'cuttlefish',name:'Frog Leg Cut', cn:'çè', color:0xc4ae92, g:22, shape:'frog'  },
+    { id:'shrimp',   name:'Shrimp',      cn:'è¾',     color:0xf28a5a, g:12, shape:'ball'  },
+    { id:'octopus', name:'Crab Piece', cn:'èè¹', color:0xde743f, g:25, shape:'crab'  },
   ],
   [ // seafood 2 & meat
-    { id:'clam',     name:'Clam',        cn:'蛤蜊',   color:0xc9b49a, g:12, shape:'ball'  },
-    { id:'mussel',   name:'Mussel',      cn:'青口',   color:0x5a6a7a, g:15, shape:'ball'  },
-    { id:'lamb', name:'Lamb Roll', cn:'羊肉卷', color:0xc96a6a, g:8, shape:'roll' },
-    { id:'beef',     name:'Beef',        cn:'牛肉',   color:0xa84a4a, g:8, shape:'slice' },
-    { id:'cuttleball',name:'Cuttlefish Ball',cn:'墨鱼丸',color:0xe4d8e8, g:20, shape:'ball' },
-    { id:'tofuskin', name:'Tofu Skin',   cn:'豆腐皮', color:0xecd9a8, g:6, shape:'slice' },
+    { id:'clam',     name:'Clam',        cn:'è¤è',   color:0xc9b49a, g:12, shape:'ball'  },
+    { id:'mussel',   name:'Mussel',      cn:'éå£',   color:0x5a6a7a, g:15, shape:'ball'  },
+    { id:'lamb', name:'Lamb Roll', cn:'ç¾èå·', color:0xc96a6a, g:8, shape:'roll' },
+    { id:'beef',     name:'Beef',        cn:'çè',   color:0xa84a4a, g:8, shape:'slice' },
+    { id:'cuttleball',name:'Cuttlefish Ball',cn:'å¢¨é±¼ä¸¸',color:0xe4d8e8, g:20, shape:'ball' },
+    { id:'tofuskin', name:'Tofu Skin',   cn:'è±èç®', color:0xecd9a8, g:6, shape:'slice' },
+  ],
+  [ // butcher & eggs
+    { id:'tripe',    name:'Beef Tripe',  cn:'çè',   color:0xe3d3b8, g:15, shape:'slice' },
+    { id:'pork',     name:'Pork Slice',  cn:'çªèç', color:0xd98a8a, g:8,  shape:'slice' },
+    { id:'egg',      name:'Egg',         cn:'é¸¡è',   color:0xf5e9d0, g:50, shape:'ball'  },
+    { id:'duckblood',name:'Duck Blood',  cn:'é¸­è¡',   color:0x7a2a2a, g:15, shape:'cube'  },
+    { id:'beefball', name:'Beef Ball',   cn:'çèä¸¸', color:0xb0785a, g:20, shape:'ball'  },
+    { id:'fillet',   name:'Fish Fillet', cn:'é±¼ç',   color:0xf0dcd2, g:10, shape:'slice' },
   ],
 ];
-const ING = {}; SHELVES.flat().forEach(i => ING[i.id] = i);
+const NOODLES = [
+  { id:'udon',    name:'Udon (pack)',       cn:'ä¹å¬é¢', color:0xf5f0e0, g:200, shape:'cube', pack:true },
+  { id:'mama',    name:'Mama Noodles',      cn:'å¦å¦é¢', color:0xf2c14e, g:60,  shape:'cube', pack:true },
+  { id:'ramenpk', name:'Ramen (pack)',      cn:'æé¢',   color:0xe8b45a, g:100, shape:'nest', pack:true },
+  { id:'daoxiao', name:'Knife-Cut Noodles', cn:'ååé¢', color:0xf8f4ec, g:150, shape:'nest', pack:true },
+];
+const ING = {}; SHELVES.flat().concat(NOODLES).forEach(i => ING[i.id] = i);
 const TRAYPOS = {};
 
 const BROTHS = [
-  { id:'red',    name:'Classic Spicy Red', cn:'经典红汤' },
-  { id:'tomato', name:'Tomato',            cn:'番茄汤'   },
-  { id:'bone',   name:'Golden Bone',       cn:'金汤'     },
-  { id:'dry',    name:'Dry Mala',          cn:'干拌'     },
+  { id:'red',    name:'Classic Spicy Red', cn:'ç»å¸çº¢æ±¤' },
+  { id:'tomato', name:'Tomato',            cn:'çªèæ±¤'   },
+  { id:'bone',   name:'Golden Bone',       cn:'éæ±¤'     },
+  { id:'dry',    name:'Dry Mala',          cn:'å¹²æ'     },
 ];
 const SPICES = [
-  { id:'mild',   name:'Mild',   cn:'微辣' },
-  { id:'medium', name:'Medium', cn:'中辣' },
-  { id:'extra',  name:'Extra',  cn:'特辣' },
+  { id:'mild',   name:'Mild',   cn:'å¾®è¾£' },
+  { id:'medium', name:'Medium', cn:'ä¸­è¾£' },
+  { id:'extra',  name:'Extra',  cn:'ç¹è¾£' },
 ];
-const GUEST_NAMES = ['Wei','Lena','Marc','Aisha','Pau','Sofia','Jon','Marta','Chen','Nora','Oriol','Liu','Anna','Ravi','Júlia','Kenji'];
+const GUEST_NAMES = ['Wei','Lena','Marc','Aisha','Pau','Sofia','Jon','Marta','Chen','Nora','Oriol','Liu','Anna','Ravi','JÃºlia','Kenji'];
 
 // ---------- renderer ----------
 const app = document.getElementById('app');
@@ -453,7 +475,7 @@ const interiorVisInit = () => {}; // visibility managed below
 
   // terracotta sign
   const sign = box(8.6, 1.15, 0.28, C.terra); sign.position.set(0, 3.75, -0.72); exterior.add(sign);
-  const signTex = textTexture(['Xiaotong Malatang', '麻 辣 烫'], { w: 1024, h: 256, bg: '#c1502f', fg: '#f7ecda', font: 'bold 92px "Trebuchet MS", sans-serif', small: '64px "Trebuchet MS", sans-serif' });
+  const signTex = textTexture(['Xiaotong Malatang', 'éº» è¾£ ç«'], { w: 1024, h: 256, bg: '#c1502f', fg: '#f7ecda', font: 'bold 92px "Trebuchet MS", sans-serif', small: '64px "Trebuchet MS", sans-serif' });
   const signFace = planeWith(signTex, 8.2, 1.0, { emissive: 0xffffff, ei: 0.25 });
   signFace.position.set(0, 3.75, -0.565); exterior.add(signFace);
 
@@ -537,7 +559,7 @@ function drawLCD(weightG, priceE) {
 
   // menu board - by-weight concept, broths & spice levels (inspired by real malatang shops)
   const menuTex = textTexture(
-    ['TODAY 今日', 'Spicy Red 红汤 · Tomato 番茄', 'Golden Bone 金汤 · Dry Mala 干拌', 'Mild 微辣 Medium 中辣 Extra 特辣', 'pay by weight · per 100 g'],
+    ['TODAY ä»æ¥', 'Spicy Red çº¢æ±¤ Â· Tomato çªè', 'Golden Bone éæ±¤ Â· Dry Mala å¹²æ', 'Mild å¾®è¾£ Medium ä¸­è¾£ Extra ç¹è¾£', 'pay by weight Â· per 100 g'],
     { w: 768, h: 512, bg: '#5a3b28', fg: '#f7ecda', font: 'bold 56px "Trebuchet MS"', small: '34px "Trebuchet MS"' });
   const menuFrame = box(0.08, 1.75, 2.55, C.woodD, { cast:false }); menuFrame.position.set(-4.6, 2.0, 0.4); interior.add(menuFrame);
   const menu = planeWith(menuTex, 2.4, 1.6, { emissive: 0xffffff, ei: 0.12 });
@@ -545,16 +567,16 @@ function drawLCD(weightG, priceE) {
 
   // ------- ingredient fridge (front-facing, 5 shelves) -------
   const fridge = new THREE.Group(); fridge.position.set(0, 0, -3.95); interior.add(fridge);
-  const fW = 6.4, fH = 2.9, fD = 0.95;
+  const fW = 6.4, fH = 3.45, fD = 0.95;
   const fBody = box(fW, fH, 0.22, 0xe4d2b2); fBody.position.set(0, fH / 2 + 0.12, -0.34); fridge.add(fBody);
   [-1, 1].forEach(sg => { const cheek = box(0.14, fH, fD, 0xe4d2b2); cheek.position.set(sg * (fW / 2 - 0.07), fH / 2 + 0.12, 0); fridge.add(cheek); });
   const fIn = box(fW - 0.3, fH - 0.35, 0.06, 0xe8f0e2, { emissive: 0xdcefe0, emissiveIntensity: 0.45, cast:false });
   fIn.position.set(0, fH / 2 + 0.16, -0.21); fridge.add(fIn);
   const fStrip = box(fW, 0.34, fD + 0.05, C.terra); fStrip.position.set(0, fH + 0.3, 0); fridge.add(fStrip);
-  const fStripT = planeWith(textTexture(['FRESH INGREDIENTS 新鲜食材', 'pay by weight · priced per 100 g'], { w: 1024, h: 160, bg: '#c1502f', fg: '#f7ecda', font: 'bold 62px "Trebuchet MS"', small: '38px "Trebuchet MS"' }), 6.8, 0.32, { emissive: 0xffffff, ei: 0.25 });
+  const fStripT = planeWith(textTexture(['FRESH INGREDIENTS æ°é²é£æ', 'pay by weight Â· priced per 100 g'], { w: 1024, h: 160, bg: '#c1502f', fg: '#f7ecda', font: 'bold 62px "Trebuchet MS"', small: '38px "Trebuchet MS"' }), 6.8, 0.32, { emissive: 0xffffff, ei: 0.25 });
   fStripT.scale.set(0.85,1,1); fStripT.position.set(0, fH + 0.3, fD / 2 + 0.04); fridge.add(fStripT);
 
-  const shelfYs = [0.42, 0.94, 1.46, 1.98, 2.5];
+  const shelfYs = [0.42, 0.94, 1.46, 1.98, 2.5, 3.02];
   const trayW = 0.92, trayD = 0.62, trayH = 0.14;
   shelfYs.forEach((sy, si) => {
     const shelf = box(fW - 0.24, 0.05, fD - 0.16, 0xb08d5e); shelf.position.set(0, sy - 0.155, 0.1); fridge.add(shelf);
@@ -624,7 +646,33 @@ function drawLCD(weightG, priceE) {
   guest.rotation.y = Math.PI;
   window.__guest = guest;
   clickable(gBody,{type:'cashier'}); clickable(gHead,{type:'cashier'});
-  const nameTag=planeWith(textTexture(['LUKAS','卢卡斯 · CASHIER'],{w:512,h:160,bg:'#fdf6e9',fg:'#a03e22',font:'bold 62px Trebuchet MS',small:'38px sans-serif'}),1.25,.4);nameTag.position.set(-2.1,2.18,2.95);nameTag.rotation.y=Math.PI;interior.add(nameTag);
+  const nameTag=planeWith(textTexture(['LUKAS','å¢å¡æ¯ Â· CASHIER'],{w:512,h:160,bg:'#fdf6e9',fg:'#a03e22',font:'bold 62px Trebuchet MS',small:'38px sans-serif'}),1.25,.4);nameTag.position.set(-2.1,2.18,2.95);nameTag.rotation.y=Math.PI;interior.add(nameTag);
+
+  // ------- noodle table (packaged noodles, one pack per tap) -------
+  const nt = new THREE.Group(); nt.position.set(-3.75, 0, -1.1); interior.add(nt);
+  const ntLeg = box(1.5, 0.82, 0.8, 0x9a6a45); ntLeg.position.y = 0.41; nt.add(ntLeg);
+  const ntTop = box(1.7, 0.09, 1.0, C.wood); ntTop.position.y = 0.86; nt.add(ntTop);
+  const ntSign = planeWith(textTexture(['NOODLES é¢', 'one pack per tap'], { w: 512, h: 150, bg: '#c1502f', fg: '#f7ecda', font: 'bold 56px "Trebuchet MS"', small: '34px "Trebuchet MS"' }), 1.5, 0.44);
+  ntSign.position.set(0, 1.55, 0); ntSign.rotation.y = Math.PI / 2; nt.add(ntSign);
+  NOODLES.forEach((ing, ti) => {
+    const nx = -0.42 + (ti % 2) * 0.84, nz = -0.22 + Math.floor(ti / 2) * 0.44;
+    const pack = box(0.34, 0.12, 0.26, ing.color); pack.position.set(nx, 0.97, nz); nt.add(pack);
+    const plab = planeWith(textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' }), 0.52, 0.22);
+    plab.position.set(nx, 1.04, nz + 0.18); plab.rotation.x = -0.5; nt.add(plab);
+    const nhit = box(0.42, 0.4, 0.36, 0xffffff, { cast:false, receive:false }); nhit.material.visible = false; nhit.position.set(nx, 1.06, nz); nt.add(nhit);
+    clickable(nhit, { type: 'pick', ing: ing.id }); clickable(pack, { type: 'pick', ing: ing.id });
+    TRAYPOS[ing.id] = new THREE.Vector3(-3.75 + nx, 1.12, -1.1 + nz);
+  });
+
+  // ------- chili oil station (free add-on) -------
+  const co = new THREE.Group(); co.position.set(-3.75, 0, 1.0); interior.add(co);
+  const coLeg = box(0.84, 0.82, 0.74, 0x9a6a45); coLeg.position.y = 0.41; co.add(coLeg);
+  const coTop = box(1.0, 0.09, 0.9, C.wood); coTop.position.y = 0.86; co.add(coTop);
+  const coPot = cyl(0.26, 0.2, 0.22, 0x8a2323); coPot.position.set(0, 1.02, 0); co.add(coPot);
+  const coOil = cyl(0.22, 0.22, 0.03, 0xc13a1a, 24, { emissive: 0x6a1000, emissiveIntensity: 0.35 }); coOil.position.set(0, 1.14, 0); co.add(coOil);
+  const coSign = planeWith(textTexture(['CHILI OIL è¾£æ²¹', 'free - tap to add'], { w: 512, h: 150, bg: '#c1502f', fg: '#f7ecda', font: 'bold 56px "Trebuchet MS"', small: '34px "Trebuchet MS"' }), 1.1, 0.33);
+  coSign.position.set(0, 1.55, 0); coSign.rotation.y = Math.PI / 2; co.add(coSign);
+  clickable(coPot, { type: 'chilioil' }); clickable(coOil, { type: 'chilioil' });
 
   // tables + stools
   [[3.4, -1.6], [3.4, 0.2]].forEach(([x, z]) => {
@@ -749,7 +797,7 @@ function clampPlayer() {
     player.z = Math.max(-2.6, Math.min(4.0, player.z)); // stay clear of the fridge shelves/labels
     if (player.z > 1.5 && player.z < 2.75 && Math.abs(player.x) < 3.3) player.z = 1.5; // counter block
     // solid furniture: tables, cashier, plant - push the player out, never let the camera inside
-    [[3.4, -1.6, 0.95], [3.4, 0.2, 0.95], [-2.1, 3.1, 0.7], [-3.9, 3.7, 0.6]].forEach(([cx, cz, r]) => {
+    [[3.4, -1.6, 0.95], [3.4, 0.2, 0.95], [-2.1, 3.1, 0.7], [-3.9, 3.7, 0.6], [-3.75, -1.1, 0.8], [-3.75, 1.0, 0.75]].forEach(([cx, cz, r]) => {
       const dx = player.x - cx, dz = player.z - cz, d = Math.hypot(dx, dz);
       if (d < r && d > 0.0001) { player.x = cx + dx / d * r; player.z = cz + dz / d * r; }
     });
@@ -761,7 +809,7 @@ function clampPlayer() {
    ============================================================ */
 const G = {
   started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
-  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
+  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, chiliOil:false, muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
 };
 const $ = id => document.getElementById('id'.length ? id : id);
 
@@ -774,33 +822,31 @@ function newGuest() {
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
-  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null;
+  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false;
   renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
   const npc = window.__guest;
   npc.children[0].material = npc.children[0].material.clone();
   npc.children[0].material.color.setHex(pick([0x7aa5c9, 0xc97a8a, 0x8ab27a, 0xc9a55a, 0x9a7ac9]));
 }
 function updateTicket() {
-  const g = G.guest; if (!g) return;
-  $('tname').textContent = g.name; $('order-summary').textContent = `${g.name} · ${g.targetW} g`; 
-  $('tbudget').textContent = fmt(g.budget);
-  $('ttarget').textContent = g.targetW + ' g';
-  $('trate').textContent = `${fmt(rate())}/100 g · min ${minG()} g`;
-  $('tbroth').textContent = g.broth.name + ' ' + g.broth.cn;
-  $('tspice').textContent = g.spice.name + ' ' + g.spice.cn;
-  const has = new Set(G.basket);
-  $('treq').innerHTML = '<span style="font-size:11px;color:#a08362;width:100%">must have:</span>' +
-    g.req.map(r => `<span class="chip ${has.has(r.id) ? 'got' : ''}">${r.name}</span>`).join('');
+  $('order-summary').textContent = 'Your bowl ð';
+  $('trate').textContent = `${fmt(rate())}/100 g${eurOf(rate()) != null ? ' â â¬' + eurOf(rate()).toFixed(2) : ''} Â· min ${minG()} g`;
+  const bn = id => { const b = BROTHS.find(x => x.id === id); return b ? b.name + ' ' + b.cn : 'choose at counter'; };
+  const sn = id => { const s = SPICES.find(x => x.id === id); return s ? s.name + ' ' + s.cn : 'choose at counter'; };
+  $('tbroth').textContent = bn(G.selBroth);
+  $('tspice').textContent = sn(G.selSpice);
+  $('toil').textContent = G.chiliOil ? 'Yes è¾£æ²¹ (free)' : 'â';
+  $('treq').innerHTML = '<span style="font-size:11px;color:#a08362;width:100%">Your bowl, your rules: pick anything, guess its weight, then commit &amp; weigh.</span>';
 }
 function basketWeight() { return G.basket.reduce((s, id) => s + ING[id].g, 0); }
 function basketPrice() { return basketWeight() / 100 * rate(); }
 function updateBasketBar() {
   const w = basketWeight(), p = basketPrice();
-  $('btotal').textContent = G.committed ? `${w} g · ${fmt(p)}` : `${G.basket.length} pieces · weight hidden`;
+  $('btotal').textContent = G.committed ? `${w} g Â· ${fmtDual(p)}` : `${G.basket.length} pieces Â· weight hidden`;
   const counts = {};
   G.basket.forEach(id => counts[id] = (counts[id] || 0) + 1);
   $('basketitems').innerHTML = Object.entries(counts)
-    .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('')
+    .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' Ã' + n : ''}</span>`).join('')
     || '<span style="font-size:11px;color:#b09a7c">empty - pick from the fridge</span>';
   $('basketbar').style.display = G.area === 'interior' ? 'block' : 'none';
   drawLCD(G.committed ? w : null, G.committed ? p : null);
@@ -857,7 +903,7 @@ function handleTap(x, y) {
       target.x = Math.max(-11, Math.min(11, target.x));
       target.z = Math.max(-0.4, Math.min(11, target.z));
     }
-    G.moveTarget = target; showPrompt('Walking…', 1200);
+    G.moveTarget = target; showPrompt('Walkingâ¦', 1200);
   }
 }
 
@@ -865,6 +911,12 @@ function act(a) {
   if (!a) return;
   if (a.type === 'enter') enterShop();
   else if (a.type === 'exit') askExit();
+  else if (a.type === 'chilioil') {
+    if (!G.started || G.committed) return;
+    if (!G.basket.length) { showPrompt('Pick your bowl first, then add chili oil. åéèåå è¾£æ²¹', 2200); return; }
+    if (!G.chiliOil) { G.chiliOil = true; blip(760, 0.08); showPrompt('Chili oil added å è¾£æ²¹äº - free!', 2200); updateTicket(); }
+    else showPrompt('Chili oil already in è¾£æ²¹å·²å ', 1600);
+  }
   else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; say(cashierLine()); }
   else if (a.type === 'pick') {
     if (G.area !== 'interior') return;
@@ -881,9 +933,10 @@ function act(a) {
 }
 
 function enterShop() {
+  startMusicDefault();
   hidePrompt();
-  $('greeting').hidden=false; $('greeting').textContent='你好，欢迎光临！ Hello, welcome! Xiaotong manages the store. Lukas / 卢卡斯 is your cashier. Tap Talk to chat.'; setTimeout(()=>{$('greeting').hidden=true;},6500);
-  if(G.voiceEnabled)say('你好，欢迎光临！','cashier','zh-CN');
+  $('greeting').hidden=false; $('greeting').textContent='ä½ å¥½ï¼æ¬¢è¿åä¸´ï¼ Hello, welcome! Xiaotong manages the store. Lukas / å¢å¡æ¯ is your cashier. Tap Talk to chat.'; setTimeout(()=>{$('greeting').hidden=true;},6500);
+  if(G.voiceEnabled)say('ä½ å¥½ï¼æ¬¢è¿åä¸´ï¼','cashier','zh-CN');
   G.moveTarget = null;
   G.area = 'interior'; player.area = 'interior';
   exterior.visible = false; interior.visible = true;
@@ -933,9 +986,8 @@ function openServe() {
   G.committed = true; updateBasketBar(); heldBowl.visible = false;
   flyTo(camPose.counter.pos, camPose.counter.yaw);
   $('v-serve').textContent = ' Finish order';
-  $('reveal').textContent = `${w} g · ${fmt(basketPrice())} · ${w < minG() ? 'BELOW SHOP MINIMUM - rejected bowl' : 'Basket locked. No more picks.'}`;
-  const g = G.guest;
-  $('brothreq').textContent = `${g.name} asked for ${g.broth.name} ${g.broth.cn}, ${g.spice.name} ${g.spice.cn} · target ${g.targetW} g · budget ${fmt(g.budget)}`;
+  $('reveal').textContent = `${w} g Â· ${fmtDual(basketPrice())} Â· ${w < minG() ? 'BELOW SHOP MINIMUM - rejected bowl' : 'Basket locked. No more picks.'}`;
+  $('brothreq').textContent = 'Pick your broth and spice level éæ±¤åºåè¾£åº¦';
   const bo = $('brothopts'); bo.innerHTML = '';
   BROTHS.forEach(b => {
     const d = document.createElement('div'); d.className = 'opt' + (G.selBroth === b.id ? ' sel' : '');
@@ -959,22 +1011,17 @@ $('servebtn').addEventListener('click', () => {
 });
 function serveGuest() {
   if (G.paid) return; G.paid = true; $('spin').hidden = false; $('spin-result').textContent='A close guess earns a better shot.';
-  const g = G.guest;
   const w = basketWeight(), price = basketPrice();
   const secs = (performance.now() - G.guestSince) / 1000;
-  const has = new Set(G.basket);
-  const reqHit = g.req.filter(r => has.has(r.id)).length;
-  const order = Math.round(reqHit / g.req.length * 60)
-    + (G.selBroth === g.broth.id ? 20 : 0) + (G.selSpice === g.spice.id ? 20 : 0);
-  const wErr = Math.abs(w - g.targetW);
-  let weightS = Math.max(0, Math.round(100 - (wErr / g.targetW) * 200));
-  const over = price > g.budget;
-  if (over) weightS = Math.max(0, weightS - Math.min(50, Math.round((price - g.budget) / g.budget * 100)));
+  const order = 100; // free pick: no assigned order to match
+  const wErr = Math.abs((G.guess || 0) - w);
+  let weightS = Math.max(0, Math.round(100 - (wErr / Math.max(w, 1)) * 200));
+  const over = false; // no guest budget anymore
   const speed = Math.max(20, Math.min(100, Math.round(130 - secs * 1.6)));
   const overall = (order + weightS + speed) / 3;
   const cents = v => Math.round(v * 100);
-  const priceC = cents(price), budgetC = cents(g.budget);
-  const tipC = over || w < minG() ? 0 : Math.max(0, budgetC - priceC) * (overall / 100) * 0.5;
+  const priceC = cents(price);
+  const tipC = 0;
   const tip = Math.round(tipC) / 100;
   const bowlC = w < minG() ? 0 : priceC;
   const drinkC = Math.round((G.drink?.price || 0) * 100);
@@ -984,31 +1031,75 @@ function serveGuest() {
   $('earnings').textContent = ' ' + fmt(G.earnings);
 
   $('rweight').textContent = w + ' g'; $('rguess').textContent = G.guess + ' g (' + (G.guess>w?'+':'') + (G.guess-w) + ' g)';
-  $('rtarget').textContent = g.targetW + ' g';
-  $('rerror').textContent = (w > g.targetW ? '+' : '-') + wErr + ' g';
-  $('rprice').textContent = fmt(bowlC / 100);
-  $('rdrink').textContent = (G.drink ? G.drink.name + ' · ' : '') + fmt(drinkC / 100);
+  $('rerror').textContent = 'Â±' + wErr + ' g vs your guess';
+  $('rprice').textContent = fmtDual(bowlC / 100);
+  $('rdrink').textContent = (G.drink ? G.drink.name + ' Â· ' : '') + fmt(drinkC / 100);
+  $('roil').textContent = G.chiliOil ? 'Yes è¾£æ²¹ Â· free' : 'â';
   $('rpayment').textContent = G.payment === 'cash' ? 'Cash (simulated)' : 'Card approved (simulated)';
-  $('rbudget').textContent = fmt(g.budget) + (over ? '  OVER' : '');
-  $('rtip').textContent = fmt(tip);
   $('rtotal').textContent = fmt(earned);
   $('sorder').textContent = order; $('border').style.width = order + '%';
   $('sweight').textContent = weightS; $('bweight').style.width = weightS + '%';
   $('sspeed').textContent = speed; $('bspeed').style.width = speed + '%';
   $('rstamp').textContent = w < minG() ? 'REJECTED' : over ? 'OVER BUDGET' : 'PAID';
   $('rstamp').style.borderColor = $('rstamp').style.color = over ? '#a03030' : '#c1502f';
-  $('rwheel').textContent='—';
+  $('rwheel').textContent='â';
   $('rcomment').textContent =
-    overall >= 90 ? pick(['"Perfect bowl! 太好吃了!" ', '"You read my mind!" ', '"Best malatang in town!" ']) :
+    overall >= 90 ? pick(['"Perfect bowl! å¤ªå¥½åäº!" ', '"You read my mind!" ', '"Best malatang in town!" ']) :
     overall >= 70 ? pick(['"Pretty good!" ', '"Nice bowl, thanks!" ', '"Almost perfect!" ']) :
-    overall >= 50 ? pick(['"Hmm, not quite my order…" ', '"It\'s okay, I guess." ']) :
-    over ? '"This costs more than my budget!" ' : '"This is not what I ordered…" ';
-  applyWheel(); if (w < minG()) { $('rwheel').textContent='—';
+    overall >= 50 ? pick(['"Hmm, not quite my orderâ¦" ', '"It\'s okay, I guess." ']) :
+    over ? '"This costs more than my budget!" ' : '"This is not what I orderedâ¦" ';
+  applyWheel(); if (w < minG()) { $('rwheel').textContent='â';
   $('rcomment').textContent = 'Below shop minimum. Bowl rejected, no bowl charge.'; $('sweight').textContent = '0'; $('bweight').style.width = '0%'; }
   $('receipt').style.display = 'flex';
   blip(523, 0.12); setTimeout(() => blip(659, 0.12), 120); setTimeout(() => blip(overall >= 50 ? 784 : 392, 0.25), 240);
 }
 $('nextguest').addEventListener('click', () => { $('receipt').style.display = 'none'; newGuest(); flyTo(camPose.fridge.pos,camPose.fridge.yaw,0.03); });
+const EAT_LINES = [
+  'Lukas: How is the bowl? å³éæä¹æ ·ï¼',
+  "Lukas: That broth is Xiaotong's own recipe. æ±¤æ¯å°å½¤çéæ¹ã",
+  'Lukas: Careful - the chili oil has a kick! è¾£æ²¹å¾è¾£å¦ã',
+  'Lukas: The beef balls are hand-made. çèä¸¸æ¯ææçã',
+  'Lukas: Sweet potato noodles soak up the broth best. çº¢è¯ç²æå¸æ±¤ã',
+  'Lukas: Enjoy! Come back soon. æ¢æ¢åï¼æ¬¢è¿ä¸æ¬¡åä¸´ï¼',
+];
+let eatIv = null;
+function sitAndEat() {
+  $('receipt').style.display = 'none'; $('receipt-tab').hidden = true;
+  flyTo([4.15, 1.3, 0.2], -Math.PI / 2, 0.25);
+  if (!window.__eatBowl) {
+    const eb = new THREE.Group(); eb.position.set(3.4, 0.86, 0.2);
+    eb.add(cyl(0.24, 0.14, 0.18, 0xfdf6e9, 28));
+    const soup = cyl(0.2, 0.2, 0.04, 0xb23a1e, 24, { emissive: 0x5a1400, emissiveIntensity: 0.3 }); soup.position.y = 0.08; eb.add(soup);
+    eb.visible = false; scene.add(eb); window.__eatBowl = eb;
+  }
+  window.__eatBowl.visible = true;
+  const npc = window.__guest, wfrom = npc.position.clone(), wto = new THREE.Vector3(2.72, 0, 0.62);
+  const t0 = performance.now();
+  const walk = setInterval(() => {
+    const k = Math.min(1, (performance.now() - t0) / 2200);
+    npc.position.lerpVectors(wfrom, wto, k); npc.rotation.y = Math.PI / 4;
+    if (k >= 1) clearInterval(walk);
+  }, 30);
+  $('eatpanel').hidden = false; let li = 0; const t1 = performance.now();
+  $('eatline').textContent = EAT_LINES[0]; $('eatbar').style.width = '0%';
+  clearInterval(eatIv);
+  eatIv = setInterval(() => {
+    const el = (performance.now() - t1) / 1000;
+    $('eatbar').style.width = Math.min(100, el / 18 * 100) + '%';
+    const ni = Math.min(EAT_LINES.length - 1, Math.floor(el / 3));
+    if (ni !== li) { li = ni; $('eatline').textContent = EAT_LINES[li]; blip(660, 0.05); }
+    if (el > 18) clearInterval(eatIv);
+  }, 200);
+}
+function finishEating() {
+  clearInterval(eatIv); $('eatpanel').hidden = true;
+  if (window.__eatBowl) window.__eatBowl.visible = false;
+  const npc = window.__guest; npc.position.set(-2.1, 0, 3.1); npc.rotation.y = Math.PI;
+  newGuest(); flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03);
+}
+$('eatbtn').onclick = sitAndEat;
+$('eat-next').onclick = finishEating;
+$('eat-skip').onclick = finishEating;
 
 // HUD buttons
 $('v-fridge').onclick = () => { if (G.area === 'interior') flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03); };
@@ -1029,7 +1120,7 @@ $('basketitems').addEventListener('click', e => {
 SHOPS.forEach(sh => {
   const d = document.createElement('div');
   d.className = 'opt' + (sh.id === G.shop.id ? ' sel' : '');
-  d.innerHTML = `${sh.flag} ${sh.city}<small>${sh.name} · ${sh.cur}${sh.rate.toFixed(2)}/100 g · min ${sh.min} g</small>`;
+  d.innerHTML = `${sh.flag} ${sh.city}<small>${sh.name} Â· ${sh.cur}${sh.rate.toFixed(2)}/100 g${sh.fx && sh.fx !== 1 ? ' â â¬' + (sh.rate / sh.fx).toFixed(2) : ''} Â· min ${sh.min} g</small>`;
   d.onclick = () => {
     G.shop = sh; blip(600, 0.06, 'triangle');
     document.querySelectorAll('#shopopts .opt').forEach(o => o.classList.remove('sel'));
@@ -1044,7 +1135,6 @@ $('startbtn').addEventListener('click', () => {
   G.started = true; $('enter-easy').hidden = false; $('zoomtools').hidden = false;
   if (NARROW()) { player.yaw = Math.PI - 0.38; applyFreeCam(); } // aim at the door on phones
   newGuest();
-  startMusicDefault();
   showPrompt('Walk to the door and click it to go in ', 5000);
 });
 document.getElementById('loading').textContent = '';
@@ -1078,18 +1168,18 @@ $('basket-toggle').onclick=()=>{const c=$('basketbar').classList.toggle('collaps
 $('min-receipt').onclick=()=>{$('receipt').style.display='none'; $('receipt-tab').hidden=false;};
 $('receipt-tab').onclick=()=>{$('receipt').style.display='flex'; $('receipt-tab').hidden=true;};
 const DRINKS = [
- ['Wang Lao Ji','王老吉','',2.5],['Jiaduobao','加多宝','',2.5],['Sour plum drink','酸梅汤','',2.8],
- ['Vitasoy soy milk','维他奶','',2.5],['Wahaha Nutri-Express','营养快线','',3],['Coconut milk','椰汁','',3],
- ['Arctic Ocean orange soda','北冰洋','',3],['Jasmine tea','茉莉花茶','',2.2],['Oolong tea','乌龙茶','',2.2],
- ['Chrysanthemum tea','菊花茶','',2.5],['Pear juice','梨汁','',2.8],['Lychee drink','荔枝汁','',2.8],
- ['Grass jelly drink','仙草蜜','',2.8],['Bubble milk tea','珍珠奶茶','',4],['Water','水','',1.5]
+ ['Wang Lao Ji','çèå','',2.5],['Jiaduobao','å å¤å®','',2.5],['Sour plum drink','é¸æ¢æ±¤','',2.8],
+ ['Vitasoy soy milk','ç»´ä»å¥¶','',2.5],['Wahaha Nutri-Express','è¥å»å¿«çº¿','',3],['Coconut milk','æ¤°æ±','',3],
+ ['Arctic Ocean orange soda','åå°æ´','',3],['Jasmine tea','èèè±è¶','',2.2],['Oolong tea','ä¹é¾è¶','',2.2],
+ ['Chrysanthemum tea','èè±è¶','',2.5],['Pear juice','æ¢¨æ±','',2.8],['Lychee drink','èææ±','',2.8],
+ ['Grass jelly drink','ä»èè','',2.8],['Bubble milk tea','çç å¥¶è¶','',4],['Water','æ°´','',1.5]
 ];
 $('v-drinks').onclick=()=>{if(!G.paid){$('drinkmodal').style.display='flex'; renderDrinks();}};
 $('close-drinks').onclick=()=>{$('drinkmodal').style.display='none';};
 function renderDrinks(){
  const d=$('drinkopts'); d.innerHTML='';
- const options=[['No drink','不加饮料','−',0],...DRINKS];
- options.forEach(([name,cn,icon,price])=>{const b=document.createElement('button'); b.className='opt';const free=G.freeDrink&&price>0; b.innerHTML=`${icon} ${name}<small>${cn} · ${free?'FREE · prize wheel':fmt(price)}</small>`; b.onclick=()=>{G.drink=price?{name,price:free?0:price}:null; if(free)G.freeDrink=false; $('drinkchoice').textContent=G.drink?`${name} · ${free?'FREE · prize wheel':fmt(price)+' (extra)'}`:'No drink selected'; blip(); $('drinkmodal').style.display='none';}; d.appendChild(b);});
+ const options=[['No drink','ä¸å é¥®æ','â',0],...DRINKS];
+ options.forEach(([name,cn,icon,price])=>{const b=document.createElement('button'); b.className='opt';const free=G.freeDrink&&price>0; b.innerHTML=`${icon} ${name}<small>${cn} Â· ${free?'FREE Â· prize wheel':fmt(price)}</small>`; b.onclick=()=>{G.drink=price?{name,price:free?0:price}:null; if(free)G.freeDrink=false; $('drinkchoice').textContent=G.drink?`${name} Â· ${free?'FREE Â· prize wheel':fmt(price)+' (extra)'}`:'No drink selected'; blip(); $('drinkmodal').style.display='none';}; d.appendChild(b);});
 }
 function finishPayment(method){ G.payment=method; $('paymodal').style.display='none'; blip(880,0.12,'sine'); setTimeout(()=>blip(1320,0.15,'sine'),150); serveGuest(); }
 $('tap-card').onclick=()=>finishPayment('card'); $('pay-cash').onclick=()=>finishPayment('cash');
@@ -1110,7 +1200,7 @@ function animatePick(id){
  showPrompt(`Tongs + ${ING[id].name}`,650); tongsAnim=.3;
 }
 const oldRenderBasket=renderBasket3D;
-$('ingredient-list').innerHTML=SHELVES.flat().map(i=>`<button class="ingredient" data-pick="${i.id}">${i.name}<small>${i.cn} · 1 ${i.id==='instant'?'pack':i.id==='glass'?'strand':'piece'}</small></button>`).join('');
+$('ingredient-list').innerHTML=SHELVES.flat().concat(NOODLES).map(i=>`<button class="ingredient" data-pick="${i.id}">${i.name}<small>${i.cn} Â· 1 ${i.pack||i.id==='instant'?'pack':i.id==='glass'?'strand':'piece'}</small></button>`).join('');
 $('ingredient-list').onclick=e=>{const b=e.target.closest('[data-pick]');if(b)act({type:'pick',ing:b.dataset.pick});};
 $('v-ingredients').onclick=()=>{$('ingredient-drawer').hidden=!$('ingredient-drawer').hidden;};
 $('close-ingredients').onclick=()=>{$('ingredient-drawer').hidden=true;};
@@ -1120,7 +1210,7 @@ $('close-ingredients').onclick=()=>{$('ingredient-drawer').hidden=true;};
 let voiceLang='en-US', recognizer=null;
 const zh=()=>voiceLang==='zh-CN';
 function say(text,role='cashier',lang=voiceLang){
- $('chatlog').textContent=(role==='guest'?(zh()?'客人: ':'Guest: '):(zh()?'卢卡斯: ':'Lukas: '))+text;
+ $('chatlog').textContent=(role==='guest'?(zh()?'å®¢äºº: ':'Guest: '):(zh()?'å¢å¡æ¯: ':'Lukas: '))+text;
  if(!('speechSynthesis' in window) || G.muted)return;
  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang=lang;
  const select=$(role==='guest'?'guest-voice':'cashier-voice');
@@ -1135,37 +1225,37 @@ function updateVoices(){
 $('voice-lang').onchange=e=>{voiceLang=e.target.value;updateVoices();};
 if('speechSynthesis' in window)speechSynthesis.addEventListener('voiceschanged',updateVoices);updateVoices();
 function guestLine(){
- const g=G.guest;if(!g)return zh()?'欢迎来到Xiaotong Malatang！先选城市，再开店。':'Welcome to Xiaotong Malatang! Choose a city, then open the shop.';
- return zh()?`你好！我要${g.targetW}克，预算${g.budget.toFixed(2)}。请加${g.req.map(i=>i.cn).join('、')}，${g.broth.cn}，${g.spice.cn}。别把我的碗变成一座山！`:`Hi, I'm ${g.name}. Aim for ${g.targetW} grams, budget ${fmt(g.budget)}. I need ${g.req.map(i=>i.name).join(', ')}, ${g.broth.name} broth and ${g.spice.name} spice. A bowl, please, not a mountain!`;
+ const g=G.guest;if(!g)return zh()?'æ¬¢è¿æ¥å°Xiaotong Malatangï¼åéåå¸ï¼åå¼åºã':'Welcome to Xiaotong Malatang! Choose a city, then open the shop.';
+ return zh()?`ä½ å¥½ï¼æè¦${g.targetW}åï¼é¢ç®${g.budget.toFixed(2)}ãè¯·å ${g.req.map(i=>i.cn).join('ã')}ï¼${g.broth.cn}ï¼${g.spice.cn}ãå«ææçç¢åæä¸åº§å±±ï¼`:`Hi, I'm ${g.name}. Aim for ${g.targetW} grams, budget ${fmt(g.budget)}. I need ${g.req.map(i=>i.name).join(', ')}, ${g.broth.name} broth and ${g.spice.name} spice. A bowl, please, not a mountain!`;
 }
 function cashierLine(){
- if(!G.started)return zh()?'欢迎！你可以自己夹菜，也可以说出食材名字。我不会偷偷告诉你重量！':'Welcome! Pick by hand or say an ingredient name. No sneaky weight spoilers from me!';
- if(G.paid)return zh()?`谢谢惠顾！${$('rcomment').textContent} 下位客人准备好了吗？`:`Payment approved. ${$('rcomment').textContent} Ready for the next hungry critic?`;
- if(G.committed)return zh()?`称好了！${basketWeight()}克。现在选汤底和辣度，然后刷游戏卡。`:`The scale has spoken: ${basketWeight()} grams. Choose broth and spice, then tap your game card.`;
- if(!G.basket.length)return zh()?'空碗减肥法？先夹点菜吧！':'The empty-bowl diet? Bold strategy. Try adding a few pieces!';
- const last=ING[G.basket.at(-1)];return zh()?`已经夹了${G.basket.length}件，最后是${last.cn}。重量保密，凭感觉来！`:`${G.basket.length} pieces so far, last up: ${last.name}. The grams are classified. Trust your noodle instincts!`;
+ if(!G.started)return zh()?'æ¬¢è¿ï¼ä½ å¯ä»¥èªå·±å¤¹èï¼ä¹å¯ä»¥è¯´åºé£æåå­ãæä¸ä¼å·å·åè¯ä½ ééï¼':'Welcome! Pick by hand or say an ingredient name. No sneaky weight spoilers from me!';
+ if(G.paid)return zh()?`è°¢è°¢æ é¡¾ï¼${$('rcomment').textContent} ä¸ä½å®¢äººåå¤å¥½äºåï¼`:`Payment approved. ${$('rcomment').textContent} Ready for the next hungry critic?`;
+ if(G.committed)return zh()?`ç§°å¥½äºï¼${basketWeight()}åãç°å¨éæ±¤åºåè¾£åº¦ï¼ç¶åå·æ¸¸æå¡ã`:`The scale has spoken: ${basketWeight()} grams. Choose broth and spice, then tap your game card.`;
+ if(!G.basket.length)return zh()?'ç©ºç¢åè¥æ³ï¼åå¤¹ç¹èå§ï¼':'The empty-bowl diet? Bold strategy. Try adding a few pieces!';
+ const last=ING[G.basket.at(-1)];return zh()?`å·²ç»å¤¹äº${G.basket.length}ä»¶ï¼æåæ¯${last.cn}ãééä¿å¯ï¼å­æè§æ¥ï¼`:`${G.basket.length} pieces so far, last up: ${last.name}. The grams are classified. Trust your noodle instincts!`;
 }
 function runVoiceCommand(raw){
  const text=raw.trim().toLowerCase(); if(!text)return;
- const found=SHELVES.flat().filter(i=>text.includes(i.name.toLowerCase())||text.includes(i.cn));
+ const found=SHELVES.flat().concat(NOODLES).filter(i=>text.includes(i.name.toLowerCase())||text.includes(i.cn));
  if(found.length){
-  if(!G.started){say(zh()?'请先开店。':'Open the shop first.');return;}
+  if(!G.started){say(zh()?'è¯·åå¼åºã':'Open the shop first.');return;}
   if(G.area!=='interior')enterShop();
   const m=text.match(/\b([1-9]|10|one|two|three|four|five|six|seven|eight|nine|ten)\b/);const nmap={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};let n=m?(nmap[m[1]]||Number(m[1])):1;
-  const cm=text.match(/([一二两三四五六七八九十])(?:个|片|根|块|颗)/);if(cm)n='一二三四五六七八九十'.indexOf(cm[1])+1||2;
-  if(G.committed){say(zh()?'已经称重锁定了，下一碗再加吧。':'This bowl is locked. Save that plot twist for the next guest.');return;}
-  found.forEach(i=>{for(let j=0;j<Math.min(10,n);j++)act({type:'pick',ing:i.id});});say(zh()?`好的，加了${found.map(i=>i.cn).join('、')}。每次一件，重量还是秘密。`:`Added ${found.map(i=>i.name).join(', ')}, ${n} each. One piece at a time, zero weight spoilers.`);return;
+  const cm=text.match(/([ä¸äºä¸¤ä¸åäºå­ä¸å«ä¹å])(?:ä¸ª|ç|æ ¹|å|é¢)/);if(cm)n='ä¸äºä¸åäºå­ä¸å«ä¹å'.indexOf(cm[1])+1||2;
+  if(G.committed){say(zh()?'å·²ç»ç§°ééå®äºï¼ä¸ä¸ç¢åå å§ã':'This bowl is locked. Save that plot twist for the next guest.');return;}
+  found.forEach(i=>{for(let j=0;j<Math.min(10,n);j++)act({type:'pick',ing:i.id});});say(zh()?`å¥½çï¼å äº${found.map(i=>i.cn).join('ã')}ãæ¯æ¬¡ä¸ä»¶ï¼ééè¿æ¯ç§å¯ã`:`Added ${found.map(i=>i.name).join(', ')}, ${n} each. One piece at a time, zero weight spoilers.`);return;
  }
- if(/recommend|suggest|推荐|吃什么|what should/.test(text)){const wanted=G.guest?.req.filter(i=>!G.basket.includes(i.id)).slice(0,3)||[ING.lamb,ING.napa,ING.porkblood];say(zh()?`推荐${wanted.map(i=>i.cn).join('、')}。加点蔬菜，别只让丸子开会！`:`Try ${wanted.map(i=>i.name).join(', ')}. Add some greens too. The fish balls cannot run this meeting alone!`);return;}
- if(/order|target|客人|订单/.test(text)){say(guestLine(),'guest');return;}
- if(/wheel|spin|转|抽/.test(text)){say(zh()?'猜得越准，转盘奖励越可能好。虚构游戏奖励，不是真赌博。':'Closer guesses earn better fictional wheel prizes. It is a game, not real gambling.');return;}
- if(/weigh|称重|结账/.test(text)){openServe();say(cashierLine());return;}
- if(/hello|hi\b|你好|cashier|收银/.test(text)){say(cashierLine());return;}
- if(/spic|辣/.test(text)){say(zh()?'辣度有微辣、中辣、特辣。特辣不是性格测试，量力而行！':'Mild, medium or extra. Extra spicy is not a personality test. Choose wisely.');return;}
- if(/drink|饮料|喝/.test(text)){$('v-drinks').click();say(zh()?'饮料不算碗重，单独收费。你的舌头可以休息一下。':'Drinks cost extra and never count toward bowl weight. Your tongue might appreciate the backup.');return;}
- if(/zoom|放大|缩小/.test(text)){dolly(/out|缩小/.test(text)?-.35:.35);return;}
- if(/thank|谢谢/.test(text)){say(zh()?'不客气！别忘了你的面。':'You are welcome. Do not abandon your noodles. They have feelings.');return;}
- say(zh()?'我会简单点单，不是万能聊天。试试“两个鱼丸”、“订单”、“饮料”或“你好”。':'I am a simple shop assistant, not a soup-powered genius. Try "two fish balls", "order", "drinks", or "hello".');
+ if(/recommend|suggest|æ¨è|åä»ä¹|what should/.test(text)){const wanted=G.guest?.req.filter(i=>!G.basket.includes(i.id)).slice(0,3)||[ING.lamb,ING.napa,ING.porkblood];say(zh()?`æ¨è${wanted.map(i=>i.cn).join('ã')}ãå ç¹è¬èï¼å«åªè®©ä¸¸å­å¼ä¼ï¼`:`Try ${wanted.map(i=>i.name).join(', ')}. Add some greens too. The fish balls cannot run this meeting alone!`);return;}
+ if(/order|target|å®¢äºº|è®¢å/.test(text)){say(guestLine(),'guest');return;}
+ if(/wheel|spin|è½¬|æ½/.test(text)){say(zh()?'çå¾è¶åï¼è½¬çå¥å±è¶å¯è½å¥½ãèææ¸¸æå¥å±ï¼ä¸æ¯çèµåã':'Closer guesses earn better fictional wheel prizes. It is a game, not real gambling.');return;}
+ if(/weigh|ç§°é|ç»è´¦/.test(text)){openServe();say(cashierLine());return;}
+ if(/hello|hi\b|ä½ å¥½|cashier|æ¶é¶/.test(text)){say(cashierLine());return;}
+ if(/spic|è¾£/.test(text)){say(zh()?'è¾£åº¦æå¾®è¾£ãä¸­è¾£ãç¹è¾£ãç¹è¾£ä¸æ¯æ§æ ¼æµè¯ï¼éåèè¡ï¼':'Mild, medium or extra. Extra spicy is not a personality test. Choose wisely.');return;}
+ if(/drink|é¥®æ|å/.test(text)){$('v-drinks').click();say(zh()?'é¥®æä¸ç®ç¢éï¼åç¬æ¶è´¹ãä½ çèå¤´å¯ä»¥ä¼æ¯ä¸ä¸ã':'Drinks cost extra and never count toward bowl weight. Your tongue might appreciate the backup.');return;}
+ if(/zoom|æ¾å¤§|ç¼©å°/.test(text)){dolly(/out|ç¼©å°/.test(text)?-.35:.35);return;}
+ if(/thank|è°¢è°¢/.test(text)){say(zh()?'ä¸å®¢æ°ï¼å«å¿äºä½ çé¢ã':'You are welcome. Do not abandon your noodles. They have feelings.');return;}
+ say(zh()?'æä¼ç®åç¹åï¼ä¸æ¯ä¸è½èå¤©ãè¯è¯âä¸¤ä¸ªé±¼ä¸¸âãâè®¢åâãâé¥®æâæâä½ å¥½âã':'I am a simple shop assistant, not a soup-powered genius. Try "two fish balls", "order", "drinks", or "hello".');
 }
 // Common plural aliases for voice ordering.
 const originalVoiceCommand=runVoiceCommand;
@@ -1198,7 +1288,7 @@ async function loadMusic(){ if(MUSIC)return MUSIC; try{const r=await fetch('./mu
 function playTrack(t){
  if(!MUSIC)return;const ids=MUSIC.ids;
  $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;
- const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+ const frame=document.createElement('iframe');frame.width='200';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
  frame.addEventListener('load',()=>{setTimeout(()=>ytCmd('setVolume',[MUSIC_VOLUME]),1200);});
  $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
 }
@@ -1207,10 +1297,12 @@ $('music-open').onclick=async()=>{
  $('musicmodal').style.display='flex';
  if($('music-list').children.length)return;
  const M=await loadMusic(); if(!M){$('music-status').textContent='Playlist is still being added. The game works without music.';return;}
- for(const t of M.tracks){const b=document.createElement('button');b.className='opt';b.textContent=t.title+' · '+t.artist;b.onclick=()=>playTrack(t);const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
+ for(const t of M.tracks){const b=document.createElement('button');b.className='opt';b.textContent=t.title+' Â· '+t.artist;b.onclick=()=>playTrack(t);const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
 };
 $('music-close').onclick=()=>{$('musicmodal').style.display='none';};
 $('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;$('music-chip').hidden=true;};
+let musicMuted=false;
+$('music-mute').onclick=()=>{musicMuted=!musicMuted;ytCmd(musicMuted?'mute':'unMute');$('music-mute').textContent=musicMuted?' ':' ';};
 function ytCmd(func,args=[]){$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func,args}),'https://www.youtube.com');}
 const MUSIC_VOLUME=35; // background level: softer than effects, user can raise it in the player
 $('music-min').onclick=()=>{ytCmd('pauseVideo');$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
