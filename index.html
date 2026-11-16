@@ -158,6 +158,7 @@
  @media(max-width:600px){#views{gap:5px}.vbtn{padding:7px 10px}#zoomtools{bottom:162px}}
  #greeting{position:absolute;top:60px;left:12px;max-width:210px;background:var(--paper);border:1px solid #dfc69f;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;pointer-events:none;z-index:25} @media(orientation:landscape) and (max-height:600px){#greeting{top:72px;max-width:180px;font-size:10px}#title .sign h2{display:none}#title .sign{margin-bottom:3px}#loading{margin-top:4px}#voice-start,#enable-voices{font-size:10px;padding:5px 10px}}
 #music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:240px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#views{max-width:150px}}
+#wheel-wrap{text-align:center;margin:14px 0}#wheel{width:150px;height:150px;border-radius:50%;border:7px solid var(--terra);background:conic-gradient(#f8d795 0 60deg,#c1502f 60deg 120deg,#f8d795 120deg 180deg,#c1502f 180deg 240deg,#f8d795 240deg 300deg,#c1502f 300deg 360deg);position:relative;margin:auto;transition:transform 3s cubic-bezier(.12,.65,.08,1)}#wheel i{position:absolute;left:50%;top:50%;font-style:normal;font-size:9px;transform-origin:0 0;color:white;text-shadow:0 1px 1px #0008}#wheel i:nth-child(1){transform:rotate(30deg) translate(46px,-4px)}#wheel i:nth-child(2){transform:rotate(90deg) translate(42px,-4px)}#wheel i:nth-child(3){transform:rotate(150deg) translate(50px,-4px)}#wheel i:nth-child(4){transform:rotate(210deg) translate(47px,-4px)}#wheel i:nth-child(5){transform:rotate(270deg) translate(50px,-4px)}#wheel i:nth-child(6){transform:rotate(330deg) translate(36px,-4px)}#spin{margin-top:12px}
 </style>
 </head>
 <body>
@@ -232,10 +233,10 @@
       <div class="blabel"><span>WEIGHT</span><span id="sweight">0</span></div><div class="bar"><i id="bweight"></i></div>
       <div class="blabel"><span>SPEED</span><span id="sspeed">0</span></div><div class="bar"><i id="bspeed"></i></div>
     </div>
-    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="sub" id="rpayment"></div><div class="rline"><span>Tip</span><b id="rtip">-</b></div>
+    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div><div class="rline"><span>Tip</span><b id="rtip">-</b></div>
     <div class="rline big"><span>TOTAL EARNED</span><b id="rtotal">-</b></div>
     <div class="sub" id="rcomment" style="text-align:center;margin-top:10px"></div>
-    <button class="cta" id="nextguest">Next guest →</button>
+    <div id="wheel-wrap"><div id="wheel"><i>Again</i><i>Drink</i><i>5%</i><i>10%</i><i>20%</i><i>Free bowl</i></div><button class="cta" id="spin" hidden>Spin the wheel</button><p class="sub" id="spin-result">Guess close to unlock better odds. Fictional rewards only.</p></div><button class="cta" id="nextguest">Next guest →</button>
   </div>
 </div>
 
@@ -753,7 +754,7 @@ function clampPlayer() {
    ============================================================ */
 const G = {
   started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
-  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, drink:null, muted:false, voiceEnabled:false,
+  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, muted:false, voiceEnabled:false,
 };
 const $ = id => document.getElementById('id'.length ? id : id);
 
@@ -766,7 +767,7 @@ function newGuest() {
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
-  G.committed = false; G.paid = false; G.guess=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null;
+  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null;
   renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
   const npc = window.__guest;
   npc.children[0].material = npc.children[0].material.clone();
@@ -927,7 +928,7 @@ $('servebtn').addEventListener('click', () => {
   $('paymodal').style.display = 'flex'; $('payamount').textContent = fmt(basketPrice() + (G.drink?.price || 0));
 });
 function serveGuest() {
-  if (G.paid) return; G.paid = true;
+  if (G.paid) return; G.paid = true; $('spin').hidden = false; $('spin-result').textContent='A close guess earns a better shot.';
   const g = G.guest;
   const w = basketWeight(), price = basketPrice();
   const secs = (performance.now() - G.guestSince) / 1000;
@@ -965,12 +966,14 @@ function serveGuest() {
   $('sspeed').textContent = speed; $('bspeed').style.width = speed + '%';
   $('rstamp').textContent = w < minG() ? 'REJECTED' : over ? 'OVER BUDGET' : 'PAID';
   $('rstamp').style.borderColor = $('rstamp').style.color = over ? '#a03030' : '#c1502f';
+  $('rwheel').textContent='—';
   $('rcomment').textContent =
     overall >= 90 ? pick(['"Perfect bowl! 太好吃了!" ', '"You read my mind!" ', '"Best malatang in town!" ']) :
     overall >= 70 ? pick(['"Pretty good!" ', '"Nice bowl, thanks!" ', '"Almost perfect!" ']) :
     overall >= 50 ? pick(['"Hmm, not quite my order…" ', '"It\'s okay, I guess." ']) :
     over ? '"This costs more than my budget!" ' : '"This is not what I ordered…" ';
-  if (w < minG()) { $('rcomment').textContent = 'Below shop minimum. Bowl rejected, no bowl charge.'; $('sweight').textContent = '0'; $('bweight').style.width = '0%'; }
+  applyWheel(); if (w < minG()) { $('rwheel').textContent='—';
+  $('rcomment').textContent = 'Below shop minimum. Bowl rejected, no bowl charge.'; $('sweight').textContent = '0'; $('bweight').style.width = '0%'; }
   $('receipt').style.display = 'flex';
   blip(523, 0.12); setTimeout(() => blip(659, 0.12), 120); setTimeout(() => blip(overall >= 50 ? 784 : 392, 0.25), 240);
 }
@@ -1123,6 +1126,7 @@ function runVoiceCommand(raw){
  }
  if(/recommend|suggest|推荐|吃什么|what should/.test(text)){const wanted=G.guest?.req.filter(i=>!G.basket.includes(i.id)).slice(0,3)||[ING.lamb,ING.napa,ING.porkblood];say(zh()?`推荐${wanted.map(i=>i.cn).join('、')}。加点蔬菜，别只让丸子开会！`:`Try ${wanted.map(i=>i.name).join(', ')}. Add some greens too. The fish balls cannot run this meeting alone!`);return;}
  if(/order|target|客人|订单/.test(text)){say(guestLine(),'guest');return;}
+ if(/wheel|spin|转|抽/.test(text)){say(zh()?'猜得越准，转盘奖励越可能好。虚构游戏奖励，不是真赌博。':'Closer guesses earn better fictional wheel prizes. It is a game, not real gambling.');return;}
  if(/weigh|称重|结账/.test(text)){openServe();say(cashierLine());return;}
  if(/hello|hi\b|你好|cashier|收银/.test(text)){say(cashierLine());return;}
  if(/spic|辣/.test(text)){say(zh()?'辣度有微辣、中辣、特辣。特辣不是性格测试，量力而行！':'Mild, medium or extra. Extra spicy is not a personality test. Choose wisely.');return;}
@@ -1172,6 +1176,24 @@ $('music-open').onclick=async()=>{
 $('music-close').onclick=()=>{$('musicmodal').style.display='none';};
 $('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;};
 
+
+function applyWheel(){
+ const spin=$('spin');if(!spin)return;
+ const w=basketWeight();if(w<minG()){spin.hidden=true;$('spin-result').textContent='Rejected bowls do not spin the wheel.';return;}
+ const err=Math.abs(G.guess-w);const weights=[15,20,25,30,5,5];
+ const cut=err<=5?weights:err<=25?[30,25,20,15,7,3]:err<=60?[35,25,20,12,7,1]:[55,20,15,8,2,0];
+ const total=cut.reduce((a,b)=>a+b,0);let n=Math.random()*total,i=0;while(n>cut[i]&&i<cut.length-1){n-=cut[i];i++;}
+ const prizes=[['Better luck next time',0],['Free drink next guest',0],['5% off',.05],['10% off',.1],['20% off',.2],['Free bowl',1]];
+ const [label,disc]=prizes[i];G.wheel={label,disc};
+ spin.hidden=false;$('spin-result').textContent='Spin after paying. Closer guess, better prizes.';
+ $('wheel').style.transform='rotate(0deg)';requestAnimationFrame(()=>{$('wheel').style.transform=`rotate(${1080+i*60+Math.random()*45}deg)`;});
+}
+$('spin').onclick=()=>{
+ if(G.wheel==null||G.wheel.applied)return;const w=basketWeight();const priceC=Math.round(basketPrice()*100);const drinkC=Math.round((G.drink?.price||0)*100);
+ if(G.wheel.label==='Free drink next guest'){G.freeDrink=true;G.earnings+=priceC/100;$('earnings').textContent='💰 '+fmt(G.earnings);}
+ else{const discount=Math.round(priceC*G.wheel.disc);G.earnings+=discount/100;$('earnings').textContent='💰 '+fmt(G.earnings);$('rwheel').textContent=G.wheel.label+(discount?' (-'+fmt(discount/100)+')':'');}
+ G.wheel.applied=true;$('spin').disabled=true;$('spin').textContent=G.wheel.label;$('spin-result').textContent='In-game reward only.';blip(880,.1);setTimeout(()=>blip(1174,.15),120);
+};
 // debug/testing hook
 function screenXY(ingId) {
   const v = TRAYPOS[ingId].clone().project(camera);
