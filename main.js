@@ -484,7 +484,7 @@ function newGuest() {
   const all = SHELVES.flat();
   const req = [];
   while (req.length < reqCount) { const c = pick(all); if (!req.includes(c)) req.push(c); }
-  const targetW = 380 + Math.round(Math.random() * 22) * 10; // 380-600 g, realistic bowl range
+  const targetW = Math.max(minG(), 380 + Math.round(Math.random() * 22) * 10); // >= shop minimum, 380-600 g realistic bowl range
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
