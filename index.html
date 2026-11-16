@@ -202,7 +202,7 @@
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
-<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Music tries to start by itself when you open the shop; some browsers still need one tap on a song. Minimize (–) pauses the song and shrinks the player to a chip - tap the chip to resume. Stop ends playback. Availability, ads and playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
+<div class="modal" id="musicmodal"><div class="card"><h2>Shop music</h2><p class="sub" id="music-status">The shop owner's own track, played directly in the game - no YouTube, no ads. Music starts when you open the shop; some browsers need one tap here. Minimize (–) shrinks the player to a chip; Stop ends playback.</p><div class="optgrid" id="music-list"><button class="opt" id="music-play-track">Play shop music</button></div><button class="vbtn" id="music-close">Close</button></div></div>
 <div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-mute" class="vbtn" title="Mute music"> </button> <button id="music-min" class="vbtn" title="Minimize - music keeps playing">–</button> <button id="music-stop" class="vbtn">Stop ×</button></span></div><div id="music-frame"></div></div>
 <div id="eatpanel" hidden><div id="eatline" style="font-size:15px;min-height:40px"></div><div class="bar" style="margin:8px 0"><i id="eatbar" style="width:0%"></i></div><p class="sub" style="margin:6px 0">Scripted chat preview - a real AI conversation with Lukas (Deepgram) is coming. Tap Talk for the current voice chat.</p><button class="cta" id="eat-next">Next bowl →</button> <button class="vbtn" id="eat-skip">Finish ×</button></div>
 <button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - paused, tap to resume</button>
@@ -1175,7 +1175,7 @@ renderer.domElement.addEventListener('touchmove',e=>{ if(e.touches.length===2 &&
 renderer.domElement.addEventListener('touchend',()=>{pinchDistance=null;dragging=false;},{passive:true});
 $('zoom-in').onclick=()=>dolly(0.35); $('zoom-out').onclick=()=>dolly(-0.35);
 $('enter-easy').onclick=()=>enterShop();
-$('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted){window.speechSynthesis?.cancel();$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func:'mute',args:[]}), 'https://www.youtube.com');} if(!G.muted) blip();};
+$('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted){window.speechSynthesis?.cancel();if(musicEl)musicEl.muted=true;} else if(musicEl&&!musicMuted)musicEl.muted=false; if(!G.muted) blip();};
 $('ticket-toggle').onclick=()=>{const c=$('ticket').classList.toggle('collapsed'); $('ticket-toggle').setAttribute('aria-expanded',!c);};
 $('basket-toggle').onclick=()=>{const c=$('basketbar').classList.toggle('collapsed'); $('basket-toggle').setAttribute('aria-expanded',!c);};
 $('min-receipt').onclick=()=>{$('receipt').style.display='none'; $('receipt-tab').hidden=false;};
@@ -1355,30 +1355,23 @@ $('voice-close').onclick=()=>{if(recognizer)recognizer.abort();lvCleanup();windo
 $('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.isInteger(n)||n<1||n>5000){$('guess-help').textContent='Enter a whole-number guess from 1 to 5000 g.';return;}G.guess=n;$('guessmodal').style.display='none';openServe();};
 $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
 
-let MUSIC=null;
-async function loadMusic(){ if(MUSIC)return MUSIC; try{const r=await fetch('./music.json',{cache:'no-cache'});if(!r.ok)throw Error();const tracks=(await r.json()).filter(t=>t&&/^[a-zA-Z0-9_-]{11}$/.test(t.id));if(!tracks.length)throw Error();MUSIC={tracks,ids:tracks.map(t=>t.id)};}catch(e){MUSIC=null;} return MUSIC; }
-function playTrack(t){
- if(!MUSIC)return;const ids=MUSIC.ids;
+// ---- Shop music: owner-supplied track, native playback only (no YouTube) ----
+let musicEl = null, musicMuted = false;
+const MUSIC_VOLUME = 0.35; // background level: softer than effects
+function musicEnsure(){ if(!musicEl){ musicEl = new Audio('./audio-ff3ef5ef.mp3'); musicEl.loop = true; musicEl.volume = MUSIC_VOLUME; musicEl.preload = 'auto'; } return musicEl; }
+function playTrack(){
  $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;
- const frame=document.createElement('iframe');frame.width='200';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
- frame.addEventListener('load',()=>{setTimeout(()=>ytCmd('setVolume',[MUSIC_VOLUME]),1200);});
- $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
+ $('music-title').textContent='Shop music';
+ const a = musicEnsure(); a.play().catch(()=>{ $('music-title').textContent='Shop music - tap play'; });
 }
-function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; loadMusic().then(M=>{ if(M)playTrack(M.tracks[0]); }); }
-$('music-open').onclick=async()=>{
- $('musicmodal').style.display='flex';
- if($('music-list').children.length)return;
- const M=await loadMusic(); if(!M){$('music-status').textContent='Playlist is still being added. The game works without music.';return;}
- for(const t of M.tracks){const b=document.createElement('button');b.className='opt';b.textContent=t.title+' · '+t.artist;b.onclick=()=>playTrack(t);const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
-};
-$('music-close').onclick=()=>{$('musicmodal').style.display='none';};
-$('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;$('music-chip').hidden=true;};
-let musicMuted=false;
-$('music-mute').onclick=()=>{musicMuted=!musicMuted;ytCmd(musicMuted?'mute':'unMute');$('music-mute').textContent=musicMuted?' ':' ';};
-function ytCmd(func,args=[]){$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func,args}),'https://www.youtube.com');}
-const MUSIC_VOLUME=35; // background level: softer than effects, user can raise it in the player
-$('music-min').onclick=()=>{ytCmd('pauseVideo');$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
-$('music-chip').onclick=()=>{$('music-chip').hidden=true;$('music-player').hidden=false;ytCmd('playVideo');};
+function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; playTrack(); }
+$('music-open').onclick=()=>{ $('musicmodal').style.display='flex'; };
+$('music-close').onclick=()=>{ $('musicmodal').style.display='none'; };
+$('music-play-track').onclick=()=>playTrack();
+$('music-stop').onclick=()=>{ if(musicEl)musicEl.pause(); $('music-player').hidden=true; $('music-chip').hidden=true; };
+$('music-mute').onclick=()=>{ musicMuted=!musicMuted; if(musicEl)musicEl.muted=musicMuted; $('music-mute').textContent=musicMuted?' ':' '; };
+$('music-min').onclick=()=>{ if(musicEl)musicEl.pause(); $('music-player').hidden=true; $('music-chip-title').textContent=$('music-title').textContent; $('music-chip').hidden=false; };
+$('music-chip').onclick=()=>{ $('music-chip').hidden=true; $('music-player').hidden=false; if(musicEl)musicEl.play().catch(()=>{}); };
 
 
 function applyWheel(){
