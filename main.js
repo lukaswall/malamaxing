@@ -352,6 +352,358 @@ function drawLCD(weightG, priceE) {
     const pot = cyl(0.14, 0.11, 0.18, i ? C.terra : 0x8a5f3a); pot.position.set(x, 1.17, 0.1); counter.add(pot);
   });
 
+/* ============================================================
+   MALAMAXING 麻辣烫 - a playable low-poly 3D malatang shop
+   Realism grounding (from public sources):
+   - by-weight malatang shops charge ~S$2.4-2.98 / 100 g
+   - Zhang Liang: S$2.88/100 g with a 300 g minimum bowl
+   - most diners build a 450-600 g bowl
+   Portion grams below are realistic per-grab estimates
+   (e.g. fish ball ~20 g, quail egg ~10 g, noodle cake ~85 g).
+   ============================================================ */
+
+// ---------- palette ----------
+const C = {
+  cream: 0xf7ecda, paper: 0xfdf6e9,
+  terra: 0xc1502f, terraD: 0x9c3b20, ink: 0x5a3b28,
+  wood: 0xb98a5e, woodD: 0x8a5f3a, floor: 0xe8d3ae,
+  pink: 0xe86a8a, steel: 0xb9bfc6, fridgeIn: 0xfef6e6,
+  sky: 0xf9efe0,
+};
+
+// Real-shop rates, normalized per 100 g (sources in README):
+//  - YGF Malatang Barcelona: EUR 2.19/100 g, 400 g minimum (2024 press)
+//  - Yangguofu Malatang Berlin: EUR 3.19/100 g (official menu)
+//  - YGF Malatang NYC: USD 15/lb = USD 3.31/100 g (Eater NY, 2024)
+//  - Bone Soup Malatang Toronto: CAD 3.50/100 g, ~400 g minimum (2026 report)
+const SHOPS = [
+  { id:'es', flag:'🇪🇸', city:'Barcelona', name:'YGF Malatang', rate:2.19, cur:'€', min:400 },
+  { id:'de', flag:'🇩🇪', city:'Berlin',    name:'Yangguofu Malatang', rate:3.19, cur:'€', min:300 },
+  { id:'us', flag:'🇺🇸', city:'New York',  name:'YGF Malatang', rate:3.31, cur:'$', min:340 },
+  { id:'ca', flag:'🇨🇦', city:'Toronto',   name:'Bone Soup Malatang', rate:3.50, cur:'CA$', min:400 },
+];
+function rate() { return G.shop.rate; }
+function minG() { return G.shop.min; }
+function fmt(p) { return G.shop.cur + p.toFixed(2); }
+
+// ---------- ingredients (5 shelves x 6 trays) ----------
+const SHELVES = [
+  [ // greens & veg
+    { id:'bokchoy',  name:'Bok Choy',    cn:'上海青', color:0x4f9b4f, g:60, shape:'leaf'  },
+    { id:'napa',     name:'Napa Cabbage',cn:'白菜',   color:0x9cc47a, g:50, shape:'leaf'  },
+    { id:'broccoli', name:'Broccoli',    cn:'西兰花', color:0x3f7d3a, g:45, shape:'ball'  },
+    { id:'corn',     name:'Corn',        cn:'玉米',   color:0xf2c14e, g:50, shape:'stick' },
+    { id:'potato',   name:'Potato',      cn:'土豆',   color:0xd9b06a, g:40, shape:'slice' },
+    { id:'lotus',    name:'Lotus Root',  cn:'藕片',   color:0xe8d9c0, g:40, shape:'slice' },
+  ],
+  [ // mushrooms & tofu
+    { id:'enoki',    name:'Enoki',       cn:'金针菇', color:0xf0e6d0, g:50, shape:'stick' },
+    { id:'woodear',  name:'Wood Ear',    cn:'木耳',   color:0x4a3a30, g:20, shape:'leaf'  },
+    { id:'kelp',     name:'Kelp',        cn:'海带',   color:0x2f5d4a, g:30, shape:'slice' },
+    { id:'tofupuff', name:'Tofu Puff',   cn:'油豆腐', color:0xe8b45a, g:30, shape:'cube'  },
+    { id:'frozentofu',name:'Frozen Tofu',cn:'冻豆腐', color:0xf5efdf, g:40, shape:'cube'  },
+    { id:'porkblood',name:'Pork Blood',  cn:'猪血',   color:0x6e2a2a, g:40, shape:'cube'  },
+  ],
+  [ // noodles & staples
+    { id:'glass',    name:'Sweet Potato Noodles',cn:'红薯粉', color:0xeef2f0, g:50, shape:'nest'  },
+    { id:'instant',  name:'Instant Noodles',cn:'方便面',color:0xf0cf7a, g:85, shape:'nest' },
+    { id:'ricecake', name:'Rice Cake',   cn:'年糕',   color:0xf8f4ec, g:60, shape:'stick' },
+    { id:'quail',    name:'Quail Egg',   cn:'鹌鹑蛋', color:0xf3e9d8, g:30, shape:'ball'  },
+    { id:'luncheon', name:'Luncheon Meat',cn:'午餐肉',color:0xd98a86, g:50, shape:'slice' },
+    { id:'sausage',  name:'Sausage',     cn:'香肠',   color:0xb4503c, g:45, shape:'stick' },
+  ],
+  [ // seafood 1
+    { id:'fishtofu', name:'Fish Tofu',   cn:'鱼豆腐', color:0xf2e3b3, g:45, shape:'cube'  },
+    { id:'crab',     name:'Crab Stick',  cn:'蟹棒',   color:0xf08a6a, g:45, shape:'stick' },
+    { id:'fishball', name:'Fish Ball',   cn:'鱼丸',   color:0xf0e8dc, g:40, shape:'ball'  },
+    { id:'cuttlefish',name:'Cuttlefish', cn:'墨鱼仔', color:0xe8e0ee, g:40, shape:'ball'  },
+    { id:'shrimp',   name:'Shrimp',      cn:'虾',     color:0xf28a5a, g:45, shape:'ball'  },
+    { id:'octopus',  name:'Octopus',     cn:'八爪鱼', color:0xc98a9a, g:50, shape:'ball'  },
+  ],
+  [ // seafood 2 & meat
+    { id:'clam',     name:'Clam',        cn:'蛤蜊',   color:0xc9b49a, g:40, shape:'ball'  },
+    { id:'mussel',   name:'Mussel',      cn:'青口',   color:0x5a6a7a, g:45, shape:'ball'  },
+    { id:'lamb',     name:'Lamb',        cn:'羊肉卷', color:0xc96a6a, g:50, shape:'slice' },
+    { id:'beef',     name:'Beef',        cn:'牛肉',   color:0xa84a4a, g:50, shape:'slice' },
+    { id:'cuttleball',name:'Cuttlefish Ball',cn:'墨鱼丸',color:0xe4d8e8, g:40, shape:'ball' },
+    { id:'tofuskin', name:'Tofu Skin',   cn:'豆腐皮', color:0xecd9a8, g:30, shape:'slice' },
+  ],
+];
+const ING = {}; SHELVES.flat().forEach(i => ING[i.id] = i);
+const TRAYPOS = {};
+
+const BROTHS = [
+  { id:'red',    name:'Classic Spicy Red', cn:'经典红汤' },
+  { id:'tomato', name:'Tomato',            cn:'番茄汤'   },
+  { id:'bone',   name:'Golden Bone',       cn:'金汤'     },
+  { id:'dry',    name:'Dry Mala',          cn:'干拌'     },
+];
+const SPICES = [
+  { id:'mild',   name:'Mild',   cn:'微辣' },
+  { id:'medium', name:'Medium', cn:'中辣' },
+  { id:'extra',  name:'Extra',  cn:'特辣' },
+];
+const GUEST_NAMES = ['Wei','Lena','Marc','Aisha','Pau','Sofia','Jon','Marta','Chen','Nora','Oriol','Liu','Anna','Ravi','Júlia','Kenji'];
+
+// ---------- renderer ----------
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(C.sky);
+scene.fog = new THREE.Fog(C.sky, 18, 42);
+
+const camera = new THREE.PerspectiveCamera(innerWidth/innerHeight < 0.75 ? 74 : 62, innerWidth/innerHeight, 0.1, 100);
+
+// lights
+const hemi = new THREE.HemisphereLight(0xfff4e0, 0xd8bd96, 0.85); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff0d8, 1.35);
+sun.position.set(6, 10, 8); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+const warmIn = new THREE.PointLight(0xffd9a0, 0.0, 12, 1.6); warmIn.position.set(0, 2.9, 0); scene.add(warmIn);
+
+// ---------- helpers ----------
+function box(w, h, d, color, opts = {}) {
+  const m = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.85, metalness: opts.metal ?? 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1, emissive: opts.emissive ?? 0x000000,
+      emissiveIntensity: opts.emissiveIntensity ?? 1 })
+  );
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function cyl(rt, rb, h, color, seg = 20, opts = {}) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.8, metalness: opts.metal ?? 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1, emissive: opts.emissive ?? 0x000000 }));
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function sph(r, color, opts = {}) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.75, metalness: 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1 }));
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function textTexture(lines, { w = 512, h = 256, bg = null, fg = '#5a3b28', font = 'bold 64px "Trebuchet MS", sans-serif', small = null, pad = 20 } = {}) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const arr = Array.isArray(lines) ? lines : [lines];
+  g.font = font;
+  const lh = h / arr.length;
+  arr.forEach((t, i) => {
+    if (small && i > 0) g.font = small;
+    g.fillText(t, w / 2, lh * (i + 0.5), w - pad * 2);
+  });
+  const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
+  return tx;
+}
+function planeWith(tex, w, h, opts = {}) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9,
+      emissive: opts.emissive ?? 0x000000, emissiveIntensity: opts.ei ?? 0.4,
+      emissiveMap: opts.emissive ? tex : null }));
+  m.castShadow = false; m.receiveShadow = false;
+  return m;
+}
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+// ---------- clickables ----------
+const clickables = [];
+function clickable(mesh, data) { mesh.userData.act = data; clickables.push(mesh); return mesh; }
+
+/* ============================================================
+   EXTERIOR
+   ============================================================ */
+const exterior = new THREE.Group(); scene.add(exterior);
+const interiorVisInit = () => {}; // visibility managed below
+{
+  const street = box(40, 0.1, 10, 0xcbb79b, { cast:false }); street.position.set(0, -0.05, 6.5); exterior.add(street);
+  const walk = box(40, 0.12, 4, 0xe6d4b4, { cast:false }); walk.position.set(0, 0, 0.8); exterior.add(walk);
+
+  const wall = box(11, 4.6, 0.4, C.cream, { cast:false }); wall.position.set(0, 2.3, -1); exterior.add(wall);
+  const base = box(11.2, 0.5, 0.5, C.terraD, { cast:false }); base.position.set(0, 0.25, -0.95); exterior.add(base);
+
+  // terracotta sign
+  const sign = box(8.6, 1.15, 0.28, C.terra); sign.position.set(0, 3.75, -0.72); exterior.add(sign);
+  const signTex = textTexture(['MALAMAXING', '麻 辣 烫'], { w: 1024, h: 256, bg: '#c1502f', fg: '#f7ecda', font: 'bold 92px "Trebuchet MS", sans-serif', small: '64px "Trebuchet MS", sans-serif' });
+  const signFace = planeWith(signTex, 8.2, 1.0, { emissive: 0xffffff, ei: 0.25 });
+  signFace.position.set(0, 3.75, -0.565); exterior.add(signFace);
+
+  // window glow
+  const winFrame = box(4.9, 2.5, 0.08, C.woodD, { cast:false }); winFrame.position.set(-2.2, 1.7, -0.83); exterior.add(winFrame);
+  const win = box(4.6, 2.2, 0.1, 0xffe9c4, { emissive: 0xffd9a0, emissiveIntensity: 0.7, cast:false });
+  win.position.set(-2.2, 1.7, -0.76); exterior.add(win);
+
+  // door
+  const doorFrame = box(1.7, 2.7, 0.14, C.woodD, { cast:false }); doorFrame.position.set(2.9, 1.35, -0.8); exterior.add(doorFrame);
+  const door = box(1.3, 2.4, 0.1, C.terra); door.position.set(2.9, 1.2, -0.72); exterior.add(door);
+  const doorGlass = box(0.9, 1.2, 0.04, 0xffe9c4, { emissive: 0xffd9a0, emissiveIntensity: 0.6 }); doorGlass.position.set(2.9, 1.65, -0.66); exterior.add(doorGlass);
+  clickable(door, { type: 'enter' }); clickable(doorGlass, { type: 'enter' }); clickable(doorFrame, { type: 'enter' });
+
+  // awning
+  const awn = box(6.4, 0.1, 1.4, C.terra, { cast:false }); awn.position.set(-1.2, 2.95, -0.1); awn.rotation.x = 0.28; exterior.add(awn);
+  for (let i = 0; i < 6; i++) { const s = box(0.5, 0.02, 1.35, C.cream, { cast:false }); s.position.set(-3.9 + i * 1.1, 2.96, -0.09); s.rotation.x = 0.28; exterior.add(s); }
+
+  // planters
+  [-4.6, 4.6].forEach(x => {
+    const pot = cyl(0.35, 0.28, 0.5, C.terra); pot.position.set(x, 0.25, 0.6); exterior.add(pot);
+    const bush = sph(0.42, 0x6f9b57); bush.position.set(x, 0.85, 0.6); exterior.add(bush);
+    const bush2 = sph(0.28, 0x86ad66); bush2.position.set(x + 0.2, 1.1, 0.5); exterior.add(bush2);
+  });
+
+  // neighbours
+  [[-9.5, 0xd9c4a2], [9.5, 0xd3b894]].forEach(([x, c]) => {
+    const b = box(7.5, 5.2, 0.6, c, { cast:false }); b.position.set(x, 2.6, -1.2); exterior.add(b);
+    const r = box(7.9, 0.4, 0.9, 0x9c5f3a, { cast:false }); r.position.set(x, 5.3, -1.1); exterior.add(r);
+  });
+
+  // street lamp
+  const pole = cyl(0.06, 0.08, 3.6, 0x6b5642); pole.position.set(-5.8, 1.8, 2.2); exterior.add(pole);
+  const lampBall = sph(0.22, 0xffe2ae, { cast:false }); lampBall.material.emissive = new THREE.Color(0xffc978); lampBall.position.set(-5.8, 3.7, 2.2); exterior.add(lampBall);
+}
+
+/* ============================================================
+   INTERIOR
+   ============================================================ */
+const interior = new THREE.Group(); interior.visible = false; scene.add(interior);
+const ROOM = { x: 4.5, h: 3.4 };
+let lcdTex, lcdCtx, lcdCanvasRef;
+
+function drawLCD(weightG, priceE) {
+  const g = lcdCtx; if (!g) return;
+  g.fillStyle = '#1e3a24'; g.fillRect(0, 0, 512, 192);
+  g.strokeStyle = '#2e5c38'; g.lineWidth = 8; g.strokeRect(6, 6, 500, 180);
+  g.fillStyle = '#8dff9a'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'bold 74px "Courier New", monospace';
+  g.fillText(`${weightG} g`, 256, 60);
+  g.font = 'bold 54px "Courier New", monospace';
+  g.fillText(`${(typeof G !== 'undefined' && G.shop) ? G.shop.cur : '€'}${priceE.toFixed(2)}`, 256, 140);
+  lcdTex.needsUpdate = true;
+}
+
+{
+  const floor = box(ROOM.x * 2 + 0.4, 0.12, 9.4, C.floor, { cast:false }); floor.position.set(0, -0.06, 0); interior.add(floor);
+  for (let i = -4; i <= 4; i++) {
+    const l1 = box(0.03, 0.005, 9.2, 0xd9c39c, { cast:false }); l1.position.set(i, 0.005, 0); interior.add(l1);
+    const l2 = box(9.2, 0.005, 0.03, 0xd9c39c, { cast:false }); l2.position.set(0, 0.005, i); interior.add(l2);
+  }
+  const wallB = box(9.4, ROOM.h, 0.25, C.cream, { cast:false }); wallB.position.set(0, ROOM.h / 2, -4.5); interior.add(wallB);
+  const wallL = box(0.25, ROOM.h, 9.4, C.cream, { cast:false }); wallL.position.set(-4.7, ROOM.h / 2, 0); interior.add(wallL);
+  const wallR = box(0.25, ROOM.h, 9.4, C.cream, { cast:false }); wallR.position.set(4.7, ROOM.h / 2, 0); interior.add(wallR);
+  const wallF = box(9.4, ROOM.h, 0.25, C.cream, { cast:false }); wallF.position.set(0, ROOM.h / 2, 4.5); interior.add(wallF);
+  const ceil = box(9.4, 0.15, 9.4, 0xfaf2e2, { cast:false }); ceil.position.set(0, ROOM.h + 0.07, 0); interior.add(ceil);
+  const sk = box(9.3, 0.22, 0.05, C.terra, { cast:false }); sk.position.set(0, 0.11, -4.35); interior.add(sk);
+
+  // inside door
+  const inDoor = box(1.3, 2.4, 0.1, C.terra); inDoor.position.set(2.9, 1.2, 4.42); interior.add(inDoor);
+  clickable(inDoor, { type: 'exit' });
+  const exitSign = planeWith(textTexture('EXIT', { w: 256, h: 80, bg: '#a03e22', fg: '#f7ecda', font: 'bold 44px "Trebuchet MS"' }), 0.8, 0.25, { emissive: 0xffffff, ei: 0.3 });
+  exitSign.position.set(2.9, 2.62, 4.34); exitSign.rotation.y = Math.PI; interior.add(exitSign);
+
+  // hanging lamps
+  [-2.4, 0, 2.4].forEach(x => {
+    const cord = cyl(0.015, 0.015, 0.5, 0x4a3a30, 8, { cast:false }); cord.position.set(x, ROOM.h - 0.25, 0); interior.add(cord);
+    const shade = cyl(0.28, 0.12, 0.28, C.terra, 24); shade.position.set(x, ROOM.h - 0.62, 0); interior.add(shade);
+    const bulb = sph(0.09, 0xffe2ae, { cast:false }); bulb.material.emissive = new THREE.Color(0xffc978); bulb.material.emissiveIntensity = 1.4; bulb.position.set(x, ROOM.h - 0.78, 0); interior.add(bulb);
+  });
+
+  // menu board - by-weight concept, broths & spice levels (inspired by real malatang shops)
+  const menuTex = textTexture(
+    ['TODAY 今日', 'Spicy Red 红汤 · Tomato 番茄', 'Golden Bone 金汤 · Dry Mala 干拌', 'Mild 微辣 Medium 中辣 Extra 特辣', 'pay by weight · per 100 g'],
+    { w: 768, h: 512, bg: '#5a3b28', fg: '#f7ecda', font: 'bold 56px "Trebuchet MS"', small: '34px "Trebuchet MS"' });
+  const menuFrame = box(0.08, 1.75, 2.55, C.woodD, { cast:false }); menuFrame.position.set(-4.6, 2.0, 0.4); interior.add(menuFrame);
+  const menu = planeWith(menuTex, 2.4, 1.6, { emissive: 0xffffff, ei: 0.12 });
+  menu.position.set(-4.53, 2.0, 0.4); menu.rotation.y = Math.PI / 2; interior.add(menu);
+
+  // ------- ingredient fridge (front-facing, 5 shelves) -------
+  const fridge = new THREE.Group(); fridge.position.set(0, 0, -3.95); interior.add(fridge);
+  const fW = 6.4, fH = 2.9, fD = 0.95;
+  const fBody = box(fW, fH, 0.22, 0xe4d2b2); fBody.position.set(0, fH / 2 + 0.12, -0.34); fridge.add(fBody);
+  [-1, 1].forEach(sg => { const cheek = box(0.14, fH, fD, 0xe4d2b2); cheek.position.set(sg * (fW / 2 - 0.07), fH / 2 + 0.12, 0); fridge.add(cheek); });
+  const fIn = box(fW - 0.3, fH - 0.35, 0.06, 0xe8f0e2, { emissive: 0xdcefe0, emissiveIntensity: 0.45, cast:false });
+  fIn.position.set(0, fH / 2 + 0.16, -0.21); fridge.add(fIn);
+  const fStrip = box(fW, 0.34, fD + 0.05, C.terra); fStrip.position.set(0, fH + 0.3, 0); fridge.add(fStrip);
+  const fStripT = planeWith(textTexture(['FRESH INGREDIENTS 新鲜食材', 'pay by weight · priced per 100 g'], { w: 1024, h: 160, bg: '#c1502f', fg: '#f7ecda', font: 'bold 62px "Trebuchet MS"', small: '38px "Trebuchet MS"' }), 6.8, 0.32, { emissive: 0xffffff, ei: 0.25 });
+  fStripT.scale.set(0.85,1,1); fStripT.position.set(0, fH + 0.3, fD / 2 + 0.04); fridge.add(fStripT);
+
+  const shelfYs = [0.42, 0.94, 1.46, 1.98, 2.5];
+  const trayW = 0.92, trayD = 0.62, trayH = 0.14;
+  shelfYs.forEach((sy, si) => {
+    const shelf = box(fW - 0.24, 0.05, fD - 0.16, 0xb08d5e); shelf.position.set(0, sy - 0.155, 0.1); fridge.add(shelf);
+    SHELVES[si].forEach((ing, ti) => {
+      const tx = -fW / 2 + 0.62 + ti * 1.04;
+      const rim = box(trayW + 0.04, 0.03, trayD + 0.04, 0xe8d5b8, { cast:false }); rim.position.set(tx, sy - trayH / 2 - 0.015, 0.12); fridge.add(rim);
+      const tray = box(trayW, trayH, trayD, 0xfbf1dd); tray.position.set(tx, sy, 0.12); fridge.add(tray);
+      TRAYPOS[ing.id] = new THREE.Vector3(tx, sy + 0.15, -3.95 + 0.12);
+      const pile = new THREE.Group(); pile.position.set(tx, sy + trayH / 2, 0.12); fridge.add(pile);
+      addPile(pile, ing);
+      const labTex = textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' });
+      const lab = planeWith(labTex, 0.78, 0.33); lab.position.set(tx, sy - 0.02, 0.12 + trayD / 2 + 0.045); lab.rotation.x = -0.25; fridge.add(lab);
+      const hit = box(trayW, 0.55, trayD + 0.1, 0xffffff, { cast:false, receive:false });
+      hit.material.visible = false; hit.position.set(tx, sy + 0.2, 0.12); fridge.add(hit);
+      clickable(hit, { type: 'pick', ing: ing.id });
+      clickable(tray, { type: 'pick', ing: ing.id });
+    });
+  });
+
+  // ------- counter with basket + scale -------
+  const counter = new THREE.Group(); counter.position.set(0, 0, 2.1); interior.add(counter);
+  const cBody = box(6.6, 0.95, 1.0, 0xcf9a6a); cBody.position.set(0, 0.5, 0); counter.add(cBody);
+  const cStripe = box(6.62, 0.18, 1.02, C.terra, { cast:false }); cStripe.position.set(0, 0.78, 0); counter.add(cStripe);
+  const cTop = box(6.6, 0.12, 1.1, C.wood); cTop.position.set(0, 1.02, 0); counter.add(cTop);
+
+  // basket (pink, translucent, with handle)
+  const basket = new THREE.Group(); basket.position.set(-1.1, 1.08, 0); counter.add(basket);
+  const bMat = new THREE.MeshStandardMaterial({ color: C.pink, transparent: true, opacity: 0.55, roughness: 0.35 });
+  const bBase = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.06, 0.7), bMat); bBase.position.y = 0.03; basket.add(bBase);
+  [[0, 0.22, 0.35, 1.05, 0.38, 0.04], [0, 0.22, -0.35, 1.05, 0.38, 0.04], [0.52, 0.22, 0, 0.04, 0.38, 0.7], [-0.52, 0.22, 0, 0.04, 0.38, 0.7]].forEach(a => {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(a[3], a[4], a[5]), bMat); w.position.set(a[0], a[1], a[2]); basket.add(w);
+  });
+  const handle = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.035, 10, 24, Math.PI), bMat);
+  handle.position.set(0, 0.42, 0); basket.add(handle);
+  const basketItems = new THREE.Group(); basketItems.position.y = 0.07; basket.add(basketItems);
+  basket.userData.itemsGroup = basketItems;
+  window.__basket3d = basket;
+  clickable(bBase, { type: 'basket' });
+
+  // scale
+  const scaleG = new THREE.Group(); scaleG.position.set(0.9, 1.08, 0); counter.add(scaleG);
+  const sBase = box(0.85, 0.09, 0.65, C.steel, { rough: 0.4, metal: 0.4 }); sBase.position.y = 0.045; scaleG.add(sBase);
+  const sPlate = cyl(0.3, 0.3, 0.04, 0xd8dde2, 28, { rough: 0.35, metal: 0.5 }); sPlate.position.y = 0.12; scaleG.add(sPlate);
+  const sNeck = box(0.1, 0.34, 0.08, C.steel, { rough: 0.4, metal: 0.4 }); sNeck.position.set(0, 0.26, -0.28); scaleG.add(sNeck);
+  const lcdCanvas = document.createElement('canvas'); lcdCanvasRef = lcdCanvas; lcdCanvas.width = 512; lcdCanvas.height = 192;
+  lcdCtx = lcdCanvas.getContext('2d');
+  lcdTex = new THREE.CanvasTexture(lcdCanvas); lcdTex.colorSpace = THREE.SRGBColorSpace;
+  lcdTex.wrapS = THREE.RepeatWrapping; lcdTex.repeat.x = -1; // read correctly from the customer side
+  const lcdFrame = box(0.82, 0.36, 0.06, 0x4a4038, { rough: 0.5 }); lcdFrame.position.set(0, 0.56, -0.32); scaleG.add(lcdFrame);
+  const lcd = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.27),
+    new THREE.MeshBasicMaterial({ map: lcdTex, side: THREE.DoubleSide }));
+  lcd.position.set(0, 0.56, -0.365); lcd.rotation.x = -0.12; scaleG.add(lcd);
+  clickable(sPlate, { type: 'weigh' }); clickable(sBase, { type: 'weigh' });
+
+  // sauce pots
+  [2.0, 2.45].forEach((x, i) => {
+    const pot = cyl(0.14, 0.11, 0.18, i ? C.terra : 0x8a5f3a); pot.position.set(x, 1.17, 0.1); counter.add(pot);
+  });
+
   // ------- guest NPC -------
   const guest = new THREE.Group(); guest.position.set(-2.1, 0, 3.1); interior.add(guest);
   const gBody = cyl(0.24, 0.3, 0.9, 0x7aa5c9); gBody.position.y = 0.85; guest.add(gBody);
@@ -402,7 +754,7 @@ let camTween = null; // {fromPos, toPos, fromQ, toQ, t}
 const NARROW = () => innerWidth < 600;
 const camPose = {
   get fridge()  { return NARROW() ? { pos: [0, 1.6, 0.6], yaw: Math.PI } : { pos: [0, 1.5, -0.55], yaw: Math.PI }; },
-  get counter() { return NARROW() ? { pos: [0.05, 1.8, -1.3], yaw: -0.06 } : { pos: [0.15, 1.62, 0.15], yaw: -0.14 }; },
+  get counter() { return NARROW() ? { pos: [0.15, 1.88, -2.2], yaw: 0.07 } : { pos: [0.15, 1.62, 0.15], yaw: -0.14 }; },
 };
 function flyTo(posArr, yaw, tilt = -0.06) {
   const toPos = new THREE.Vector3(posArr[0], posArr[1], posArr[2]);
