@@ -223,7 +223,7 @@
   <div class="card" style="position:relative">
     <button class="vbtn" id="min-receipt" style="margin-bottom:12px">Minimize receipt ↑</button><div class="stamp" id="rstamp">PAID</div>
     <h2>Xiaotong Malatang 麻辣烫</h2>
-    <div class="sub">*** GUEST RECEIPT ***</div>
+    <div class="sub">*** YOUR RECEIPT ***</div>
     <div id="sticker"></div>
     <div class="rline"><span>Weight</span><b id="rweight">-</b></div>
     <div class="rline"><span>Your guess / error</span><b id="rguess">-</b></div>
@@ -1072,7 +1072,7 @@ const EAT_LINES = [
 let eatIv = null;
 function sitAndEat() {
   $('receipt').style.display = 'none'; $('receipt-tab').hidden = true;
-  flyTo([4.15, 1.3, 0.2], -Math.PI / 2, 0.25);
+  flyTo([4.15, 1.25, 0.2], -Math.PI / 2, -0.45);
   if (!window.__eatBowl) {
     const eb = new THREE.Group(); eb.position.set(3.4, 0.86, 0.2);
     eb.add(cyl(0.24, 0.14, 0.18, 0xfdf6e9, 28));
@@ -1084,8 +1084,8 @@ function sitAndEat() {
   const t0 = performance.now();
   const walk = setInterval(() => {
     const k = Math.min(1, (performance.now() - t0) / 2200);
-    npc.position.lerpVectors(wfrom, wto, k); npc.rotation.y = Math.PI / 4;
-    if (k >= 1) clearInterval(walk);
+    npc.position.lerpVectors(wfrom, wto, k); npc.rotation.y = Math.PI + (Math.PI / 2 - Math.PI) * k;
+    if (k >= 1) { clearInterval(walk); npc.rotation.y = Math.PI / 2; }
   }, 30);
   $('eatpanel').hidden = false; let li = 0; const t1 = performance.now();
   $('eatline').textContent = EAT_LINES[0]; $('eatbar').style.width = '0%';
