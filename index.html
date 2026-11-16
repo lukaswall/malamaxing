@@ -1197,7 +1197,7 @@ let MUSIC=null;
 async function loadMusic(){ if(MUSIC)return MUSIC; try{const r=await fetch('./music.json',{cache:'no-cache'});if(!r.ok)throw Error();const tracks=(await r.json()).filter(t=>t&&/^[a-zA-Z0-9_-]{11}$/.test(t.id));if(!tracks.length)throw Error();MUSIC={tracks,ids:tracks.map(t=>t.id)};}catch(e){MUSIC=null;} return MUSIC; }
 function playTrack(t){
  if(!MUSIC)return;const ids=MUSIC.ids;
- $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;$('ticket').classList.add('collapsed');
+ $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;
  const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
  $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
 }
