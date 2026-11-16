@@ -399,9 +399,10 @@ function addPile(group, ing) {
    ============================================================ */
 const player = { x: 0, z: 6.8, yaw: Math.PI, area: 'exterior' };
 let camTween = null; // {fromPos, toPos, fromQ, toQ, t}
+const NARROW = () => innerWidth < 600;
 const camPose = {
-  fridge:  { pos: [0, 1.5, -0.55], yaw: Math.PI },
-  counter: { pos: [0.15, 1.62, 0.15], yaw: -0.14 },
+  get fridge()  { return NARROW() ? { pos: [0, 1.55, -1.9], yaw: Math.PI } : { pos: [0, 1.5, -0.55], yaw: Math.PI }; },
+  get counter() { return NARROW() ? { pos: [0.05, 1.78, -1.15], yaw: -0.06 } : { pos: [0.15, 1.62, 0.15], yaw: -0.14 }; },
 };
 function flyTo(posArr, yaw, tilt = -0.06) {
   const toPos = new THREE.Vector3(posArr[0], posArr[1], posArr[2]);
@@ -578,6 +579,7 @@ function act(a) {
 }
 
 function enterShop() {
+  hidePrompt();
   G.area = 'interior'; player.area = 'interior';
   exterior.visible = false; interior.visible = true;
   player.x = 2.6; player.z = 3.4; player.yaw = Math.PI;
@@ -589,6 +591,7 @@ function enterShop() {
   blip(520, 0.12, 'triangle'); setTimeout(() => blip(780, 0.14, 'triangle'), 120);
 }
 function exitShop() {
+  hidePrompt();
   G.area = 'exterior'; player.area = 'exterior';
   exterior.visible = true; interior.visible = false;
   player.x = 2.9; player.z = 1.2; player.yaw = Math.PI;
