@@ -1335,6 +1335,7 @@ async function lvStart(){
   ws.onopen=()=>{
     try{
       const ac=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+      if(ac.state==='suspended')ac.resume();
       LV.ac=ac; LV.playAt=ac.currentTime;
       const src=ac.createMediaStreamSource(stream); LV.src=src;
       const proc=ac.createScriptProcessor(4096,1,1); LV.proc=proc;
