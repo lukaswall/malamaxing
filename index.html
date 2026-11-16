@@ -754,7 +754,7 @@ function clampPlayer() {
    ============================================================ */
 const G = {
   started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
-  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, muted:false, voiceEnabled:false,
+  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
 };
 const $ = id => document.getElementById('id'.length ? id : id);
 
@@ -950,6 +950,7 @@ function serveGuest() {
   const drinkC = Math.round((G.drink?.price || 0) * 100);
   const earned = (bowlC + drinkC + Math.round(tipC)) / 100;
   G.earnings += earned; G.served++;
+  G.lastBill = { bowlC, drinkC, tipC: Math.round(tipC), earnedC: bowlC + drinkC + Math.round(tipC) };
   $('earnings').textContent = ' ' + fmt(G.earnings);
 
   $('rweight').textContent = w + ' g'; $('rguess').textContent = G.guess + ' g (' + (G.guess>w?'+':'') + (G.guess-w) + ' g)';
@@ -1057,7 +1058,7 @@ $('close-drinks').onclick=()=>{$('drinkmodal').style.display='none';};
 function renderDrinks(){
  const d=$('drinkopts'); d.innerHTML='';
  const options=[['No drink','不加饮料','−',0],...DRINKS];
- options.forEach(([name,cn,icon,price])=>{const b=document.createElement('button'); b.className='opt'; b.innerHTML=`${icon} ${name}<small>${cn} · ${fmt(price)}</small>`; b.onclick=()=>{G.drink=price?{name,price}:null; $('drinkchoice').textContent=G.drink?`${name} · ${fmt(price)} (extra)`:'No drink selected'; blip(); $('drinkmodal').style.display='none';}; d.appendChild(b);});
+ options.forEach(([name,cn,icon,price])=>{const b=document.createElement('button'); b.className='opt';const free=G.freeDrink&&price>0; b.innerHTML=`${icon} ${name}<small>${cn} · ${free?'FREE · prize wheel':fmt(price)}</small>`; b.onclick=()=>{G.drink=price?{name,price:free?0:price}:null; if(free)G.freeDrink=false; $('drinkchoice').textContent=G.drink?`${name} · ${free?'FREE · prize wheel':fmt(price)+' (extra)'}`:'No drink selected'; blip(); $('drinkmodal').style.display='none';}; d.appendChild(b);});
 }
 function finishPayment(method){ G.payment=method; $('paymodal').style.display='none'; blip(880,0.12,'sine'); setTimeout(()=>blip(1320,0.15,'sine'),150); serveGuest(); }
 $('tap-card').onclick=()=>finishPayment('card'); $('pay-cash').onclick=()=>finishPayment('cash');
@@ -1189,9 +1190,15 @@ function applyWheel(){
  $('wheel').style.transform='rotate(0deg)';requestAnimationFrame(()=>{$('wheel').style.transform=`rotate(${1080+i*60+Math.random()*45}deg)`;});
 }
 $('spin').onclick=()=>{
- if(G.wheel==null||G.wheel.applied)return;const w=basketWeight();const priceC=Math.round(basketPrice()*100);const drinkC=Math.round((G.drink?.price||0)*100);
- if(G.wheel.label==='Free drink next guest'){G.freeDrink=true;G.earnings+=priceC/100;$('earnings').textContent='💰 '+fmt(G.earnings);}
- else{const discount=Math.round(priceC*G.wheel.disc);G.earnings+=discount/100;$('earnings').textContent='💰 '+fmt(G.earnings);$('rwheel').textContent=G.wheel.label+(discount?' (-'+fmt(discount/100)+')':'');}
+ if(G.wheel==null||G.wheel.applied||!G.lastBill)return;
+ const b=G.lastBill;const discountC=Math.round(b.bowlC*G.wheel.disc);
+ if(G.wheel.label==='Free drink next guest'){G.freeDrink=true;$('rwheel').textContent='Free drink for the next guest';}
+ else if(discountC>0){
+  b.earnedC-=discountC;G.earnings=Math.round((G.earnings*100-discountC))/100;
+  $('earnings').textContent=' '+fmt(G.earnings);
+  $('rwheel').textContent=G.wheel.label+' (-'+fmt(discountC/100)+')';
+  $('rtotal').textContent=fmt(b.earnedC/100);
+ } else $('rwheel').textContent=G.wheel.label;
  G.wheel.applied=true;$('spin').disabled=true;$('spin').textContent=G.wheel.label;$('spin-result').textContent='In-game reward only.';blip(880,.1);setTimeout(()=>blip(1174,.15),120);
 };
 // debug/testing hook
