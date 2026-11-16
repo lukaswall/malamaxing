@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MALAMAXING 麻辣烫 - Malatang Shop Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Xiaotong Malatang 麻辣烫 - Malatang Shop Game</title>
 <style>
   :root{
     --cream:#f7ecda; --cream2:#f2e2c8; --terra:#c1502f; --terra-d:#a03e22;
@@ -122,6 +122,42 @@
     #views{top:58px}
     .vbtn{padding:8px 11px;font-size:12px}
   }
+
+  [hidden]{display:none!important}
+  .panel-toggle{font:inherit;font-weight:bold;font-size:12px;border:0;background:none;color:var(--terra);cursor:pointer;text-align:left;width:100%;padding:4px 0;display:flex;justify-content:space-between;gap:8px}
+  .collapsed .panel-content{display:none}
+  .ticket{top:12px;bottom:auto;max-height:42vh;overflow:auto}
+  #zoomtools{position:absolute;bottom:150px;right:12px;display:flex;gap:4px;pointer-events:auto}
+  #receipt-tab{z-index:28;position:absolute;top:12px;left:50%;transform:translateX(-50%);pointer-events:auto}
+  .easy-enter{position:absolute;top:55%;left:50%;transform:translateX(-50%);background:var(--terra);color:white;pointer-events:auto}
+  #ingredient-drawer{position:absolute;right:12px;top:54px;bottom:150px;width:min(430px,94vw);padding:10px;background:var(--paper);border-radius:14px;box-shadow:0 8px 35px #5a3b2866;pointer-events:auto;overflow:auto;touch-action:pan-y;z-index:20}
+  #ingredient-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+  .ingredient{padding:10px 5px;background:#f4e7cf;border:1px solid #dfc69f;border-radius:8px;color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+  .ingredient:active{background:#e6b7a4;transform:scale(.96)}
+  .ingredient small{display:block;font-size:10px;color:#987755;margin-top:3px}
+  #title{overflow:auto;padding:20px 10px;justify-content:safe center;touch-action:pan-y}
+  #title .sign h1{font-size:clamp(21px,4vw,36px);letter-spacing:1px}
+  #title p{margin:6px 0 12px}
+  .card{touch-action:pan-y}
+  .terminal{background:#263f36;color:#a7ffc5;border:12px solid #36413c;border-bottom-width:30px;border-radius:14px;padding:20px;text-align:center;line-height:1.8;margin:12px 0 20px}
+  #pay-cash{width:100%;margin-top:15px}
+  #reveal{padding:10px;background:#e6edce;color:#465329;font-weight:bold}
+  @media (orientation:landscape) and (max-height:600px){
+    .ticket{width:176px;font-size:11px;max-height:50vh}.ticket .row{font-size:10px}
+    #views{top:10px;left:200px;right:85px;flex-direction:row;flex-wrap:wrap;gap:4px}.vbtn{padding:7px 9px;font-size:11px}
+    #earnings{top:10px;right:8px;font-size:10px;padding:7px}
+    #basketbar{left:auto;right:10px;bottom:10px;transform:none;max-width:45vw;min-width:200px}
+    #zoomtools{bottom:100px;right:10px}#joy{width:100px;height:100px;left:15px;bottom:15px;display:block}
+    #ingredient-drawer{top:65px;bottom:12px;width:55vw}#ingredient-list{grid-template-columns:repeat(4,1fr)}
+    #title .sign{padding:8px 20px;margin-bottom:4px}#title p{font-size:11px;max-width:600px;margin:3px 0 7px}#title .optgrid{grid-template-columns:repeat(4,1fr);width:90vw!important;margin-bottom:5px}#title .opt{padding:6px;font-size:11px}#title .cta{padding:8px 25px}
+    .card{max-height:94vh;width:min(550px,90vw);padding:15px 20px}#receipt .card{width:420px}
+  }
+
+
+ #voicemodal label{display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:6px;margin:9px 0}#voicemodal select{max-width:65%;padding:6px;border:1px solid #dac3a4;border-radius:6px;background:white;color:var(--ink)}.chatlog{padding:12px;background:#f1e3cb;border-radius:8px;font-size:13px;line-height:1.5;margin:10px 0}#voice-status{margin-top:12px}#voice-start{margin-top:6px}
+ @media(max-width:600px){#views{gap:5px}.vbtn{padding:7px 10px}#zoomtools{bottom:162px}}
+ #greeting{position:absolute;top:60px;left:12px;max-width:210px;background:var(--paper);border:1px solid #dfc69f;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;pointer-events:none;z-index:25} @media(orientation:landscape) and (max-height:600px){#greeting{top:72px;max-width:180px;font-size:10px}#title .sign h2{display:none}#title .sign{margin-bottom:3px}#loading{margin-top:4px}#voice-start,#enable-voices{font-size:10px;padding:5px 10px}}
+#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:240px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#views{max-width:150px}}
 </style>
 </head>
 <body>
@@ -129,58 +165,65 @@
 
 <div id="hud">
   <div class="ticket" id="ticket" style="display:none">
-    <h3>🧾 Guest Order</h3>
+    <button id="ticket-toggle" class="panel-toggle" aria-expanded="true"> <span id="order-summary">Guest order</span> <span>− / +</span></button><div class="panel-content">
     <div class="row"><span>Guest</span><b id="tname">-</b></div>
     <div class="row"><span>Budget</span><b id="tbudget">-</b></div>
     <div class="row"><span>Target weight</span><b id="ttarget">-</b></div>
     <div class="row"><span>Shop rate</span><b id="trate">-</b></div>
     <div class="row"><span>Broth</span><b id="tbroth">-</b></div>
     <div class="row"><span>Spice</span><b id="tspice">-</b></div>
-    <div class="req" id="treq"></div>
+    <div class="req" id="treq"></div></div>
   </div>
 
-  <div id="earnings" style="display:none">💰 €0.00</div>
+  <div id="earnings" style="display:none"> €0.00</div>
 
   <div id="views">
-    <button class="vbtn" id="v-fridge">🥬 Fridge</button>
-    <button class="vbtn" id="v-counter">⚖️ Counter</button>
-    <button class="vbtn" id="v-door">🚪 Door</button>
-    <button class="vbtn serve" id="v-serve">✅ Weigh &amp; Serve</button>
+    <button class="vbtn" id="v-fridge"> Fridge</button>
+    <button class="vbtn" id="v-counter"> Counter</button>
+    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open">Music</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-door"> Door</button>
+    <button class="vbtn serve" id="v-serve"> Commit &amp; weigh</button>
   </div>
 
   <div id="basketbar">
     <div class="bhead">
-      <span class="btitle">🧺 Your basket</span>
-      <span class="btotal" id="btotal">0 g · €0.00</span>
+      <button id="basket-toggle" class="panel-toggle" aria-expanded="true"> Basket − / +</button>
+      <span class="btotal" id="btotal">weight hidden</span>
     </div>
-    <div id="basketitems"></div>
-    <div id="baskethint">tap an item to put it back</div>
+    <div class="panel-content"><div id="basketitems"></div>
+    <div id="baskethint">One piece per tap. Weights are estimates. Tap to remove before committing.</div></div>
   </div>
 
-  <div id="prompt"></div>
+  <button class="vbtn easy-enter" id="enter-easy" hidden>Enter shop →</button>
+  <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">−</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">＋</button><button class="vbtn" id="sound"> Sound on</button></div>
+  <button id="receipt-tab" class="vbtn" hidden> Show receipt</button>
+  <div id="ingredient-drawer" hidden><button id="close-ingredients" class="vbtn">Close ingredients ×</button><div id="ingredient-list"></div></div>
+  <div id="greeting" hidden></div><div id="prompt"></div>
 
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
+<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Tap a song to start. The visible player stays on screen; hiding it stops playback. Availability, ads and background playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
+<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px"><span id="music-title"></span><button id="music-stop" class="vbtn">Stop ×</button></div><div id="music-frame"></div></div>
+<div class="modal" id="guessmodal"><div class="card"><h2>What does your bowl weigh?</h2><p class="sub" id="guess-help">Enter your own estimate before the scale reveals the answer. This locks the basket, even if it is below the shop minimum.</p><label for="guess-input">Your guess, in grams</label><input id="guess-input" type="number" inputmode="numeric" min="1" max="5000" step="1" style="width:100%;padding:14px;margin:12px 0;font-size:20px"><button class="cta" id="lock-guess">Lock guess &amp; weigh</button><button class="vbtn" id="cancel-guess" style="margin-top:12px">Keep picking</button></div></div>
 <div class="modal" id="brothmodal">
   <div class="card">
-    <h2>Choose the broth</h2>
+    <div class="sub" id="reveal"></div><h2>Choose the broth</h2>
     <div class="sub" id="brothreq">The guest asked for…</div>
     <div class="optgrid" id="brothopts"></div>
-    <h2 style="font-size:16px">Spice level 🌶️</h2>
+    <h2 style="font-size:16px">Spice level </h2>
     <div class="optgrid" id="spiceopts" style="grid-template-columns:1fr 1fr 1fr"></div>
-    <button class="cta" id="servebtn">Cook &amp; Serve 🍜</button>
+    <p id="drinkchoice" class="sub">No drink selected. Drinks are optional extras.</p><button class="cta" id="servebtn">Cook &amp; pay </button>
   </div>
 </div>
 
 <div class="modal" id="receipt">
   <div class="card" style="position:relative">
-    <div class="stamp" id="rstamp">PAID</div>
-    <h2>MALAMAXING 麻辣烫</h2>
+    <button class="vbtn" id="min-receipt" style="margin-bottom:12px">Minimize receipt ↑</button><div class="stamp" id="rstamp">PAID</div>
+    <h2>Xiaotong Malatang 麻辣烫</h2>
     <div class="sub">*** GUEST RECEIPT ***</div>
-    <div id="sticker">🍜</div>
+    <div id="sticker"></div>
     <div class="rline"><span>Weight</span><b id="rweight">-</b></div>
-    <div class="rline"><span>Target</span><b id="rtarget">-</b></div>
+    <div class="rline"><span>Your guess / error</span><b id="rguess">-</b></div><div class="rline"><span>Guest target</span><b id="rtarget">-</b></div>
     <div class="rline"><span>Error</span><b id="rerror">-</b></div>
     <div class="rline"><span>Price</span><b id="rprice">-</b></div>
     <div class="rline"><span>Budget</span><b id="rbudget">-</b></div>
@@ -189,26 +232,1002 @@
       <div class="blabel"><span>WEIGHT</span><span id="sweight">0</span></div><div class="bar"><i id="bweight"></i></div>
       <div class="blabel"><span>SPEED</span><span id="sspeed">0</span></div><div class="bar"><i id="bspeed"></i></div>
     </div>
-    <div class="rline"><span>Tip</span><b id="rtip">-</b></div>
+    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="sub" id="rpayment"></div><div class="rline"><span>Tip</span><b id="rtip">-</b></div>
     <div class="rline big"><span>TOTAL EARNED</span><b id="rtotal">-</b></div>
     <div class="sub" id="rcomment" style="text-align:center;margin-top:10px"></div>
     <button class="cta" id="nextguest">Next guest →</button>
   </div>
 </div>
 
+<div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close ×</button></div></div>
+<div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
+<div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
+<label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">中文普通话</option></select></label>
+<label>Guest voice <select id="guest-voice"></select></label><label>Lukas / 卢卡斯 voice <select id="cashier-voice"></select></label>
+<p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "两个鱼丸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / 输入指令" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div><button class="vbtn" id="voice-close">Close ×</button></div></div>
 <div id="title">
-  <div class="sign"><h1>MALAMAXING</h1><h2>麻 辣 烫</h2></div>
-  <p>Run your own malatang shop. Walk in, fill your basket from the fridge,
-     weigh it on the scale, pick the broth and spice - hit the guest's target
-     weight without blowing the budget.</p>
+  <div class="sign"><h1>Xiaotong Malatang</h1><h2>麻 辣 烫</h2></div>
+  <p>Guess the bowl weight, one piece at a time. Fill the basket without seeing the grams. Commit to the scale, choose broth and spice, then pay at the terminal.</p>
   <p style="font-size:12.5px;color:#a08362;margin:0 0 8px">Pick your city's shop - real pay-by-weight rates:</p>
   <div class="optgrid" id="shopopts" style="width:min(420px,90vw)"></div>
   <p style="font-size:10.5px;color:#b09a7c;margin:2px 0 14px">Rates from real shops: YGF Barcelona €2.19/100 g · Yangguofu Berlin €3.19/100 g · YGF NYC $15/lb · Bone Soup Toronto CA$3.50/100 g</p>
-  <button class="cta" id="startbtn">Open the shop 🏮</button>
-  <p style="font-size:12px;margin-top:16px;color:#b0906c">WASD / joystick to walk · drag to look · click / tap to pick</p>
-  <div id="loading">loading…</div>
+  <button class="cta" id="startbtn">Open the shop </button>
+  <p style="font-size:12px;margin-top:16px;color:#b0906c">Tap Enter shop and Ingredients for easy controls. Drag to look, pinch / scroll or ± to zoom. Rotate your phone for landscape.</p>
+  <p style="font-size:12px;margin:6px 0">Xiaotong is the manager. Lukas / 卢卡斯 is your cashier.<br>Turn up your volume for optional voices.</p><button class="vbtn" id="enable-voices">Enable voices &amp; welcome</button><button class="vbtn" id="voice-start"> Voice &amp; language</button><div id="loading">loading…</div>
 </div>
 
-<script type="module" src="./main.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
+
+/* ============================================================
+   Xiaotong Malatang 麻辣烫 - a playable low-poly 3D malatang shop
+   Realism grounding (from public sources):
+   - by-weight malatang shops charge ~S$2.4-2.98 / 100 g
+   - Zhang Liang: S$2.88/100 g with a 300 g minimum bowl
+   - most diners build a 450-600 g bowl
+   Portion grams below are realistic per-grab estimates
+   (e.g. fish ball ~20 g, quail egg ~10 g, noodle cake ~85 g).
+   ============================================================ */
+
+// ---------- palette ----------
+const C = {
+  cream: 0xf7ecda, paper: 0xfdf6e9,
+  terra: 0xc1502f, terraD: 0x9c3b20, ink: 0x5a3b28,
+  wood: 0xb98a5e, woodD: 0x8a5f3a, floor: 0xe8d3ae,
+  pink: 0xe86a8a, steel: 0xb9bfc6, fridgeIn: 0xfef6e6,
+  sky: 0xf9efe0,
+};
+
+// Real-shop rates, normalized per 100 g (sources in README):
+//  - YGF Malatang Barcelona: EUR 2.19/100 g, 400 g minimum (2024 press)
+//  - Yangguofu Malatang Berlin: EUR 3.19/100 g (official menu)
+//  - YGF Malatang NYC: USD 15/lb = USD 3.31/100 g (Eater NY, 2024)
+//  - Bone Soup Malatang Toronto: CAD 3.50/100 g, ~400 g minimum (2026 report)
+const SHOPS = [
+  { id:'es', flag:'', city:'Barcelona', name:'YGF Malatang', rate:2.19, cur:'€', min:400 },
+  { id:'de', flag:'', city:'Berlin',    name:'Yangguofu Malatang', rate:3.19, cur:'€', min:300 },
+  { id:'us', flag:'', city:'New York',  name:'YGF Malatang', rate:3.31, cur:'$', min:340 },
+  { id:'ca', flag:'', city:'Toronto',   name:'Bone Soup Malatang', rate:3.50, cur:'CA$', min:400 },
+];
+function rate() { return G.shop.rate; }
+function minG() { return G.shop.min; }
+function fmt(p) { return G.shop.cur + p.toFixed(2); }
+
+// ---------- ingredients (5 shelves x 6 trays) ----------
+const SHELVES = [
+  [ // greens & veg
+    { id:'bokchoy',  name:'Bok Choy',    cn:'上海青', color:0x4f9b4f, g:25, shape:'leaf'  },
+    { id:'napa',     name:'Napa Cabbage',cn:'白菜',   color:0x9cc47a, g:18, shape:'leaf'  },
+    { id:'broccoli', name:'Broccoli',    cn:'西兰花', color:0x3f7d3a, g:15, shape:'ball'  },
+    { id:'corn',     name:'Corn',        cn:'玉米',   color:0xf2c14e, g:30, shape:'stick' },
+    { id:'potato',   name:'Potato',      cn:'土豆',   color:0xd9b06a, g:10, shape:'slice' },
+    { id:'lotus',    name:'Lotus Root',  cn:'藕片',   color:0xe8d9c0, g:8, shape:'slice' },
+  ],
+  [ // mushrooms & tofu
+    { id:'enoki',    name:'Enoki',       cn:'金针菇', color:0xf0e6d0, g:5, shape:'stick' },
+    { id:'woodear',  name:'Wood Ear',    cn:'木耳',   color:0x4a3a30, g:3, shape:'leaf'  },
+    { id:'kelp',     name:'Kelp',        cn:'海带',   color:0x2f5d4a, g:5, shape:'slice' },
+    { id:'tofupuff', name:'Tofu Puff',   cn:'油豆腐', color:0xe8b45a, g:8, shape:'cube'  },
+    { id:'frozentofu',name:'Frozen Tofu',cn:'冻豆腐', color:0xf5efdf, g:12, shape:'cube'  },
+    { id:'porkblood',name:'Beef Tendon', cn:'牛筋', color:0xd9c299, g:12, shape:'tendon'  },
+  ],
+  [ // noodles & staples
+    { id:'glass',    name:'Sweet Potato Noodles',cn:'红薯粉', color:0xeef2f0, g:5, shape:'nest'  },
+    { id:'instant',  name:'Instant Noodles',cn:'方便面',color:0xf0cf7a, g:85, shape:'nest' },
+    { id:'ricecake', name:'Rice Cake',   cn:'年糕',   color:0xf8f4ec, g:8, shape:'stick' },
+    { id:'quail',    name:'Quail Egg',   cn:'鹌鹑蛋', color:0xf3e9d8, g:10, shape:'ball'  },
+    { id:'luncheon', name:'Luncheon Meat',cn:'午餐肉',color:0xd98a86, g:12, shape:'slice' },
+    { id:'sausage',  name:'Sausage',     cn:'香肠',   color:0xb4503c, g:20, shape:'stick' },
+  ],
+  [ // seafood 1
+    { id:'fishtofu', name:'Fish Tofu',   cn:'鱼豆腐', color:0xf2e3b3, g:15, shape:'cube'  },
+    { id:'crab',     name:'Crab Stick',  cn:'蟹棒',   color:0xf08a6a, g:15, shape:'stick' },
+    { id:'fishball', name:'Fish Ball',   cn:'鱼丸',   color:0xf0e8dc, g:20, shape:'ball'  },
+    { id:'cuttlefish',name:'Frog Leg Cut', cn:'牛蛙', color:0xc4ae92, g:22, shape:'frog'  },
+    { id:'shrimp',   name:'Shrimp',      cn:'虾',     color:0xf28a5a, g:12, shape:'ball'  },
+    { id:'octopus', name:'Crab Piece', cn:'螃蟹', color:0xde743f, g:25, shape:'crab'  },
+  ],
+  [ // seafood 2 & meat
+    { id:'clam',     name:'Clam',        cn:'蛤蜊',   color:0xc9b49a, g:12, shape:'ball'  },
+    { id:'mussel',   name:'Mussel',      cn:'青口',   color:0x5a6a7a, g:15, shape:'ball'  },
+    { id:'lamb', name:'Lamb Roll', cn:'羊肉卷', color:0xc96a6a, g:8, shape:'roll' },
+    { id:'beef',     name:'Beef',        cn:'牛肉',   color:0xa84a4a, g:8, shape:'slice' },
+    { id:'cuttleball',name:'Cuttlefish Ball',cn:'墨鱼丸',color:0xe4d8e8, g:20, shape:'ball' },
+    { id:'tofuskin', name:'Tofu Skin',   cn:'豆腐皮', color:0xecd9a8, g:6, shape:'slice' },
+  ],
+];
+const ING = {}; SHELVES.flat().forEach(i => ING[i.id] = i);
+const TRAYPOS = {};
+
+const BROTHS = [
+  { id:'red',    name:'Classic Spicy Red', cn:'经典红汤' },
+  { id:'tomato', name:'Tomato',            cn:'番茄汤'   },
+  { id:'bone',   name:'Golden Bone',       cn:'金汤'     },
+  { id:'dry',    name:'Dry Mala',          cn:'干拌'     },
+];
+const SPICES = [
+  { id:'mild',   name:'Mild',   cn:'微辣' },
+  { id:'medium', name:'Medium', cn:'中辣' },
+  { id:'extra',  name:'Extra',  cn:'特辣' },
+];
+const GUEST_NAMES = ['Wei','Lena','Marc','Aisha','Pau','Sofia','Jon','Marta','Chen','Nora','Oriol','Liu','Anna','Ravi','Júlia','Kenji'];
+
+// ---------- renderer ----------
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(C.sky);
+scene.fog = new THREE.Fog(C.sky, 18, 42);
+
+const camera = new THREE.PerspectiveCamera(innerWidth/innerHeight < 0.75 ? 74 : 62, innerWidth/innerHeight, 0.1, 100);
+
+// lights
+const hemi = new THREE.HemisphereLight(0xfff4e0, 0xd8bd96, 0.85); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff0d8, 1.35);
+sun.position.set(6, 10, 8); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+const warmIn = new THREE.PointLight(0xffd9a0, 0.0, 12, 1.6); warmIn.position.set(0, 2.9, 0); scene.add(warmIn);
+
+// ---------- helpers ----------
+function box(w, h, d, color, opts = {}) {
+  const m = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.85, metalness: opts.metal ?? 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1, emissive: opts.emissive ?? 0x000000,
+      emissiveIntensity: opts.emissiveIntensity ?? 1 })
+  );
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function cyl(rt, rb, h, color, seg = 20, opts = {}) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.8, metalness: opts.metal ?? 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1, emissive: opts.emissive ?? 0x000000 }));
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function sph(r, color, opts = {}) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14),
+    new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? 0.75, metalness: 0.02,
+      transparent: !!opts.transparent, opacity: opts.opacity ?? 1 }));
+  m.castShadow = opts.cast ?? true; m.receiveShadow = opts.receive ?? true;
+  return m;
+}
+function textTexture(lines, { w = 512, h = 256, bg = null, fg = '#5a3b28', font = 'bold 64px "Trebuchet MS", sans-serif', small = null, pad = 20 } = {}) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const arr = Array.isArray(lines) ? lines : [lines];
+  g.font = font;
+  const lh = h / arr.length;
+  arr.forEach((t, i) => {
+    if (small && i > 0) g.font = small;
+    g.fillText(t, w / 2, lh * (i + 0.5), w - pad * 2);
+  });
+  const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
+  return tx;
+}
+function planeWith(tex, w, h, opts = {}) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9,
+      emissive: opts.emissive ?? 0x000000, emissiveIntensity: opts.ei ?? 0.4,
+      emissiveMap: opts.emissive ? tex : null }));
+  m.castShadow = false; m.receiveShadow = false;
+  return m;
+}
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+// ---------- clickables ----------
+const clickables = [];
+function clickable(mesh, data) { mesh.userData.act = data; clickables.push(mesh); return mesh; }
+
+/* ============================================================
+   EXTERIOR
+   ============================================================ */
+const exterior = new THREE.Group(); scene.add(exterior);
+const interiorVisInit = () => {}; // visibility managed below
+{
+  const street = box(40, 0.1, 10, 0xcbb79b, { cast:false }); street.position.set(0, -0.05, 6.5); exterior.add(street);
+  const walk = box(40, 0.12, 4, 0xe6d4b4, { cast:false }); walk.position.set(0, 0, 0.8); exterior.add(walk);
+
+  const wall = box(11, 4.6, 0.4, C.cream, { cast:false }); wall.position.set(0, 2.3, -1); exterior.add(wall);
+  const base = box(11.2, 0.5, 0.5, C.terraD, { cast:false }); base.position.set(0, 0.25, -0.95); exterior.add(base);
+
+  // terracotta sign
+  const sign = box(8.6, 1.15, 0.28, C.terra); sign.position.set(0, 3.75, -0.72); exterior.add(sign);
+  const signTex = textTexture(['Xiaotong Malatang', '麻 辣 烫'], { w: 1024, h: 256, bg: '#c1502f', fg: '#f7ecda', font: 'bold 92px "Trebuchet MS", sans-serif', small: '64px "Trebuchet MS", sans-serif' });
+  const signFace = planeWith(signTex, 8.2, 1.0, { emissive: 0xffffff, ei: 0.25 });
+  signFace.position.set(0, 3.75, -0.565); exterior.add(signFace);
+
+  // window glow
+  const winFrame = box(4.9, 2.5, 0.08, C.woodD, { cast:false }); winFrame.position.set(-2.2, 1.7, -0.83); exterior.add(winFrame);
+  const win = box(4.6, 2.2, 0.1, 0xffe9c4, { emissive: 0xffd9a0, emissiveIntensity: 0.7, cast:false });
+  win.position.set(-2.2, 1.7, -0.76); exterior.add(win);
+
+  // door
+  const doorFrame = box(1.7, 2.7, 0.14, C.woodD, { cast:false }); doorFrame.position.set(2.9, 1.35, -0.8); exterior.add(doorFrame);
+  const door = box(1.3, 2.4, 0.1, C.terra); door.position.set(2.9, 1.2, -0.72); exterior.add(door);
+  const doorGlass = box(0.9, 1.2, 0.04, 0xffe9c4, { emissive: 0xffd9a0, emissiveIntensity: 0.6 }); doorGlass.position.set(2.9, 1.65, -0.66); exterior.add(doorGlass);
+  clickable(door, { type: 'enter' }); clickable(doorGlass, { type: 'enter' }); clickable(doorFrame, { type: 'enter' });
+
+  // awning
+  const awn = box(6.4, 0.1, 1.4, C.terra, { cast:false }); awn.position.set(-1.2, 2.95, -0.1); awn.rotation.x = 0.28; exterior.add(awn);
+  for (let i = 0; i < 6; i++) { const s = box(0.5, 0.02, 1.35, C.cream, { cast:false }); s.position.set(-3.9 + i * 1.1, 2.96, -0.09); s.rotation.x = 0.28; exterior.add(s); }
+
+  // planters
+  [-4.6, 4.6].forEach(x => {
+    const pot = cyl(0.35, 0.28, 0.5, C.terra); pot.position.set(x, 0.25, 0.6); exterior.add(pot);
+    const bush = sph(0.42, 0x6f9b57); bush.position.set(x, 0.85, 0.6); exterior.add(bush);
+    const bush2 = sph(0.28, 0x86ad66); bush2.position.set(x + 0.2, 1.1, 0.5); exterior.add(bush2);
+  });
+
+  // neighbours
+  [[-9.5, 0xd9c4a2], [9.5, 0xd3b894]].forEach(([x, c]) => {
+    const b = box(7.5, 5.2, 0.6, c, { cast:false }); b.position.set(x, 2.6, -1.2); exterior.add(b);
+    const r = box(7.9, 0.4, 0.9, 0x9c5f3a, { cast:false }); r.position.set(x, 5.3, -1.1); exterior.add(r);
+  });
+
+  // street lamp
+  const pole = cyl(0.06, 0.08, 3.6, 0x6b5642); pole.position.set(-5.8, 1.8, 2.2); exterior.add(pole);
+  const lampBall = sph(0.22, 0xffe2ae, { cast:false }); lampBall.material.emissive = new THREE.Color(0xffc978); lampBall.position.set(-5.8, 3.7, 2.2); exterior.add(lampBall);
+}
+
+/* ============================================================
+   INTERIOR
+   ============================================================ */
+const interior = new THREE.Group(); interior.visible = false; scene.add(interior);
+const ROOM = { x: 4.5, h: 3.4 };
+let lcdTex, lcdCtx, lcdCanvasRef;
+
+function drawLCD(weightG, priceE) {
+  const g = lcdCtx; if (!g) return;
+  g.fillStyle = '#1e3a24'; g.fillRect(0, 0, 512, 192);
+  g.strokeStyle = '#2e5c38'; g.lineWidth = 8; g.strokeRect(6, 6, 500, 180);
+  g.fillStyle = '#8dff9a'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'bold 74px "Courier New", monospace';
+  g.fillText(weightG == null ? 'GUESS' : `${weightG} g`, 256, 60);
+  g.font = 'bold 54px "Courier New", monospace';
+  g.fillText(priceE == null ? 'LOCK TO WEIGH' : `${G.shop.cur}${priceE.toFixed(2)}`, 256, 140);
+  lcdTex.needsUpdate = true;
+}
+
+{
+  const floor = box(ROOM.x * 2 + 0.4, 0.12, 9.4, C.floor, { cast:false }); floor.position.set(0, -0.06, 0); interior.add(floor);
+  for (let i = -4; i <= 4; i++) {
+    const l1 = box(0.03, 0.005, 9.2, 0xd9c39c, { cast:false }); l1.position.set(i, 0.005, 0); interior.add(l1);
+    const l2 = box(9.2, 0.005, 0.03, 0xd9c39c, { cast:false }); l2.position.set(0, 0.005, i); interior.add(l2);
+  }
+  const wallB = box(9.4, ROOM.h, 0.25, C.cream, { cast:false }); wallB.position.set(0, ROOM.h / 2, -4.5); interior.add(wallB);
+  const wallL = box(0.25, ROOM.h, 9.4, C.cream, { cast:false }); wallL.position.set(-4.7, ROOM.h / 2, 0); interior.add(wallL);
+  const wallR = box(0.25, ROOM.h, 9.4, C.cream, { cast:false }); wallR.position.set(4.7, ROOM.h / 2, 0); interior.add(wallR);
+  const wallF = box(9.4, ROOM.h, 0.25, C.cream, { cast:false }); wallF.position.set(0, ROOM.h / 2, 4.5); interior.add(wallF);
+  const ceil = box(9.4, 0.15, 9.4, 0xfaf2e2, { cast:false }); ceil.position.set(0, ROOM.h + 0.07, 0); interior.add(ceil);
+  const sk = box(9.3, 0.22, 0.05, C.terra, { cast:false }); sk.position.set(0, 0.11, -4.35); interior.add(sk);
+
+  // inside door
+  const inDoor = box(1.3, 2.4, 0.1, C.terra); inDoor.position.set(2.9, 1.2, 4.42); interior.add(inDoor);
+  clickable(inDoor, { type: 'exit' });
+  const exitSign = planeWith(textTexture('EXIT', { w: 256, h: 80, bg: '#a03e22', fg: '#f7ecda', font: 'bold 44px "Trebuchet MS"' }), 0.8, 0.25, { emissive: 0xffffff, ei: 0.3 });
+  exitSign.position.set(2.9, 2.62, 4.34); exitSign.rotation.y = Math.PI; interior.add(exitSign);
+
+  // hanging lamps
+  [-2.4, 0, 2.4].forEach(x => {
+    const cord = cyl(0.015, 0.015, 0.5, 0x4a3a30, 8, { cast:false }); cord.position.set(x, ROOM.h - 0.25, 0); interior.add(cord);
+    const shade = cyl(0.28, 0.12, 0.28, C.terra, 24); shade.position.set(x, ROOM.h - 0.62, 0); interior.add(shade);
+    const bulb = sph(0.09, 0xffe2ae, { cast:false }); bulb.material.emissive = new THREE.Color(0xffc978); bulb.material.emissiveIntensity = 1.4; bulb.position.set(x, ROOM.h - 0.78, 0); interior.add(bulb);
+  });
+
+  // menu board - by-weight concept, broths & spice levels (inspired by real malatang shops)
+  const menuTex = textTexture(
+    ['TODAY 今日', 'Spicy Red 红汤 · Tomato 番茄', 'Golden Bone 金汤 · Dry Mala 干拌', 'Mild 微辣 Medium 中辣 Extra 特辣', 'pay by weight · per 100 g'],
+    { w: 768, h: 512, bg: '#5a3b28', fg: '#f7ecda', font: 'bold 56px "Trebuchet MS"', small: '34px "Trebuchet MS"' });
+  const menuFrame = box(0.08, 1.75, 2.55, C.woodD, { cast:false }); menuFrame.position.set(-4.6, 2.0, 0.4); interior.add(menuFrame);
+  const menu = planeWith(menuTex, 2.4, 1.6, { emissive: 0xffffff, ei: 0.12 });
+  menu.position.set(-4.53, 2.0, 0.4); menu.rotation.y = Math.PI / 2; interior.add(menu);
+
+  // ------- ingredient fridge (front-facing, 5 shelves) -------
+  const fridge = new THREE.Group(); fridge.position.set(0, 0, -3.95); interior.add(fridge);
+  const fW = 6.4, fH = 2.9, fD = 0.95;
+  const fBody = box(fW, fH, 0.22, 0xe4d2b2); fBody.position.set(0, fH / 2 + 0.12, -0.34); fridge.add(fBody);
+  [-1, 1].forEach(sg => { const cheek = box(0.14, fH, fD, 0xe4d2b2); cheek.position.set(sg * (fW / 2 - 0.07), fH / 2 + 0.12, 0); fridge.add(cheek); });
+  const fIn = box(fW - 0.3, fH - 0.35, 0.06, 0xe8f0e2, { emissive: 0xdcefe0, emissiveIntensity: 0.45, cast:false });
+  fIn.position.set(0, fH / 2 + 0.16, -0.21); fridge.add(fIn);
+  const fStrip = box(fW, 0.34, fD + 0.05, C.terra); fStrip.position.set(0, fH + 0.3, 0); fridge.add(fStrip);
+  const fStripT = planeWith(textTexture(['FRESH INGREDIENTS 新鲜食材', 'pay by weight · priced per 100 g'], { w: 1024, h: 160, bg: '#c1502f', fg: '#f7ecda', font: 'bold 62px "Trebuchet MS"', small: '38px "Trebuchet MS"' }), 6.8, 0.32, { emissive: 0xffffff, ei: 0.25 });
+  fStripT.scale.set(0.85,1,1); fStripT.position.set(0, fH + 0.3, fD / 2 + 0.04); fridge.add(fStripT);
+
+  const shelfYs = [0.42, 0.94, 1.46, 1.98, 2.5];
+  const trayW = 0.92, trayD = 0.62, trayH = 0.14;
+  shelfYs.forEach((sy, si) => {
+    const shelf = box(fW - 0.24, 0.05, fD - 0.16, 0xb08d5e); shelf.position.set(0, sy - 0.155, 0.1); fridge.add(shelf);
+    SHELVES[si].forEach((ing, ti) => {
+      const tx = -fW / 2 + 0.62 + ti * 1.04;
+      const rim = box(trayW + 0.04, 0.03, trayD + 0.04, 0xe8d5b8, { cast:false }); rim.position.set(tx, sy - trayH / 2 - 0.015, 0.12); fridge.add(rim);
+      const tray = box(trayW, trayH, trayD, 0xfbf1dd); tray.position.set(tx, sy, 0.12); fridge.add(tray);
+      TRAYPOS[ing.id] = new THREE.Vector3(tx, sy + 0.15, -3.95 + 0.12);
+      const pile = new THREE.Group(); pile.position.set(tx, sy + trayH / 2, 0.12); fridge.add(pile);
+      addPile(pile, ing);
+      const labTex = textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' });
+      const lab = planeWith(labTex, 0.78, 0.33); lab.position.set(tx, sy - 0.02, 0.12 + trayD / 2 + 0.045); lab.rotation.x = -0.25; fridge.add(lab);
+      const hit = box(trayW, 0.55, trayD + 0.1, 0xffffff, { cast:false, receive:false });
+      hit.material.visible = false; hit.position.set(tx, sy + 0.2, 0.12); fridge.add(hit);
+      clickable(hit, { type: 'pick', ing: ing.id });
+      clickable(tray, { type: 'pick', ing: ing.id });
+    });
+  });
+
+  // ------- counter with basket + scale -------
+  const counter = new THREE.Group(); counter.position.set(0, 0, 2.1); interior.add(counter);
+  const cBody = box(6.6, 0.95, 1.0, 0xcf9a6a); cBody.position.set(0, 0.5, 0); counter.add(cBody);
+  const cStripe = box(6.62, 0.18, 1.02, C.terra, { cast:false }); cStripe.position.set(0, 0.78, 0); counter.add(cStripe);
+  const cTop = box(6.6, 0.12, 1.1, C.wood); cTop.position.set(0, 1.02, 0); counter.add(cTop);
+
+  // basket (pink, translucent, with handle)
+  const basket = new THREE.Group(); basket.position.set(-1.1, 1.08, 0); counter.add(basket);
+  const bMat = new THREE.MeshStandardMaterial({ color: C.pink, transparent: true, opacity: 0.55, roughness: 0.35 });
+  const bBase = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.06, 0.7), bMat); bBase.position.y = 0.03; basket.add(bBase);
+  [[0, 0.22, 0.35, 1.05, 0.38, 0.04], [0, 0.22, -0.35, 1.05, 0.38, 0.04], [0.52, 0.22, 0, 0.04, 0.38, 0.7], [-0.52, 0.22, 0, 0.04, 0.38, 0.7]].forEach(a => {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(a[3], a[4], a[5]), bMat); w.position.set(a[0], a[1], a[2]); basket.add(w);
+  });
+  const handle = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.035, 10, 24, Math.PI), bMat);
+  handle.position.set(0, 0.42, 0); basket.add(handle);
+  const basketItems = new THREE.Group(); basketItems.position.y = 0.07; basket.add(basketItems);
+  basket.userData.itemsGroup = basketItems;
+  window.__basket3d = basket;
+  clickable(bBase, { type: 'basket' });
+
+  // scale
+  const scaleG = new THREE.Group(); scaleG.position.set(0.9, 1.08, 0); counter.add(scaleG);
+  const sBase = box(0.85, 0.09, 0.65, C.steel, { rough: 0.4, metal: 0.4 }); sBase.position.y = 0.045; scaleG.add(sBase);
+  const sPlate = cyl(0.3, 0.3, 0.04, 0xd8dde2, 28, { rough: 0.35, metal: 0.5 }); sPlate.position.y = 0.12; scaleG.add(sPlate);
+  const sNeck = box(0.1, 0.34, 0.08, C.steel, { rough: 0.4, metal: 0.4 }); sNeck.position.set(0, 0.26, -0.28); scaleG.add(sNeck);
+  const lcdCanvas = document.createElement('canvas'); lcdCanvasRef = lcdCanvas; lcdCanvas.width = 512; lcdCanvas.height = 192;
+  lcdCtx = lcdCanvas.getContext('2d');
+  lcdTex = new THREE.CanvasTexture(lcdCanvas); lcdTex.colorSpace = THREE.SRGBColorSpace;
+  lcdTex.wrapS = THREE.RepeatWrapping; lcdTex.repeat.x = -1; // read correctly from the customer side
+  const lcdFrame = box(0.82, 0.36, 0.06, 0x4a4038, { rough: 0.5 }); lcdFrame.position.set(0, 0.56, -0.32); scaleG.add(lcdFrame);
+  const lcd = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.27),
+    new THREE.MeshBasicMaterial({ map: lcdTex, side: THREE.DoubleSide }));
+  lcd.position.set(0, 0.56, -0.365); lcd.rotation.x = -0.12; scaleG.add(lcd);
+  clickable(sPlate, { type: 'weigh' }); clickable(sBase, { type: 'weigh' });
+
+  // sauce pots
+  [2.0, 2.45].forEach((x, i) => {
+    const pot = cyl(0.14, 0.11, 0.18, i ? C.terra : 0x8a5f3a); pot.position.set(x, 1.17, 0.1); counter.add(pot);
+  });
+
+  // ------- guest NPC -------
+  const guest = new THREE.Group(); guest.position.set(-2.1, 0, 3.1); interior.add(guest);
+  const gBody = cyl(0.24, 0.3, 0.9, 0x7aa5c9); gBody.position.y = 0.85; guest.add(gBody);
+  const gHead = sph(0.21, 0xf2c9a0); gHead.position.y = 1.55; guest.add(gHead);
+  const gHair = sph(0.22, 0x4a3a30); gHair.scale.y = 0.7; gHair.position.y = 1.66; guest.add(gHair);
+  const gEyeL = sph(0.025, 0x333333, { cast:false }); gEyeL.position.set(-0.07, 1.57, -0.18); guest.add(gEyeL);
+  const gEyeR = gEyeL.clone(); gEyeR.position.x = 0.07; guest.add(gEyeR);
+  guest.rotation.y = Math.PI;
+  window.__guest = guest;
+  clickable(gBody,{type:'cashier'}); clickable(gHead,{type:'cashier'});
+  const nameTag=planeWith(textTexture(['LUKAS','卢卡斯 · CASHIER'],{w:512,h:160,bg:'#fdf6e9',fg:'#a03e22',font:'bold 62px Trebuchet MS',small:'38px sans-serif'}),1.25,.4);nameTag.position.set(-2.1,2.18,2.95);nameTag.rotation.y=Math.PI;interior.add(nameTag);
+
+  // tables + stools
+  [[3.4, -1.6], [3.4, 0.2]].forEach(([x, z]) => {
+    const t = cyl(0.42, 0.42, 0.05, C.wood); t.position.set(x, 0.75, z); interior.add(t);
+    const leg = cyl(0.05, 0.05, 0.72, C.woodD); leg.position.set(x, 0.38, z); interior.add(leg);
+    [[0.75, 0], [-0.75, 0]].forEach(([dx, dz]) => {
+      const st = cyl(0.18, 0.16, 0.42, C.terra); st.position.set(x + dx, 0.21, z + dz); interior.add(st);
+    });
+  });
+
+  // plant corner
+  const ppot = cyl(0.25, 0.2, 0.4, C.terra); ppot.position.set(-3.9, 0.2, 3.7); interior.add(ppot);
+  const pleaf = sph(0.35, 0x6f9b57); pleaf.position.set(-3.9, 0.75, 3.7); interior.add(pleaf);
+  const pleaf2 = sph(0.22, 0x86ad66); pleaf2.position.set(-3.7, 1.0, 3.6); interior.add(pleaf2);
+}
+
+
+function specialPiece(ing){
+ const g=new THREE.Group();
+ if(ing.shape==='roll'){
+   const m=cyl(.065,.065,.16,ing.color,16);m.rotation.z=Math.PI/2;g.add(m);
+   for(const x of [-.082,.082]){const fat=new THREE.Mesh(new THREE.TorusGeometry(.042,.012,6,16,Math.PI*1.8),new THREE.MeshStandardMaterial({color:0xf6d4c0}));fat.rotation.y=Math.PI/2;fat.position.x=x;g.add(fat);}
+ } else if(ing.shape==='tendon'){
+   const m=cyl(.04,.065,.16,ing.color,7,{transparent:true,opacity:.83});m.rotation.z=1.2;g.add(m);const b=box(.1,.055,.07,0xead8b5);b.position.x=.06;g.add(b);
+ } else if(ing.shape==='frog'){
+   for(const a of [-.6,.6]){const thigh=cyl(.025,.045,.15,ing.color,8);thigh.rotation.z=a;thigh.position.x=a*.055;g.add(thigh);const bone=cyl(.012,.012,.09,0xf6e9cf,8);bone.position.set(a*.1,-.1,0);g.add(bone);}
+ } else if(ing.shape==='crab'){
+   const claw=sph(.075,ing.color);claw.scale.set(1.5,.6,1);g.add(claw);for(const a of [-1,1]){const leg=cyl(.012,.018,.18,0xe49d68,8);leg.rotation.z=a*.85;leg.position.set(a*.06,-.04,0);g.add(leg);}
+ }return g;
+}
+
+function addPile(group, ing) {
+  const n = 7;
+  for (let i = 0; i < n; i++) {
+    let m;
+    const s = rand(1.05, 1.45);
+    if (['roll','tendon','frog','crab'].includes(ing.shape)) m=specialPiece(ing);
+    else if (ing.shape === 'ball') m = sph(0.055 * s, ing.color);
+    else if (ing.shape === 'cube') m = box(0.09 * s, 0.07 * s, 0.09 * s, ing.color);
+    else if (ing.shape === 'stick') { m = cyl(0.03 * s, 0.03 * s, 0.2 * s, ing.color, 8); m.rotation.z = Math.PI / 2 + rand(-0.3, 0.3); }
+    else if (ing.shape === 'slice') { m = cyl(0.07 * s, 0.07 * s, 0.025 * s, ing.color, 14); m.rotation.x = rand(-0.4, 0.4); }
+    else if (ing.shape === 'nest') { m = new THREE.Mesh(new THREE.TorusGeometry(0.07 * s, 0.028 * s, 8, 16), new THREE.MeshStandardMaterial({ color: ing.color, roughness: 0.8 })); m.rotation.x = Math.PI / 2 + rand(-0.3, 0.3); m.castShadow = true; }
+    else { m = sph(0.06 * s, ing.color); m.scale.set(1, 1.5, 1); }
+    m.position.set(rand(-0.3, 0.3), 0.03 + i * 0.022, rand(-0.16, 0.16));
+    m.rotation.y = rand(0, Math.PI * 2);
+    group.add(m);
+  }
+}
+
+/* ============================================================
+   PLAYER / CAMERA / MOVEMENT
+   ============================================================ */
+const player = { x: 0, z: 6.8, yaw: Math.PI, y:1.6, tilt:-0.06, area: 'exterior' };
+let camTween = null; // {fromPos, toPos, fromQ, toQ, t}
+const NARROW = () => innerWidth < 600;
+const camPose = {
+  get fridge()  { return NARROW() ? { pos: [0, 1.6, 0.6], yaw: Math.PI } : { pos: [0, 1.65, 0.25], yaw: Math.PI }; },
+  get counter() { return NARROW() ? { pos: [0.15, 1.88, -2.2], yaw: 0.07 } : { pos: [0.15, 1.62, 0.15], yaw: -0.14 }; },
+};
+function flyTo(posArr, yaw, tilt = -0.06) {
+  const toPos = new THREE.Vector3(posArr[0], posArr[1], posArr[2]);
+  const m = new THREE.Matrix4().lookAt(toPos, lookPointFor(toPos, yaw, tilt), new THREE.Vector3(0, 1, 0));
+  camTween = {
+    fromPos: camera.position.clone(), toPos,
+    fromQ: camera.quaternion.clone(),
+    toQ: new THREE.Quaternion().setFromRotationMatrix(m), t: 0,
+    endX: posArr[0], endY: posArr[1], endZ: posArr[2], endYaw: yaw, endTilt:tilt,
+  };
+}
+function lookPointFor(pos, yaw, tilt = -0.06) {
+  return new THREE.Vector3(pos.x + Math.sin(yaw), pos.y + tilt, pos.z + Math.cos(yaw));
+}
+function applyFreeCam() {
+  camera.position.set(player.x, player.y, player.z);
+  camera.lookAt(lookPointFor(new THREE.Vector3(player.x, player.y, player.z), player.yaw, player.tilt));
+}
+applyFreeCam();
+
+const keys = {};
+addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if (e.key.toLowerCase() === 'e') tryPrompt(); });
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+// drag look + tap
+let dragging = false, dragMoved = 0, lastX = 0, downX = 0, downY = 0;
+renderer.domElement.addEventListener('pointerdown', e => {
+  dragging = true; dragMoved = 0; lastX = downX = e.clientX; downY = e.clientY;
+});
+addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX;
+  dragMoved += Math.abs(e.clientX - downX) + Math.abs(e.clientY - downY);
+  lastX = e.clientX;
+  if (!camTween && G.started) player.yaw -= dx * 0.005;
+});
+addEventListener('pointerup', e => {
+  if (dragging && dragMoved < 12) handleTap(e.clientX, e.clientY);
+  dragging = false;
+});
+
+// joystick
+const joy = document.getElementById('joy'), knob = document.getElementById('joyknob');
+let joyVec = { x: 0, y: 0 }, joyId = null;
+joy.addEventListener('pointerdown', e => { joyId = e.pointerId; joy.setPointerCapture(joyId); e.stopPropagation(); });
+joy.addEventListener('pointermove', e => {
+  if (e.pointerId !== joyId) return;
+  const r = joy.getBoundingClientRect();
+  let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+  const m = Math.hypot(dx, dy), max = 42;
+  if (m > max) { dx *= max / m; dy *= max / m; }
+  knob.style.left = (35 + dx) + 'px'; knob.style.top = (35 + dy) + 'px';
+  joyVec = { x: dx / max, y: dy / max };
+});
+function joyEnd(e) { if (e.pointerId !== joyId) return; joyId = null; joyVec = { x: 0, y: 0 }; knob.style.left = '35px'; knob.style.top = '35px'; }
+joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+
+function clampPlayer() {
+  if (player.area === 'exterior') {
+    player.x = Math.max(-11, Math.min(11, player.x));
+    player.z = Math.max(-0.4, Math.min(11, player.z));
+  } else {
+    player.x = Math.max(-4.1, Math.min(4.1, player.x));
+    player.z = Math.max(-3.0, Math.min(4.0, player.z));
+    if (player.z > 1.5 && player.z < 2.75 && Math.abs(player.x) < 3.3) player.z = 1.5; // counter block
+  }
+}
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+const G = {
+  started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
+  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, drink:null, muted:false, voiceEnabled:false,
+};
+const $ = id => document.getElementById('id'.length ? id : id);
+
+function newGuest() {
+  const reqCount = 2 + (Math.random() < 0.5 ? 1 : 0);
+  const all = SHELVES.flat();
+  const req = [];
+  while (req.length < reqCount) { const c = pick(all); if (!req.includes(c)) req.push(c); }
+  const targetW = Math.max(minG(), 380 + Math.round(Math.random() * 22) * 10); // >= shop minimum, 380-600 g realistic bowl range
+  const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
+  G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
+  G.guestSince = performance.now();
+  G.committed = false; G.paid = false; G.guess=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null;
+  renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
+  const npc = window.__guest;
+  npc.children[0].material = npc.children[0].material.clone();
+  npc.children[0].material.color.setHex(pick([0x7aa5c9, 0xc97a8a, 0x8ab27a, 0xc9a55a, 0x9a7ac9]));
+}
+function updateTicket() {
+  const g = G.guest; if (!g) return;
+  $('tname').textContent = g.name; $('order-summary').textContent = `${g.name} · ${g.targetW} g`; 
+  $('tbudget').textContent = fmt(g.budget);
+  $('ttarget').textContent = g.targetW + ' g';
+  $('trate').textContent = `${fmt(rate())}/100 g · min ${minG()} g`;
+  $('tbroth').textContent = g.broth.name + ' ' + g.broth.cn;
+  $('tspice').textContent = g.spice.name + ' ' + g.spice.cn;
+  const has = new Set(G.basket);
+  $('treq').innerHTML = '<span style="font-size:11px;color:#a08362;width:100%">must have:</span>' +
+    g.req.map(r => `<span class="chip ${has.has(r.id) ? 'got' : ''}">${r.name}</span>`).join('');
+}
+function basketWeight() { return G.basket.reduce((s, id) => s + ING[id].g, 0); }
+function basketPrice() { return basketWeight() / 100 * rate(); }
+function updateBasketBar() {
+  const w = basketWeight(), p = basketPrice();
+  $('btotal').textContent = G.committed ? `${w} g · ${fmt(p)}` : `${G.basket.length} pieces · weight hidden`;
+  const counts = {};
+  G.basket.forEach(id => counts[id] = (counts[id] || 0) + 1);
+  $('basketitems').innerHTML = Object.entries(counts)
+    .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('')
+    || '<span style="font-size:11px;color:#b09a7c">empty - pick from the fridge</span>';
+  $('basketbar').style.display = G.area === 'interior' ? 'block' : 'none';
+  drawLCD(G.committed ? w : null, G.committed ? p : null);
+  if (G.guest) updateTicket();
+}
+function renderBasket3D() {
+  const grp = window.__basket3d.userData.itemsGroup;
+  while (grp.children.length) grp.remove(grp.children[0]);
+  G.basket.slice(0, 24).forEach(id => {
+    const m = sph(0.055, ING[id].color);
+    m.position.set(rand(-0.35, 0.35), 0.02 + rand(0, 0.12), rand(-0.2, 0.2));
+    grp.add(m);
+  });
+}
+
+// audio blips
+let AC = null;
+function blip(f = 660, d = 0.08, type = 'sine', vol = 0.12) {
+  if (G.muted) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(vol, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + d);
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + d);
+  } catch (e) {}
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+const ray = new THREE.Raycaster();
+function handleTap(x, y) {
+  if (!G.started) return;
+  ray.setFromCamera(new THREE.Vector2((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
+  const hits = ray.intersectObjects(clickables, false);
+  if (!hits.length) return;
+  if (hits[0].distance > 6.5) { showPrompt('Walk closer! ', 1200); return; }
+  act(hits[0].object.userData.act);
+}
+
+function act(a) {
+  if (!a) return;
+  if (a.type === 'enter') enterShop();
+  else if (a.type === 'exit') exitShop();
+  else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; say(cashierLine()); }
+  else if (a.type === 'pick') {
+    if (G.area !== 'interior') return;
+    if (G.committed) { showPrompt('Basket committed - finish this guest first', 1500); return; }
+    if (G.basket.length >= 150) { showPrompt('Basket is full! ', 1200); return; }
+    G.basket.push(a.ing); animatePick(a.ing);
+    blip(720 + Math.random() * 120, 0.07, 'triangle');
+    renderBasket3D(); updateBasketBar();
+  }
+  else if (a.type === 'weigh') openServe();
+  else if (a.type === 'basket') {
+    if (G.basket.length && !G.committed) { G.basket.pop(); blip(330, 0.09, 'triangle'); renderBasket3D(); updateBasketBar(); }
+  }
+}
+
+function enterShop() {
+  hidePrompt();
+  $('greeting').hidden=false; $('greeting').textContent='你好，欢迎光临！ Hello, welcome! Xiaotong manages the store. Lukas / 卢卡斯 is your cashier. Tap Talk to chat.'; setTimeout(()=>{$('greeting').hidden=true;},6500);
+  if(G.voiceEnabled)say('你好，欢迎光临！','cashier','zh-CN');
+  G.area = 'interior'; player.area = 'interior';
+  exterior.visible = false; interior.visible = true;
+  player.x = 2.6; player.z = 3.4; player.yaw = Math.PI;
+  warmIn.intensity = 0.9;
+  scene.fog = new THREE.Fog(0xf7ecda, 20, 45);
+  flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03);
+  $('enter-easy').hidden = true; heldBowl.visible = !G.committed;
+  $('views').style.display = 'flex'; $('ticket').style.display = 'block'; $('earnings').style.display = 'block';
+  updateBasketBar();
+  blip(520, 0.12, 'triangle'); setTimeout(() => blip(780, 0.14, 'triangle'), 120);
+}
+function exitShop() {
+  hidePrompt();
+  G.area = 'exterior'; player.area = 'exterior';
+  exterior.visible = true; interior.visible = false;
+  player.x = 2.9; player.z = 1.2; player.yaw = Math.PI;
+  warmIn.intensity = 0.0;
+  scene.fog = new THREE.Fog(C.sky, 18, 42);
+  camTween = null; applyFreeCam();
+  heldBowl.visible = false; $('enter-easy').hidden = false;
+  $('views').style.display = 'none'; $('basketbar').style.display = 'none';
+}
+
+let promptTimer = null;
+function showPrompt(text, ms = 0) {
+  const p = $('prompt');
+  if (p.textContent !== text) p.textContent = text;
+  p.style.display = 'block';
+  clearTimeout(promptTimer);
+  if (ms) promptTimer = setTimeout(() => { p.style.display = 'none'; }, ms);
+}
+function hidePrompt() { $('prompt').style.display = 'none'; clearTimeout(promptTimer); }
+$('prompt').addEventListener('click', () => tryPrompt());
+function tryPrompt() {
+  if (G.area === 'exterior' && Math.abs(player.x - 2.9) < 2.2 && player.z < 1.6) enterShop();
+}
+
+/* ---------- serve flow ---------- */
+function openServe() {
+  if (!G.basket.length) { showPrompt('Basket is empty - pick ingredients first! ', 1600); return; }
+  if (!G.committed && G.guess==null) { $('guessmodal').style.display='flex'; $('guess-input').value=''; return; }
+  const w = basketWeight();
+  G.committed = true; updateBasketBar(); heldBowl.visible = false;
+  flyTo(camPose.counter.pos, camPose.counter.yaw);
+  $('v-serve').textContent = ' Finish order';
+  $('reveal').textContent = `${w} g · ${fmt(basketPrice())} · ${w < minG() ? 'BELOW SHOP MINIMUM - rejected bowl' : 'Basket locked. No more picks.'}`;
+  const g = G.guest;
+  $('brothreq').textContent = `${g.name} asked for ${g.broth.name} ${g.broth.cn}, ${g.spice.name} ${g.spice.cn} · target ${g.targetW} g · budget ${fmt(g.budget)}`;
+  const bo = $('brothopts'); bo.innerHTML = '';
+  BROTHS.forEach(b => {
+    const d = document.createElement('div'); d.className = 'opt' + (G.selBroth === b.id ? ' sel' : '');
+    d.innerHTML = `${b.name}<small>${b.cn}</small>`;
+    d.onclick = () => { G.selBroth = b.id; blip(600, 0.06, 'triangle'); openServe(); };
+    bo.appendChild(d);
+  });
+  const so = $('spiceopts'); so.innerHTML = '';
+  SPICES.forEach(s => {
+    const d = document.createElement('div'); d.className = 'opt' + (G.selSpice === s.id ? ' sel' : '');
+    d.innerHTML = `${s.name}<small>${s.cn}</small>`;
+    d.onclick = () => { G.selSpice = s.id; blip(640, 0.06, 'triangle'); openServe(); };
+    so.appendChild(d);
+  });
+  $('brothmodal').style.display = 'flex';
+}
+$('servebtn').addEventListener('click', () => {
+  if (!G.selBroth || !G.selSpice) { $('brothreq').textContent = 'Pick a broth AND a spice level first!'; return; }
+  $('brothmodal').style.display = 'none';
+  $('paymodal').style.display = 'flex'; $('payamount').textContent = fmt(basketPrice() + (G.drink?.price || 0));
+});
+function serveGuest() {
+  if (G.paid) return; G.paid = true;
+  const g = G.guest;
+  const w = basketWeight(), price = basketPrice();
+  const secs = (performance.now() - G.guestSince) / 1000;
+  const has = new Set(G.basket);
+  const reqHit = g.req.filter(r => has.has(r.id)).length;
+  const order = Math.round(reqHit / g.req.length * 60)
+    + (G.selBroth === g.broth.id ? 20 : 0) + (G.selSpice === g.spice.id ? 20 : 0);
+  const wErr = Math.abs(w - g.targetW);
+  let weightS = Math.max(0, Math.round(100 - (wErr / g.targetW) * 200));
+  const over = price > g.budget;
+  if (over) weightS = Math.max(0, weightS - Math.min(50, Math.round((price - g.budget) / g.budget * 100)));
+  const speed = Math.max(20, Math.min(100, Math.round(130 - secs * 1.6)));
+  const overall = (order + weightS + speed) / 3;
+  const cents = v => Math.round(v * 100);
+  const priceC = cents(price), budgetC = cents(g.budget);
+  const tipC = over || w < minG() ? 0 : Math.max(0, budgetC - priceC) * (overall / 100) * 0.5;
+  const tip = Math.round(tipC) / 100;
+  const bowlC = w < minG() ? 0 : priceC;
+  const drinkC = Math.round((G.drink?.price || 0) * 100);
+  const earned = (bowlC + drinkC + Math.round(tipC)) / 100;
+  G.earnings += earned; G.served++;
+  $('earnings').textContent = ' ' + fmt(G.earnings);
+
+  $('rweight').textContent = w + ' g'; $('rguess').textContent = G.guess + ' g (' + (G.guess>w?'+':'') + (G.guess-w) + ' g)';
+  $('rtarget').textContent = g.targetW + ' g';
+  $('rerror').textContent = (w > g.targetW ? '+' : '-') + wErr + ' g';
+  $('rprice').textContent = fmt(bowlC / 100);
+  $('rdrink').textContent = (G.drink ? G.drink.name + ' · ' : '') + fmt(drinkC / 100);
+  $('rpayment').textContent = G.payment === 'cash' ? 'Cash (simulated)' : 'Card approved (simulated)';
+  $('rbudget').textContent = fmt(g.budget) + (over ? '  OVER' : '');
+  $('rtip').textContent = fmt(tip);
+  $('rtotal').textContent = fmt(earned);
+  $('sorder').textContent = order; $('border').style.width = order + '%';
+  $('sweight').textContent = weightS; $('bweight').style.width = weightS + '%';
+  $('sspeed').textContent = speed; $('bspeed').style.width = speed + '%';
+  $('rstamp').textContent = w < minG() ? 'REJECTED' : over ? 'OVER BUDGET' : 'PAID';
+  $('rstamp').style.borderColor = $('rstamp').style.color = over ? '#a03030' : '#c1502f';
+  $('rcomment').textContent =
+    overall >= 90 ? pick(['"Perfect bowl! 太好吃了!" ', '"You read my mind!" ', '"Best malatang in town!" ']) :
+    overall >= 70 ? pick(['"Pretty good!" ', '"Nice bowl, thanks!" ', '"Almost perfect!" ']) :
+    overall >= 50 ? pick(['"Hmm, not quite my order…" ', '"It\'s okay, I guess." ']) :
+    over ? '"This costs more than my budget!" ' : '"This is not what I ordered…" ';
+  if (w < minG()) { $('rcomment').textContent = 'Below shop minimum. Bowl rejected, no bowl charge.'; $('sweight').textContent = '0'; $('bweight').style.width = '0%'; }
+  $('receipt').style.display = 'flex';
+  blip(523, 0.12); setTimeout(() => blip(659, 0.12), 120); setTimeout(() => blip(overall >= 50 ? 784 : 392, 0.25), 240);
+}
+$('nextguest').addEventListener('click', () => { $('receipt').style.display = 'none'; newGuest(); flyTo(camPose.fridge.pos,camPose.fridge.yaw,0.03); });
+
+// HUD buttons
+$('v-fridge').onclick = () => { if (G.area === 'interior') flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03); };
+$('v-counter').onclick = () => { if (G.area === 'interior') flyTo(camPose.counter.pos, camPose.counter.yaw); };
+$('v-door').onclick = () => { if (G.area === 'interior') exitShop(); };
+$('v-serve').onclick = () => openServe();
+$('basketitems').addEventListener('click', e => {
+  const id = e.target.dataset && e.target.dataset.ing;
+  if (!id || G.committed) return;
+  const i = G.basket.indexOf(id);
+  if (i >= 0) { G.basket.splice(i, 1); blip(330, 0.09, 'triangle'); renderBasket3D(); updateBasketBar(); }
+});
+
+/* ============================================================
+   START / LOOP
+   ============================================================ */
+// shop selector on title screen
+SHOPS.forEach(sh => {
+  const d = document.createElement('div');
+  d.className = 'opt' + (sh.id === G.shop.id ? ' sel' : '');
+  d.innerHTML = `${sh.flag} ${sh.city}<small>${sh.name} · ${sh.cur}${sh.rate.toFixed(2)}/100 g · min ${sh.min} g</small>`;
+  d.onclick = () => {
+    G.shop = sh; blip(600, 0.06, 'triangle');
+    document.querySelectorAll('#shopopts .opt').forEach(o => o.classList.remove('sel'));
+    d.classList.add('sel');
+    drawLCD(null, null);
+  };
+  $('shopopts').appendChild(d);
+});
+
+$('startbtn').addEventListener('click', () => {
+  $('title').style.display = 'none';
+  G.started = true; $('enter-easy').hidden = false; $('zoomtools').hidden = false;
+  if (NARROW()) { player.yaw = Math.PI - 0.38; applyFreeCam(); } // aim at the door on phones
+  newGuest();
+  showPrompt('Walk to the door and click it to go in ', 5000);
+});
+document.getElementById('loading').textContent = '';
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.fov = camera.aspect < 0.75 ? 74 : 62;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+
+// User controls: direct stations, scene dolly zoom, and visible food drops.
+function dolly(delta) {
+  if (!G.started || camTween) return;
+  const nextZ = player.z + Math.cos(player.yaw) * delta;
+  if (G.area === 'interior' && (nextZ < -2.9 || nextZ > 1.1)) return;
+  player.x = Math.max(-3.5, Math.min(3.5, player.x + Math.sin(player.yaw) * delta));
+  player.z = Math.max(-2.9, Math.min(10, nextZ)); applyFreeCam();
+}
+renderer.domElement.addEventListener('wheel', e => { e.preventDefault(); dolly(-Math.sign(e.deltaY)*0.28); }, {passive:false});
+let pinchDistance = null;
+renderer.domElement.addEventListener('touchstart', e => { if(e.touches.length===2) { dragging=false; pinchDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); } },{passive:true});
+renderer.domElement.addEventListener('touchmove',e=>{ if(e.touches.length===2 && pinchDistance!=null){ e.preventDefault(); dragging=false; const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); dolly((d-pinchDistance)*0.012); pinchDistance=d; } },{passive:false});
+renderer.domElement.addEventListener('touchend',()=>{pinchDistance=null;dragging=false;},{passive:true});
+$('zoom-in').onclick=()=>dolly(0.35); $('zoom-out').onclick=()=>dolly(-0.35);
+$('enter-easy').onclick=()=>enterShop();
+$('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted){window.speechSynthesis?.cancel();$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func:'mute',args:[]}), 'https://www.youtube.com');} if(!G.muted) blip();};
+$('ticket-toggle').onclick=()=>{const c=$('ticket').classList.toggle('collapsed'); $('ticket-toggle').setAttribute('aria-expanded',!c);};
+$('basket-toggle').onclick=()=>{const c=$('basketbar').classList.toggle('collapsed'); $('basket-toggle').setAttribute('aria-expanded',!c);};
+$('min-receipt').onclick=()=>{$('receipt').style.display='none'; $('receipt-tab').hidden=false;};
+$('receipt-tab').onclick=()=>{$('receipt').style.display='flex'; $('receipt-tab').hidden=true;};
+const DRINKS = [
+ ['Wang Lao Ji','王老吉','',2.5],['Jiaduobao','加多宝','',2.5],['Sour plum drink','酸梅汤','',2.8],
+ ['Vitasoy soy milk','维他奶','',2.5],['Wahaha Nutri-Express','营养快线','',3],['Coconut milk','椰汁','',3],
+ ['Arctic Ocean orange soda','北冰洋','',3],['Jasmine tea','茉莉花茶','',2.2],['Oolong tea','乌龙茶','',2.2],
+ ['Chrysanthemum tea','菊花茶','',2.5],['Pear juice','梨汁','',2.8],['Lychee drink','荔枝汁','',2.8],
+ ['Grass jelly drink','仙草蜜','',2.8],['Bubble milk tea','珍珠奶茶','',4],['Water','水','',1.5]
+];
+$('v-drinks').onclick=()=>{if(!G.paid){$('drinkmodal').style.display='flex'; renderDrinks();}};
+$('close-drinks').onclick=()=>{$('drinkmodal').style.display='none';};
+function renderDrinks(){
+ const d=$('drinkopts'); d.innerHTML='';
+ const options=[['No drink','不加饮料','−',0],...DRINKS];
+ options.forEach(([name,cn,icon,price])=>{const b=document.createElement('button'); b.className='opt'; b.innerHTML=`${icon} ${name}<small>${cn} · ${fmt(price)}</small>`; b.onclick=()=>{G.drink=price?{name,price}:null; $('drinkchoice').textContent=G.drink?`${name} · ${fmt(price)} (extra)`:'No drink selected'; blip(); $('drinkmodal').style.display='none';}; d.appendChild(b);});
+}
+function finishPayment(method){ G.payment=method; $('paymodal').style.display='none'; blip(880,0.12,'sine'); setTimeout(()=>blip(1320,0.15,'sine'),150); serveGuest(); }
+$('tap-card').onclick=()=>finishPayment('card'); $('pay-cash').onclick=()=>finishPayment('cash');
+let tongsAnim=0;
+const heldBowl = new THREE.Group(); camera.add(heldBowl); scene.add(camera);
+heldBowl.position.set(0,-0.52,-1.1); heldBowl.visible=false;
+const tongs=new THREE.Group();camera.add(tongs);tongs.position.set(-.25,-.23,-.68);tongs.rotation.z=.16;
+const metal=new THREE.MeshStandardMaterial({color:0xd5d7db,metalness:.75,roughness:.28});
+[-.016,.016].forEach(x=>{const a=box(.014,.32,.018,0,{metal:.75,rough:.25});a.material=metal;a.position.set(x,-.06,0);a.rotation.z=x>0?-.1:.1;tongs.add(a);});
+[-.02,.02].forEach(x=>{const pincer=box(.055,.075,.025,0,{metal:.75,rough:.25});pincer.material=metal;pincer.position.set(x,-.25,-.035);pincer.rotation.x=.25;tongs.add(pincer);});
+const spring=sph(.033,0x9b0e0e);spring.position.set(0,.13,0);tongs.add(spring);
+const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.8}); heldBowl.add(hb);
+const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
+const heldFood = new THREE.Group(); heldBowl.add(heldFood);
+const falling=[];
+function animatePick(id){
+ const food=['roll','tendon','frog','crab'].includes(ING[id].shape)?specialPiece(ING[id]):sph(0.033,ING[id].color); food.scale.multiplyScalar(0.65);food.position.set(rand(-.15,.15),.55,rand(-.12,.12));heldFood.add(food); falling.push({mesh:food,t:0});
+ showPrompt(`Tongs + ${ING[id].name}`,650); tongsAnim=.3;
+}
+const oldRenderBasket=renderBasket3D;
+$('ingredient-list').innerHTML=SHELVES.flat().map(i=>`<button class="ingredient" data-pick="${i.id}">${i.name}<small>${i.cn} · 1 ${i.id==='instant'?'pack':i.id==='glass'?'strand':'piece'}</small></button>`).join('');
+$('ingredient-list').onclick=e=>{const b=e.target.closest('[data-pick]');if(b)act({type:'pick',ing:b.dataset.pick});};
+$('v-ingredients').onclick=()=>{$('ingredient-drawer').hidden=!$('ingredient-drawer').hidden;};
+$('close-ingredients').onclick=()=>{$('ingredient-drawer').hidden=true;};
+
+
+// Speech is optional. Recognition availability and voices vary by device.
+let voiceLang='en-US', recognizer=null;
+const zh=()=>voiceLang==='zh-CN';
+function say(text,role='cashier',lang=voiceLang){
+ $('chatlog').textContent=(role==='guest'?(zh()?'客人: ':'Guest: '):(zh()?'卢卡斯: ':'Lukas: '))+text;
+ if(!('speechSynthesis' in window) || G.muted)return;
+ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang=lang;
+ const select=$(role==='guest'?'guest-voice':'cashier-voice');
+ const voices=speechSynthesis.getVoices();u.voice=voices.find(v=>v.voiceURI===select.value && v.lang.toLowerCase().startsWith(lang.slice(0,2)))||voices.find(v=>v.lang.toLowerCase().startsWith(lang.slice(0,2)))||null;u.rate=role==='guest'?1.03:.96;u.pitch=role==='guest'?1.12:.88;
+ u.onerror=()=>{$('voice-status').textContent='Speech audio unavailable here. Replies remain on screen.';}; speechSynthesis.speak(u);
+}
+function updateVoices(){
+ const vs=window.speechSynthesis?.getVoices()||[];const matching=vs.filter(v=>v.lang.toLowerCase().startsWith(zh()?'zh':'en'));
+ ['guest-voice','cashier-voice'].forEach((id,j)=>{const el=$(id);el.innerHTML='';matching.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=v.name;el.appendChild(o);}); if(matching.length)el.selectedIndex=Math.min(j,matching.length-1);else{const o=document.createElement('option');o.textContent='Device default (if available)';el.appendChild(o);}});
+ $('voice-status').textContent=matching.length>=2?'Choose separate guest and cashier voices.':matching.length===1?'Only one voice for this language is installed.':'No matching installed voice detected. Text replies always work.';
+}
+$('voice-lang').onchange=e=>{voiceLang=e.target.value;updateVoices();};
+if('speechSynthesis' in window)speechSynthesis.addEventListener('voiceschanged',updateVoices);updateVoices();
+function guestLine(){
+ const g=G.guest;if(!g)return zh()?'欢迎来到Xiaotong Malatang！先选城市，再开店。':'Welcome to Xiaotong Malatang! Choose a city, then open the shop.';
+ return zh()?`你好！我要${g.targetW}克，预算${g.budget.toFixed(2)}。请加${g.req.map(i=>i.cn).join('、')}，${g.broth.cn}，${g.spice.cn}。别把我的碗变成一座山！`:`Hi, I'm ${g.name}. Aim for ${g.targetW} grams, budget ${fmt(g.budget)}. I need ${g.req.map(i=>i.name).join(', ')}, ${g.broth.name} broth and ${g.spice.name} spice. A bowl, please, not a mountain!`;
+}
+function cashierLine(){
+ if(!G.started)return zh()?'欢迎！你可以自己夹菜，也可以说出食材名字。我不会偷偷告诉你重量！':'Welcome! Pick by hand or say an ingredient name. No sneaky weight spoilers from me!';
+ if(G.paid)return zh()?`谢谢惠顾！${$('rcomment').textContent} 下位客人准备好了吗？`:`Payment approved. ${$('rcomment').textContent} Ready for the next hungry critic?`;
+ if(G.committed)return zh()?`称好了！${basketWeight()}克。现在选汤底和辣度，然后刷游戏卡。`:`The scale has spoken: ${basketWeight()} grams. Choose broth and spice, then tap your game card.`;
+ if(!G.basket.length)return zh()?'空碗减肥法？先夹点菜吧！':'The empty-bowl diet? Bold strategy. Try adding a few pieces!';
+ const last=ING[G.basket.at(-1)];return zh()?`已经夹了${G.basket.length}件，最后是${last.cn}。重量保密，凭感觉来！`:`${G.basket.length} pieces so far, last up: ${last.name}. The grams are classified. Trust your noodle instincts!`;
+}
+function runVoiceCommand(raw){
+ const text=raw.trim().toLowerCase(); if(!text)return;
+ const found=SHELVES.flat().filter(i=>text.includes(i.name.toLowerCase())||text.includes(i.cn));
+ if(found.length){
+  if(!G.started){say(zh()?'请先开店。':'Open the shop first.');return;}
+  if(G.area!=='interior')enterShop();
+  const m=text.match(/\b([1-9]|10|one|two|three|four|five|six|seven|eight|nine|ten)\b/);const nmap={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};let n=m?(nmap[m[1]]||Number(m[1])):1;
+  const cm=text.match(/([一二两三四五六七八九十])(?:个|片|根|块|颗)/);if(cm)n='一二三四五六七八九十'.indexOf(cm[1])+1||2;
+  if(G.committed){say(zh()?'已经称重锁定了，下一碗再加吧。':'This bowl is locked. Save that plot twist for the next guest.');return;}
+  found.forEach(i=>{for(let j=0;j<Math.min(10,n);j++)act({type:'pick',ing:i.id});});say(zh()?`好的，加了${found.map(i=>i.cn).join('、')}。每次一件，重量还是秘密。`:`Added ${found.map(i=>i.name).join(', ')}, ${n} each. One piece at a time, zero weight spoilers.`);return;
+ }
+ if(/recommend|suggest|推荐|吃什么|what should/.test(text)){const wanted=G.guest?.req.filter(i=>!G.basket.includes(i.id)).slice(0,3)||[ING.lamb,ING.napa,ING.porkblood];say(zh()?`推荐${wanted.map(i=>i.cn).join('、')}。加点蔬菜，别只让丸子开会！`:`Try ${wanted.map(i=>i.name).join(', ')}. Add some greens too. The fish balls cannot run this meeting alone!`);return;}
+ if(/order|target|客人|订单/.test(text)){say(guestLine(),'guest');return;}
+ if(/weigh|称重|结账/.test(text)){openServe();say(cashierLine());return;}
+ if(/hello|hi\b|你好|cashier|收银/.test(text)){say(cashierLine());return;}
+ if(/spic|辣/.test(text)){say(zh()?'辣度有微辣、中辣、特辣。特辣不是性格测试，量力而行！':'Mild, medium or extra. Extra spicy is not a personality test. Choose wisely.');return;}
+ if(/drink|饮料|喝/.test(text)){$('v-drinks').click();say(zh()?'饮料不算碗重，单独收费。你的舌头可以休息一下。':'Drinks cost extra and never count toward bowl weight. Your tongue might appreciate the backup.');return;}
+ if(/zoom|放大|缩小/.test(text)){dolly(/out|缩小/.test(text)?-.35:.35);return;}
+ if(/thank|谢谢/.test(text)){say(zh()?'不客气！别忘了你的面。':'You are welcome. Do not abandon your noodles. They have feelings.');return;}
+ say(zh()?'我会简单点单，不是万能聊天。试试“两个鱼丸”、“订单”、“饮料”或“你好”。':'I am a simple shop assistant, not a soup-powered genius. Try "two fish balls", "order", "drinks", or "hello".');
+}
+// Common plural aliases for voice ordering.
+const originalVoiceCommand=runVoiceCommand;
+function commandInput(t){originalVoiceCommand(t.replace(/beef tendon/ig,'Beef Tendon').replace(/frog legs?|frog/ig,'Frog Leg Cut').replace(/crab(?! stick| piece)/ig,'Crab Piece').replace(/lamb rolls?/ig,'Lamb Roll').replace(/fish balls/ig,'fish ball').replace(/quail eggs/ig,'quail egg').replace(/rice cakes/ig,'rice cake'));}
+$('command-send').onclick=()=>{commandInput($('command-text').value);$('command-text').value='';};
+$('command-text').addEventListener('keydown',e=>{if(e.key==='Enter')$('command-send').click();});
+$('hear-guest').onclick=()=>say(guestLine(),'guest');$('hear-cashier').onclick=()=>say(cashierLine());
+const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+$('mic').disabled=!Recognition;
+if(!Recognition)$('mic').textContent='Mic unavailable - type below';
+$('mic').onclick=()=>{
+ if(!Recognition)return;
+ if(recognizer){recognizer.abort();recognizer=null;$('mic').textContent=' Talk (one command)';return;}
+ recognizer=new Recognition();recognizer.lang=voiceLang;recognizer.continuous=false;recognizer.interimResults=false;
+ recognizer.onresult=e=>{const text=e.results[0][0].transcript;$('command-text').value=text;commandInput(text);};
+ recognizer.onerror=e=>{$('voice-status').textContent=`Microphone: ${e.error}. Use the typed commands or manual picking.`;};
+ recognizer.onend=()=>{recognizer=null;$('mic').textContent=' Talk (one command)';};
+ try{recognizer.start();$('mic').textContent='Listening... tap to stop';}catch(e){recognizer=null;$('voice-status').textContent='Microphone could not start. Type or pick manually.';}
+};
+$('enable-voices').onclick=()=>{G.voiceEnabled=true;G.muted=false;$('enable-voices').textContent='Voices enabled';say(`Hello, welcome to Xiaotong Malatang. Xiaotong is the store manager, and I am Lukas, your cashier. Our ${G.shop.city} ingredient rate is ${G.shop.rate} per one hundred grams, minimum ${G.shop.min} grams. Pick one piece at a time, guess the target, then commit to weighing. Touch Talk to order in English or Chinese. Turn up your device volume if needed.`);};
+$('voice-open').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();};
+$('voice-start').onclick=()=>{$('voicemodal').style.display='flex';updateVoices();};
+$('voice-close').onclick=()=>{if(recognizer)recognizer.abort();window.speechSynthesis?.cancel();$('voicemodal').style.display='none';};
+
+$('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.isInteger(n)||n<1||n>5000){$('guess-help').textContent='Enter a whole-number guess from 1 to 5000 g.';return;}G.guess=n;$('guessmodal').style.display='none';openServe();};
+$('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
+
+$('music-open').onclick=async()=>{
+ $('musicmodal').style.display='flex';
+ if($('music-list').children.length)return;
+ try{const r=await fetch('./music.json',{cache:'no-cache'});if(!r.ok)throw Error();const tracks=await r.json();if(!Array.isArray(tracks)||!tracks.length)throw Error();
+ const ids=tracks.map(t=>t.id).filter(id=>/^[a-zA-Z0-9_-]{11}$/.test(id));
+ for(const t of tracks){if(!ids.includes(t.id))continue;const b=document.createElement('button');b.className='opt';b.textContent=t.title+' · '+t.artist;b.onclick=()=>{
+ $('musicmodal').style.display='none';$('music-player').hidden=false;$('ticket').classList.add('collapsed');
+ const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+ $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
+ };const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
+ }catch(e){$('music-status').textContent='Playlist is still being added. The game works without music.';}
+};
+$('music-close').onclick=()=>{$('musicmodal').style.display='none';};
+$('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;};
+
+// debug/testing hook
+function screenXY(ingId) {
+  const v = TRAYPOS[ingId].clone().project(camera);
+  return { x: (v.x * 0.5 + 0.5) * innerWidth, y: (-v.y * 0.5 + 0.5) * innerHeight };
+}
+window.__game = { G, act, lcdCanvasRef: () => lcdCanvasRef, enterShop, exitShop, openServe, serveGuest, newGuest, player, basketWeight, basketPrice, flyTo, camPose, screenXY };
+
+let lastT = performance.now();
+function loop() {
+  requestAnimationFrame(loop);
+  const now = performance.now();
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+
+  if (G.started && !camTween) {
+    let mx = 0, mz = 0;
+    if (keys['w'] || keys['arrowup']) mz += 1;
+    if (keys['s'] || keys['arrowdown']) mz -= 1;
+    if (keys['a'] || keys['arrowleft']) mx -= 1;
+    if (keys['d'] || keys['arrowright']) mx += 1;
+    mx += joyVec.x; mz -= joyVec.y;
+    const m = Math.hypot(mx, mz);
+    if (m > 0.05) {
+      if (m > 1) { mx /= m; mz /= m; }
+      const sp = 3.4 * dt;
+      const sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
+      player.x += (sin * mz + cos * mx) * sp;
+      player.z += (cos * mz - sin * mx) * sp;
+      clampPlayer();
+    }
+    applyFreeCam();
+    if (G.area === 'exterior') {
+      if (Math.abs(player.x - 2.9) < 2.2 && player.z < 1.6) showPrompt('Click the door to enter ');
+      else if ($('prompt').textContent.startsWith('Click the door')) hidePrompt();
+    }
+  } else if (camTween) {
+    camTween.t += dt * 1.5;
+    const k = Math.min(1, camTween.t);
+    const e = 1 - Math.pow(1 - k, 3);
+    camera.position.lerpVectors(camTween.fromPos, camTween.toPos, e);
+    camera.quaternion.slerpQuaternions(camTween.fromQ, camTween.toQ, e);
+    if (k >= 1) {
+      player.x = camTween.endX; player.z = camTween.endZ; player.yaw = camTween.endYaw; player.y = camTween.endY; player.tilt = camTween.endTilt;
+      camTween = null; applyFreeCam();
+    }
+  }
+
+  if (window.__guest) window.__guest.position.y = Math.sin(now / 480) * 0.02;
+
+  heldBowl.visible = G.started && G.area === 'interior' && !G.committed; tongs.visible=heldBowl.visible; tongsAnim=Math.max(0,(tongsAnim||0)-dt); const pinch=tongsAnim?Math.sin((tongsAnim/.3)*Math.PI):0; tongs.children[0].rotation.z=.1+pinch*.18;tongs.children[1].rotation.z=-.1-pinch*.18;tongs.children[2].position.x=-.02-pinch*.03;tongs.children[3].position.x=.02+pinch*.03;tongs.position.y=-.23-pinch*.16;
+  for(let i=falling.length-1;i>=0;i--){const a=falling[i];a.t+=dt;a.mesh.position.y=Math.max(0.1,0.55-a.t*1.5);if(a.t>0.3)falling.splice(i,1);}
+  while(heldFood.children.length>G.basket.length)heldFood.remove(heldFood.children[0]);
+  const bowlTarget=G.committed?0.9:-1.1; window.__basket3d.position.x+=(bowlTarget-window.__basket3d.position.x)*Math.min(1,dt*3); window.__basket3d.position.y=1.08+(G.committed?0.15:0);
+  renderer.render(scene, camera);
+}
+loop();
+
+</script>
 </body>
 </html>
