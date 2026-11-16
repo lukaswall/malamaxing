@@ -16,10 +16,10 @@ guest's target weight without going over their budget.
 
 ## Realism notes (prices researched, Nov 2026)
 Pay-by-weight rates from real malatang shops, selectable on the title screen:
-- YGF Malatang, Barcelona: EUR 2.19 / 100 g, 400 g minimum (local press, 2024)
-- Yangguofu Malatang, Berlin: EUR 3.19 / 100 g (official menu)
-- YGF Malatang, New York: USD 15 / lb = USD 3.31 / 100 g (Eater NY, 2024)
-- Bone Soup Malatang, Toronto: CAD 3.50 / 100 g, ~400 g minimum (2026 report)
+- YGF Malatang, Barcelona: EUR 2.19 / 100 g, 400 g minimum - Time Out Barcelona (https://www.timeout.es/barcelona/es/noticias/el-restaurante-de-sopas-que-triunfa-en-china-ha-abierto-en-barcelona-y-puedes-elegir-todos-los-ingredientes-del-plato-072825) and Barcelona Secreta (https://barcelonasecreta.com/ygf-malatang-barcelona/)
+- Yangguofu Malatang, Berlin: EUR 3.19 / 100 g - official menu (https://yangguofu-mala.de/buffet-und-zutaten/)
+- YGF Malatang, New York: USD 15 / lb = USD 3.31 / 100 g - Eater NY (https://ny.eater.com/2024/2/29/24086100/ygf-malatang-hot-pot-east-village-opening)
+- Bone Soup Malatang, Toronto: CAD 3.50 / 100 g, ~400 g minimum - menusca.com 2026 price guide (https://menusca.com/mala-tang-menu-prices-canada/)
 
 Typical real bowls are 450-600 g; guest target weights use a 380-600 g range.
 Ingredient pick weights are best estimates per piece / small portion
@@ -27,4 +27,4 @@ Ingredient pick weights are best estimates per piece / small portion
 estimates, not measured values.
 
 ## Tech
-Plain HTML + Three.js (r160, bundled locally). No build step.
+Plain HTML + Three.js (r160, via jsdelivr CDN). No build step.
