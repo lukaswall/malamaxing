@@ -746,8 +746,13 @@ function clampPlayer() {
     player.z = Math.max(-0.4, Math.min(11, player.z));
   } else {
     player.x = Math.max(-4.1, Math.min(4.1, player.x));
-    player.z = Math.max(-3.0, Math.min(4.0, player.z));
+    player.z = Math.max(-2.6, Math.min(4.0, player.z)); // stay clear of the fridge shelves/labels
     if (player.z > 1.5 && player.z < 2.75 && Math.abs(player.x) < 3.3) player.z = 1.5; // counter block
+    // solid furniture: tables, cashier, plant - push the player out, never let the camera inside
+    [[3.4, -1.6, 0.95], [3.4, 0.2, 0.95], [-2.1, 3.1, 0.7], [-3.9, 3.7, 0.6]].forEach(([cx, cz, r]) => {
+      const dx = player.x - cx, dz = player.z - cz, d = Math.hypot(dx, dz);
+      if (d < r && d > 0.0001) { player.x = cx + dx / d * r; player.z = cz + dz / d * r; }
+    });
   }
 }
 
@@ -843,7 +848,17 @@ function handleTap(x, y) {
     const t = ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), new THREE.Vector3());
     if (t && Math.abs(t.x) < 30 && Math.abs(t.z) < 30) target = { x: t.x, z: t.z };
   }
-  if (target) { G.moveTarget = target; showPrompt('Walking…', 1200); }
+  if (target) {
+    // clamp the destination into the walkable area so the walk can actually finish
+    if (player.area === 'interior') {
+      target.x = Math.max(-4.1, Math.min(4.1, target.x));
+      target.z = Math.max(-2.6, Math.min(4.0, target.z));
+    } else {
+      target.x = Math.max(-11, Math.min(11, target.x));
+      target.z = Math.max(-0.4, Math.min(11, target.z));
+    }
+    G.moveTarget = target; showPrompt('Walking…', 1200);
+  }
 }
 
 function act(a) {
@@ -1256,7 +1271,12 @@ function loop() {
       const dx = G.moveTarget.x - player.x, dz = G.moveTarget.z - player.z;
       const dist = Math.hypot(dx, dz);
       if (dist < 0.25) G.moveTarget = null;
-      else { const sp = 3.4 * dt; player.x += dx / dist * sp; player.z += dz / dist * sp; player.yaw = Math.atan2(dx, dz); clampPlayer(); }
+      else {
+        const sp = 3.4 * dt, ox = player.x, oz = player.z;
+        player.x += dx / dist * sp; player.z += dz / dist * sp; player.yaw = Math.atan2(dx, dz);
+        clampPlayer();
+        if (Math.hypot(player.x - ox, player.z - oz) < sp * 0.4) G.moveTarget = null; // blocked by furniture/wall: stop, don't push forever
+      }
     }
     applyFreeCam();
     if (G.area === 'exterior') {
