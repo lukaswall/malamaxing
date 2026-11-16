@@ -203,9 +203,9 @@
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
-<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Tap a song to start. Minimize (–) keeps the music playing in a small chip; Stop ends playback. Availability, ads and background playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
+<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Music tries to start by itself when you open the shop; some browsers still need one tap on a song. Minimize (–) pauses the song and shrinks the player to a chip - tap the chip to resume. Stop ends playback. Availability, ads and playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
 <div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-min" class="vbtn" title="Minimize - music keeps playing">–</button> <button id="music-stop" class="vbtn">Stop ×</button></span></div><div id="music-frame"></div></div>
-<button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - tap to show player</button>
+<button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - paused, tap to resume</button>
 <div class="modal" id="exitmodal"><div class="card"><h2>Step outside?</h2><p class="sub">Your basket and current guest stay as they are. This just prevents accidental exits.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="cta" id="exit-cancel">Stay inside</button><button class="vbtn" id="exit-confirm">Exit shop</button></div></div></div>
 <div class="modal" id="guessmodal"><div class="card"><h2>What does your bowl weigh?</h2><p class="sub" id="guess-help">Enter your own estimate before the scale reveals the answer. This locks the basket, even if it is below the shop minimum.</p><label for="guess-input">Your guess, in grams</label><input id="guess-input" type="number" inputmode="numeric" min="1" max="5000" step="1" style="width:100%;padding:14px;margin:12px 0;font-size:20px"><button class="cta" id="lock-guess">Lock guess &amp; weigh</button><button class="vbtn" id="cancel-guess" style="margin-top:12px">Keep picking</button></div></div>
 <div class="modal" id="brothmodal">
@@ -1029,6 +1029,7 @@ $('startbtn').addEventListener('click', () => {
   G.started = true; $('enter-easy').hidden = false; $('zoomtools').hidden = false;
   if (NARROW()) { player.yaw = Math.PI - 0.38; applyFreeCam(); } // aim at the door on phones
   newGuest();
+  startMusicDefault();
   showPrompt('Walk to the door and click it to go in ', 5000);
 });
 document.getElementById('loading').textContent = '';
@@ -1177,22 +1178,26 @@ $('voice-close').onclick=()=>{if(recognizer)recognizer.abort();window.speechSynt
 $('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.isInteger(n)||n<1||n>5000){$('guess-help').textContent='Enter a whole-number guess from 1 to 5000 g.';return;}G.guess=n;$('guessmodal').style.display='none';openServe();};
 $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
 
+let MUSIC=null;
+async function loadMusic(){ if(MUSIC)return MUSIC; try{const r=await fetch('./music.json',{cache:'no-cache'});if(!r.ok)throw Error();const tracks=(await r.json()).filter(t=>t&&/^[a-zA-Z0-9_-]{11}$/.test(t.id));if(!tracks.length)throw Error();MUSIC={tracks,ids:tracks.map(t=>t.id)};}catch(e){MUSIC=null;} return MUSIC; }
+function playTrack(t){
+ if(!MUSIC)return;const ids=MUSIC.ids;
+ $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;$('ticket').classList.add('collapsed');
+ const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+ $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
+}
+function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; loadMusic().then(M=>{ if(M)playTrack(M.tracks[0]); }); }
 $('music-open').onclick=async()=>{
  $('musicmodal').style.display='flex';
  if($('music-list').children.length)return;
- try{const r=await fetch('./music.json',{cache:'no-cache'});if(!r.ok)throw Error();const tracks=await r.json();if(!Array.isArray(tracks)||!tracks.length)throw Error();
- const ids=tracks.map(t=>t.id).filter(id=>/^[a-zA-Z0-9_-]{11}$/.test(id));
- for(const t of tracks){if(!ids.includes(t.id))continue;const b=document.createElement('button');b.className='opt';b.textContent=t.title+' · '+t.artist;b.onclick=()=>{
- $('musicmodal').style.display='none';$('music-player').hidden=false;$('ticket').classList.add('collapsed');
- const frame=document.createElement('iframe');frame.width='240';frame.height='200';frame.title='Official music player: '+t.title;frame.src='https://www.youtube.com/embed/'+t.id+'?playsinline=1&enablejsapi=1&autoplay=1&loop=1&playlist='+ids.join(',');frame.allow='autoplay; encrypted-media; picture-in-picture';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
- $('music-frame').replaceChildren(frame);$('music-title').textContent=t.title;
- };const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
- }catch(e){$('music-status').textContent='Playlist is still being added. The game works without music.';}
+ const M=await loadMusic(); if(!M){$('music-status').textContent='Playlist is still being added. The game works without music.';return;}
+ for(const t of M.tracks){const b=document.createElement('button');b.className='opt';b.textContent=t.title+' · '+t.artist;b.onclick=()=>playTrack(t);const row=document.createElement('div');row.appendChild(b);const a=document.createElement('a');a.href=t.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official recording';a.style.fontSize='11px';a.style.display='block';row.appendChild(a);$('music-list').appendChild(row);}
 };
 $('music-close').onclick=()=>{$('musicmodal').style.display='none';};
 $('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;$('music-chip').hidden=true;};
-$('music-min').onclick=()=>{$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
-$('music-chip').onclick=()=>{$('music-chip').hidden=true;$('music-player').hidden=false;};
+function ytCmd(func){$('music-frame').querySelector('iframe')?.contentWindow.postMessage(JSON.stringify({event:'command',func,args:[]}),'https://www.youtube.com');}
+$('music-min').onclick=()=>{ytCmd('pauseVideo');$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
+$('music-chip').onclick=()=>{$('music-chip').hidden=true;$('music-player').hidden=false;ytCmd('playVideo');};
 
 
 function applyWheel(){
