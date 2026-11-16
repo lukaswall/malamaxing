@@ -157,7 +157,7 @@
  #voicemodal label{display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:6px;margin:9px 0}#voicemodal select{max-width:65%;padding:6px;border:1px solid #dac3a4;border-radius:6px;background:white;color:var(--ink)}.chatlog{padding:12px;background:#f1e3cb;border-radius:8px;font-size:13px;line-height:1.5;margin:10px 0}#voice-status{margin-top:12px}#voice-start{margin-top:6px}
  @media(max-width:600px){#views{gap:5px}.vbtn{padding:7px 10px}#zoomtools{bottom:162px}}
  #greeting{position:absolute;top:60px;left:12px;max-width:210px;background:var(--paper);border:1px solid #dfc69f;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;pointer-events:none;z-index:25} @media(orientation:landscape) and (max-height:600px){#greeting{top:72px;max-width:180px;font-size:10px}#title .sign h2{display:none}#title .sign{margin-bottom:3px}#loading{margin-top:4px}#voice-start,#enable-voices{font-size:10px;padding:5px 10px}}
-#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:240px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#views{max-width:150px}}
+#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:240px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px}#music-chip{position:fixed;left:12px;bottom:12px;z-index:27;max-width:180px} @media(max-width:600px){#music-player{top:65px;bottom:auto}#music-chip{top:65px;bottom:auto}#views{max-width:150px}}
 #wheel-wrap{text-align:center;margin:14px 0}#wheel{width:150px;height:150px;border-radius:50%;border:7px solid var(--terra);background:conic-gradient(#f8d795 0 60deg,#c1502f 60deg 120deg,#f8d795 120deg 180deg,#c1502f 180deg 240deg,#f8d795 240deg 300deg,#c1502f 300deg 360deg);position:relative;margin:auto;transition:transform 3s cubic-bezier(.12,.65,.08,1)}#wheel i{position:absolute;left:50%;top:50%;font-style:normal;font-size:9px;transform-origin:0 0;color:white;text-shadow:0 1px 1px #0008}#wheel i:nth-child(1){transform:rotate(30deg) translate(46px,-4px)}#wheel i:nth-child(2){transform:rotate(90deg) translate(42px,-4px)}#wheel i:nth-child(3){transform:rotate(150deg) translate(50px,-4px)}#wheel i:nth-child(4){transform:rotate(210deg) translate(47px,-4px)}#wheel i:nth-child(5){transform:rotate(270deg) translate(50px,-4px)}#wheel i:nth-child(6){transform:rotate(330deg) translate(36px,-4px)}#spin{margin-top:12px}
 </style>
 </head>
@@ -203,8 +203,10 @@
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
-<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Tap a song to start. The visible player stays on screen; hiding it stops playback. Availability, ads and background playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
-<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px"><span id="music-title"></span><button id="music-stop" class="vbtn">Stop ×</button></div><div id="music-frame"></div></div>
+<div class="modal" id="musicmodal"><div class="card"><h2>Chinese shop playlist</h2><p class="sub" id="music-status">Real recordings in the official YouTube player. Tap a song to start. Minimize (–) keeps the music playing in a small chip; Stop ends playback. Availability, ads and background playback depend on YouTube and your browser. No songs are downloaded or hosted here.</p><div class="optgrid" id="music-list"></div><button class="vbtn" id="music-close">Close</button></div></div>
+<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-min" class="vbtn" title="Minimize - music keeps playing">–</button> <button id="music-stop" class="vbtn">Stop ×</button></span></div><div id="music-frame"></div></div>
+<button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - tap to show player</button>
+<div class="modal" id="exitmodal"><div class="card"><h2>Step outside?</h2><p class="sub">Your basket and current guest stay as they are. This just prevents accidental exits.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="cta" id="exit-cancel">Stay inside</button><button class="vbtn" id="exit-confirm">Exit shop</button></div></div></div>
 <div class="modal" id="guessmodal"><div class="card"><h2>What does your bowl weigh?</h2><p class="sub" id="guess-help">Enter your own estimate before the scale reveals the answer. This locks the basket, even if it is below the shop minimum.</p><label for="guess-input">Your guess, in grams</label><input id="guess-input" type="number" inputmode="numeric" min="1" max="5000" step="1" style="width:100%;padding:14px;margin:12px 0;font-size:20px"><button class="cta" id="lock-guess">Lock guess &amp; weigh</button><button class="vbtn" id="cancel-guess" style="margin-top:12px">Keep picking</button></div></div>
 <div class="modal" id="brothmodal">
   <div class="card">
@@ -830,15 +832,24 @@ function handleTap(x, y) {
   if (!G.started) return;
   ray.setFromCamera(new THREE.Vector2((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
   const hits = ray.intersectObjects(clickables, false);
-  if (!hits.length) return;
-  if (hits[0].distance > 6.5) { showPrompt('Walk closer! ', 1200); return; }
-  act(hits[0].object.userData.act);
+  if (hits.length && hits[0].distance <= 6.5) { act(hits[0].object.userData.act); return; }
+  // tap-to-walk: tap a far object to walk up to it, or tap the floor to walk there
+  let target = null;
+  if (hits.length) {
+    const p = hits[0].object.getWorldPosition(new THREE.Vector3());
+    const dir = new THREE.Vector3(player.x - p.x, 0, player.z - p.z).normalize();
+    target = { x: p.x + dir.x * 1.4, z: p.z + dir.z * 1.4 };
+  } else {
+    const t = ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), new THREE.Vector3());
+    if (t && Math.abs(t.x) < 30 && Math.abs(t.z) < 30) target = { x: t.x, z: t.z };
+  }
+  if (target) { G.moveTarget = target; showPrompt('Walking…', 1200); }
 }
 
 function act(a) {
   if (!a) return;
   if (a.type === 'enter') enterShop();
-  else if (a.type === 'exit') exitShop();
+  else if (a.type === 'exit') askExit();
   else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; say(cashierLine()); }
   else if (a.type === 'pick') {
     if (G.area !== 'interior') return;
@@ -858,6 +869,7 @@ function enterShop() {
   hidePrompt();
   $('greeting').hidden=false; $('greeting').textContent='你好，欢迎光临！ Hello, welcome! Xiaotong manages the store. Lukas / 卢卡斯 is your cashier. Tap Talk to chat.'; setTimeout(()=>{$('greeting').hidden=true;},6500);
   if(G.voiceEnabled)say('你好，欢迎光临！','cashier','zh-CN');
+  G.moveTarget = null;
   G.area = 'interior'; player.area = 'interior';
   exterior.visible = false; interior.visible = true;
   player.x = 2.6; player.z = 3.4; player.yaw = Math.PI;
@@ -869,8 +881,11 @@ function enterShop() {
   updateBasketBar();
   blip(520, 0.12, 'triangle'); setTimeout(() => blip(780, 0.14, 'triangle'), 120);
 }
+function askExit() { if (G.area !== 'interior') return; $('exitmodal').style.display = 'flex'; }
+$('exit-cancel').onclick = () => { $('exitmodal').style.display = 'none'; };
+$('exit-confirm').onclick = () => { $('exitmodal').style.display = 'none'; exitShop(); };
 function exitShop() {
-  hidePrompt();
+  hidePrompt(); G.moveTarget = null;
   G.area = 'exterior'; player.area = 'exterior';
   exterior.visible = true; interior.visible = false;
   player.x = 2.9; player.z = 1.2; player.yaw = Math.PI;
@@ -983,7 +998,7 @@ $('nextguest').addEventListener('click', () => { $('receipt').style.display = 'n
 // HUD buttons
 $('v-fridge').onclick = () => { if (G.area === 'interior') flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03); };
 $('v-counter').onclick = () => { if (G.area === 'interior') flyTo(camPose.counter.pos, camPose.counter.yaw); };
-$('v-door').onclick = () => { if (G.area === 'interior') exitShop(); };
+$('v-door').onclick = () => askExit();
 $('v-serve').onclick = () => openServe();
 $('basketitems').addEventListener('click', e => {
   const id = e.target.dataset && e.target.dataset.ing;
@@ -1175,7 +1190,9 @@ $('music-open').onclick=async()=>{
  }catch(e){$('music-status').textContent='Playlist is still being added. The game works without music.';}
 };
 $('music-close').onclick=()=>{$('musicmodal').style.display='none';};
-$('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;};
+$('music-stop').onclick=()=>{$('music-frame').replaceChildren();$('music-player').hidden=true;$('music-chip').hidden=true;};
+$('music-min').onclick=()=>{$('music-player').hidden=true;$('music-chip-title').textContent=$('music-title').textContent;$('music-chip').hidden=false;};
+$('music-chip').onclick=()=>{$('music-chip').hidden=true;$('music-player').hidden=false;};
 
 
 function applyWheel(){
@@ -1223,12 +1240,18 @@ function loop() {
     mx += joyVec.x; mz -= joyVec.y;
     const m = Math.hypot(mx, mz);
     if (m > 0.05) {
+      G.moveTarget = null; // manual control cancels tap-to-walk
       if (m > 1) { mx /= m; mz /= m; }
       const sp = 3.4 * dt;
       const sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
       player.x += (sin * mz + cos * mx) * sp;
       player.z += (cos * mz - sin * mx) * sp;
       clampPlayer();
+    } else if (G.moveTarget) {
+      const dx = G.moveTarget.x - player.x, dz = G.moveTarget.z - player.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 0.25) G.moveTarget = null;
+      else { const sp = 3.4 * dt; player.x += dx / dist * sp; player.z += dz / dist * sp; player.yaw = Math.atan2(dx, dz); clampPlayer(); }
     }
     applyFreeCam();
     if (G.area === 'exterior') {
