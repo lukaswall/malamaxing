@@ -585,7 +585,7 @@ function enterShop() {
   player.x = 2.6; player.z = 3.4; player.yaw = Math.PI;
   warmIn.intensity = 0.9;
   scene.fog = new THREE.Fog(0xf7ecda, 20, 45);
-  flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.12);
+  flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03);
   $('views').style.display = 'flex'; $('ticket').style.display = 'block'; $('earnings').style.display = 'block';
   updateBasketBar();
   blip(520, 0.12, 'triangle'); setTimeout(() => blip(780, 0.14, 'triangle'), 120);
@@ -657,15 +657,18 @@ function serveGuest() {
   if (over) weightS = Math.max(0, weightS - Math.min(50, Math.round((price - g.budget) / g.budget * 100)));
   const speed = Math.max(20, Math.min(100, Math.round(130 - secs * 1.6)));
   const overall = (order + weightS + speed) / 3;
-  const tip = over ? 0 : Math.max(0, g.budget - price) * (overall / 100) * 0.5;
-  const earned = Math.min(price, g.budget) + tip;
+  const cents = v => Math.round(v * 100);
+  const priceC = cents(price), budgetC = cents(g.budget);
+  const tipC = over ? 0 : Math.max(0, budgetC - priceC) * (overall / 100) * 0.5;
+  const tip = Math.round(tipC) / 100;
+  const earned = (Math.min(priceC, budgetC) + Math.round(tipC)) / 100;
   G.earnings += earned; G.served++;
   $('earnings').textContent = '💰 ' + fmt(G.earnings);
 
   $('rweight').textContent = w + ' g';
   $('rtarget').textContent = g.targetW + ' g';
   $('rerror').textContent = (w > g.targetW ? '+' : '-') + wErr + ' g';
-  $('rprice').textContent = fmt(price);
+  $('rprice').textContent = fmt(priceC / 100);
   $('rbudget').textContent = fmt(g.budget) + (over ? ' ⚠️ OVER' : '');
   $('rtip').textContent = fmt(tip);
   $('rtotal').textContent = fmt(earned);
@@ -685,7 +688,7 @@ function serveGuest() {
 $('nextguest').addEventListener('click', () => { $('receipt').style.display = 'none'; newGuest(); });
 
 // HUD buttons
-$('v-fridge').onclick = () => { if (G.area === 'interior') flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.12); };
+$('v-fridge').onclick = () => { if (G.area === 'interior') flyTo(camPose.fridge.pos, camPose.fridge.yaw, 0.03); };
 $('v-counter').onclick = () => { if (G.area === 'interior') flyTo(camPose.counter.pos, camPose.counter.yaw); };
 $('v-door').onclick = () => { if (G.area === 'interior') exitShop(); };
 $('v-serve').onclick = () => openServe();
@@ -716,6 +719,7 @@ SHOPS.forEach(sh => {
 $('startbtn').addEventListener('click', () => {
   $('title').style.display = 'none';
   G.started = true;
+  if (NARROW()) { player.yaw = Math.PI - 0.38; applyFreeCam(); } // aim at the door on phones
   newGuest();
   showPrompt('Walk to the door and click it to go in 🚪', 5000);
 });
