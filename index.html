@@ -1655,7 +1655,9 @@ async function musicPlay(){
   musicStarting = true;
   try {
     if (!musicEl) {
-      const b64 = await (await fetch('./music-quiet.b64')).text();
+      let res = await fetch('./music-quiet.b64');
+      if (!res.ok) res = await fetch('https://lukaswall.github.io/malamaxing/music-quiet.b64'); // Railway mirror only serves startup-known paths
+      const b64 = await res.text();
       const bin = atob(b64.trim()); const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       musicEl = new Audio(URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })));
