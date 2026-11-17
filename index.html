@@ -1470,7 +1470,7 @@ const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.5}); heldBowl.
 const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
 const falling=[];
-function bowlSlot(i){ const per=6, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.06+(k%2)*.045; return {x:Math.cos(ang)*rad, y:0.0+layer*.05, z:Math.sin(ang)*rad*.8}; }
+function bowlSlot(i){ const per=8, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.78; const rad=k===0?0:.085+(k%3)*.04; return {x:Math.cos(ang)*rad, y:-0.01+layer*.052, z:Math.sin(ang)*rad*.78}; }
 function animatePick(id){
  if(heldFood.children.length<26){
   const slot=bowlSlot(heldFood.children.length);
@@ -1668,7 +1668,7 @@ async function musicPlay(){
     musicOn = true;
   } catch (e) { musicOn = false; }
   musicUi(musicOn);
-  window.__music = { on: musicOn, engine: 'element-quietfile', volume: musicEl ? musicEl.volume : null, paused: musicEl ? musicEl.paused : null, src: musicEl ? musicEl.currentSrc : null };
+  window.__music = { on: musicOn, engine: 'element-quietfile', volume: musicEl ? musicEl.volume : null, paused: musicEl ? musicEl.paused : null, src: musicEl ? musicEl.currentSrc : null, t: musicEl ? musicEl.currentTime : null, build: '20261118c' };
   musicStarting = false;
 }
 function musicStop(){
