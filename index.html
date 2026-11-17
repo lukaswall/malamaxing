@@ -1463,9 +1463,11 @@ const heldBowl = new THREE.Group(); camera.add(heldBowl); scene.add(camera);
 heldBowl.position.set(0,-0.52,-1.1); heldBowl.visible=false;
 const tongs=new THREE.Group();camera.add(tongs);tongs.position.set(-.25,-.23,-.68);tongs.rotation.z=.16;
 const metal=new THREE.MeshStandardMaterial({color:0xd5d7db,metalness:.75,roughness:.28});
-[-.016,.016].forEach(x=>{const a=box(.014,.32,.018,0,{metal:.75,rough:.25});a.material=metal;a.position.set(x,-.06,0);a.rotation.z=x>0?-.1:.1;tongs.add(a);});
-[-.02,.02].forEach(x=>{const pincer=box(.055,.075,.025,0,{metal:.75,rough:.25});pincer.material=metal;pincer.position.set(x,-.25,-.035);pincer.rotation.x=.25;tongs.add(pincer);});
-const spring=sph(.033,0x9b0e0e);spring.position.set(0,.13,0);tongs.add(spring);
+[-.016,.016].forEach(x=>{const a=box(.016,.3,.02,0,{metal:.75,rough:.25});a.material=metal;a.position.set(x,-.05,0);a.rotation.z=x>0?-.1:.1;tongs.add(a);});
+[-.02,.02].forEach(x=>{const tip=box(.06,.085,.014,0,{metal:.7,rough:.3});tip.material=metal;tip.position.set(x,-.26,-.02);tip.rotation.x=.32;tip.rotation.z=x>0?.12:-.12;tongs.add(tip);});
+const tHandle=cyl(.02,.02,.14,0x8a8f96,10,{metal:.7,rough:.35});tHandle.position.set(0,.15,0);tongs.add(tHandle);
+const tGrip=cyl(.024,.024,.1,0x9b0e0e,10);tGrip.position.set(0,.19,0);tongs.add(tGrip);
+const tLoop=new THREE.Mesh(new THREE.TorusGeometry(.024,.006,8,20),metal);tLoop.position.set(0,.26,0);tongs.add(tLoop);
 const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.5}); heldBowl.add(hb);
 const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
@@ -1478,7 +1480,7 @@ function animatePick(id){
   food.position.set(rand(-.15,.15),.55,rand(-.12,.12));
   heldFood.add(food); falling.push({mesh:food,t:0,tx:slot.x,ty:slot.y,tz:slot.z});
  }
- showPrompt(`Tongs + ${ING[id].name}`,650); tongsAnim=.3;
+ showPrompt(ING[id].name,650); tongsAnim=.3;
 }
 const oldRenderBasket=renderBasket3D;
 $('ingredient-list').innerHTML=SHELVES.flat().concat(NOODLES).map(i=>`<button class="ingredient" data-pick="${i.id}">${i.name}<small>${i.cn} · 1 ${i.pack||i.id==='instant'?'pack':i.id==='glass'?'strand':'piece'}</small></button>`).join('');
