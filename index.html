@@ -1418,9 +1418,9 @@ function lvCleanup(msg){
   if (msg) lvStatus(msg);
 }
 function lvCtx(){
-  const stage = !G.basket.length ? 'browsing the shelves' : !G.committed ? 'building the bowl' : !G.paid ? 'bowl weighed, paying' : 'eating at a table';
-  const c = { type:'GameContext', stage, city: G.shop.city, cur: G.shop.cur, ingredients: G.basket.slice(0,40).map(id=>ING[id].name), broth: G.selBroth, spice: G.selSpice, revealed: !!G.committed };
-  if (G.committed) { c.weightG = basketWeight(); c.totalCents = Math.round(basketPrice()*100); if (G.guess!=null) c.guess = G.guess; }
+  const stage = !G.basket.length ? 'browsing the shelves' : !G.committed ? 'building the bowl' : !G.weighLocked ? 'weighing the bowl' : !G.paid ? 'bowl weighed, paying' : 'eating at a table';
+  const c = { type:'GameContext', stage, city: G.shop.city, cur: G.shop.cur, ingredients: G.basket.slice(0,40).map(id=>ING[id].name), broth: G.selBroth, spice: G.selSpice, revealed: !!(G.committed && G.weighLocked) };
+  if (G.committed && G.weighLocked) { c.weightG = basketWeight(); c.totalCents = Math.round(chargePrice()*100); if (G.guess!=null) c.guess = G.guess; }
   return c;
 }
 function lvPushCtx(){ if (LV && LV.ws.readyState===1) { try{ LV.ws.send(JSON.stringify(lvCtx())); }catch(e){} } }
