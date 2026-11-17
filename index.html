@@ -1245,6 +1245,7 @@ $('startbtn').addEventListener('click', () => {
   showPrompt('Walk to the door and click it to go in ', 5000);
 });
 document.getElementById('loading').textContent = '';
+if (new URLSearchParams(location.search).get('unlocked') === '1') { history.replaceState(null, '', '/'); setTimeout(() => showPrompt('Voice unlocked ✓ Now tap Talk → Start live voice ', 7000), 900); }
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -1426,12 +1427,12 @@ async function lvStart(){
   lvCleanup(); $('lv-start').disabled=true; lvStatus('Connecting…');
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio:{ channelCount:1, echoCancellation:true, noiseSuppression:true } }); }
-  catch(e){ lvStatus('Microphone unavailable - allow mic access, or use the scripted chat below.'); $('lv-start').disabled=false; return; }
+  catch(e){ lvStatus('Microphone unavailable - allow mic access, or use the scripted chat below. On iPhone, open this page in Safari or Chrome directly, not inside WhatsApp.'); $('lv-start').disabled=false; return; }
   const ws = new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/voice');
   ws.binaryType='arraybuffer';
   LV = { ws, stream, playAt:0, ac:null, proc:null, src:null, playNodes:[] };
   ws.onerror=()=>lvCleanup('Connection failed.');
-  ws.onclose=(e)=>lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':e.reason==='unauthorized'?'Owner login needed: open /unlock on this same site first.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.'));
+  ws.onclose=(e)=>{ if(e.reason==='unauthorized'){ lvCleanup(); $('lv-status').innerHTML='Owner login needed - <a href="/unlock" style="color:#c1502f;font-weight:bold">tap here to unlock</a>.'; return; } lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.')); };
   ws.onmessage=(ev)=>{
     if (typeof ev.data==='string'){ try{ const j=JSON.parse(ev.data);
       if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
@@ -1576,4 +1577,4 @@ loop();
 
 </script>
 </body>
-</html>
+  </html>
