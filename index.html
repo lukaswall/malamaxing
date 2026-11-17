@@ -233,7 +233,7 @@
       <div class="blabel"><span>WEIGHT</span><span id="sweight">0</span></div><div class="bar"><i id="bweight"></i></div>
       <div class="blabel"><span>SPEED</span><span id="sspeed">0</span></div><div class="bar"><i id="bspeed"></i></div>
     </div>
-    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="rline"><span>Sauce</span><b id="roil">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div>
+    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="rline"><span>Sauce</span><b id="roil" style="text-align:right;margin-left:10px">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div>
     <div class="rline big"><span>TOTAL EARNED</span><b id="rtotal">-</b></div>
     <div class="sub" id="rcomment" style="text-align:center;margin-top:10px"></div>
     <div id="wheel-wrap"><div id="wheel"><i>Again</i><i>Drink</i><i>5%</i><i>10%</i><i>20%</i><i>Free bowl</i></div><button class="cta" id="spin" hidden>Spin the wheel</button><p class="sub" id="spin-result">Guess close to unlock better odds. Fictional rewards only.</p></div><button class="cta" id="nextguest">Next bowl →</button><button class="cta" id="eatbtn" style="margin-top:8px;background:#8a5f3a">Sit &amp; eat 🍜</button>
@@ -846,7 +846,7 @@ function clampPlayer() {
    GAME STATE
    ============================================================ */
 const G = {
-  started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
+  started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0, weighLocked: false,
   earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, chiliOil:false, sauce:[], muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
 };
 const $ = id => document.getElementById('id'.length ? id : id);
@@ -860,7 +860,7 @@ function newGuest() {
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
-  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('v-serve').style.visibility = ''; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false; G.sauce = [];
+  G.committed = false; G.paid = false; G.weighLocked = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('v-serve').style.visibility = ''; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false; G.sauce = [];
   renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
   const npc = window.__guest;
   npc.children[0].material = npc.children[0].material.clone();
@@ -880,15 +880,15 @@ function basketWeight() { return G.basket.reduce((s, id) => s + ING[id].g, 0); }
 function basketPrice() { return basketWeight() / 100 * rate(); }
 function chargePrice() { return Math.max(basketWeight(), minG()) / 100 * rate(); } // owner rule: below-min bowls charge the shop minimum
 function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
-  const w = basketWeight(), p = basketPrice();
-  $('btotal').textContent = G.committed ? `${w} g · ${fmtDual(p)}` : `${G.basket.length} pieces · weight hidden`;
+  const w = basketWeight(), p = chargePrice();
+  $('btotal').textContent = (G.committed && G.weighLocked) ? `${w} g · ${fmtDual(p)}` : (G.committed ? 'On the scale 称重中…' : `${G.basket.length} pieces · weight hidden`);
   const counts = {};
   G.basket.forEach(id => counts[id] = (counts[id] || 0) + 1);
   $('basketitems').innerHTML = Object.entries(counts)
     .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('')
     || '<span style="font-size:11px;color:#b09a7c">empty - pick from the fridge</span>';
   $('basketbar').style.display = G.area === 'interior' ? 'block' : 'none';
-  drawLCD(G.committed ? w : null, G.committed ? chargePrice() : null);
+  drawLCD((G.committed && G.weighLocked) ? w : null, (G.committed && G.weighLocked) ? p : null);
   if (G.guest) updateTicket();
 }
 function pilePieces(grp, ids, cap) {
@@ -1041,6 +1041,7 @@ function openServe() {
     dramaticWeigh(w, chargePrice());
     return;
   }
+  if (G.paid) { $('receipt').style.display = 'flex'; return; } // after payment, Finish order reopens the receipt, never the broth modal
   openBroth();
 }
 function dramaticWeigh(w, price) {
@@ -1052,6 +1053,7 @@ function dramaticWeigh(w, price) {
     else if (el < 2050) drawLCD(-1, null);
     else {
       clearInterval(flick);
+      G.weighLocked = true; updateBasketBar();
       drawLCD(w, null); blip(660, 0.12);
       setTimeout(() => { drawLCD(w, price); blip(880, 0.15); setTimeout(() => blip(1174, 0.2), 170); }, 380);
       setTimeout(() => showReveal(w, price), 1050);
@@ -1097,7 +1099,7 @@ $('servebtn').addEventListener('click', () => {
   $('paymodal').style.display = 'flex';
 });
 function serveGuest() {
-  if (G.paid) return; G.paid = true; $('spin').hidden = false; $('spin-result').textContent='A close guess earns a better shot.';
+  if (G.paid) return; G.paid = true; $('v-serve').style.visibility = 'hidden'; $('spin').hidden = false; $('spin-result').textContent='A close guess earns a better shot.';
   const w = basketWeight(), price = basketPrice();
   const secs = (performance.now() - G.guestSince) / 1000;
   const order = 100; // free pick: no assigned order to match
