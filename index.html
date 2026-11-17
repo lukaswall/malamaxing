@@ -1436,6 +1436,12 @@ async function lvStart(){
       if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
       if(j.type==='AgentAudioDone'){ lvStatus('Live. Just talk - interrupt any time.'); return; }
       const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
+    const b0=new Uint8Array(ev.data);
+    if(b0[0]===0x7b){ try{ const j=JSON.parse(new TextDecoder().decode(b0));
+      if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
+      if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
+      if(j.type==='AgentAudioDone'){ lvStatus('Live. Just talk - interrupt any time.'); return; }
+      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
     const L=LV; if(!L||!L.ac)return; const i16=new Int16Array(ev.data); const f=new Float32Array(i16.length);
     for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
     const buf=L.ac.createBuffer(1,f.length,16000); buf.copyToChannel(f,0);
