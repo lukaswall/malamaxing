@@ -1130,7 +1130,8 @@ const EAT_LINES = [
 let eatIv = null;
 function sitAndEat() {
   $('receipt').style.display = 'none'; $('receipt-tab').hidden = true;
-  flyTo([4.85, 1.8, 0.75], -Math.PI / 2 - 0.3, -0.5);
+  const ecx = 4.85, ecy = 1.95, ecz = 0.75;
+  flyTo([ecx, ecy, ecz], Math.atan2(3.4 - ecx, 0.2 - ecz), (0.95 - ecy) / Math.hypot(3.4 - ecx, 0.2 - ecz));
   if (!window.__eatBowl) {
     const eb = new THREE.Group(); eb.position.set(3.4, 0.86, 0.2);
     eb.add(cyl(0.24, 0.14, 0.18, 0xfdf6e9, 28));
