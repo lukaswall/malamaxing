@@ -243,7 +243,7 @@
 </div>
 
 <div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close ×</button></div></div>
-<div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
+<div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub" id="paysub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
 <div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
 <div id="livevoice" hidden style="background:#fff3d6;border:1px solid #e0b84f;border-radius:8px;padding:8px;margin:8px 0">
 <b style="font-size:13px">Live AI voice · owner preview</b>
@@ -730,18 +730,24 @@ function specialPiece(ing){
  }return g;
 }
 
+
+function pieceMesh(ing, s = 1) {
+  if (['roll','tendon','frog','crab'].includes(ing.shape)) { const g = specialPiece(ing); g.scale.multiplyScalar(s); return g; }
+  let m;
+  if (ing.shape === 'ball') m = sph(0.055 * s, ing.color);
+  else if (ing.shape === 'cube') m = box(0.09 * s, 0.07 * s, 0.09 * s, ing.color);
+  else if (ing.shape === 'stick') { m = cyl(0.03 * s, 0.03 * s, 0.2 * s, ing.color, 8); m.rotation.z = Math.PI / 2 + rand(-0.3, 0.3); }
+  else if (ing.shape === 'slice') { m = cyl(0.07 * s, 0.07 * s, 0.025 * s, ing.color, 14); m.rotation.x = rand(-0.4, 0.4); }
+  else if (ing.shape === 'nest') { m = new THREE.Mesh(new THREE.TorusGeometry(0.07 * s, 0.028 * s, 8, 16), new THREE.MeshStandardMaterial({ color: ing.color, roughness: 0.8 })); m.rotation.x = Math.PI / 2 + rand(-0.3, 0.3); m.castShadow = true; }
+  else { m = sph(0.06 * s, ing.color); m.scale.set(1, 1.5, 1); } // leaf-ish oval
+  return m;
+}
+
 function addPile(group, ing) {
   const n = 7;
   for (let i = 0; i < n; i++) {
-    let m;
     const s = rand(1.05, 1.45);
-    if (['roll','tendon','frog','crab'].includes(ing.shape)) m=specialPiece(ing);
-    else if (ing.shape === 'ball') m = sph(0.055 * s, ing.color);
-    else if (ing.shape === 'cube') m = box(0.09 * s, 0.07 * s, 0.09 * s, ing.color);
-    else if (ing.shape === 'stick') { m = cyl(0.03 * s, 0.03 * s, 0.2 * s, ing.color, 8); m.rotation.z = Math.PI / 2 + rand(-0.3, 0.3); }
-    else if (ing.shape === 'slice') { m = cyl(0.07 * s, 0.07 * s, 0.025 * s, ing.color, 14); m.rotation.x = rand(-0.4, 0.4); }
-    else if (ing.shape === 'nest') { m = new THREE.Mesh(new THREE.TorusGeometry(0.07 * s, 0.028 * s, 8, 16), new THREE.MeshStandardMaterial({ color: ing.color, roughness: 0.8 })); m.rotation.x = Math.PI / 2 + rand(-0.3, 0.3); m.castShadow = true; }
-    else { m = sph(0.06 * s, ing.color); m.scale.set(1, 1.5, 1); }
+    const m = pieceMesh(ing, s);
     m.position.set(rand(-0.3, 0.3), 0.03 + i * 0.022, rand(-0.16, 0.16));
     m.rotation.y = rand(0, Math.PI * 2);
     group.add(m);
@@ -883,7 +889,7 @@ function pilePieces(grp, ids, cap) {
   const per = 9;
   ids.slice(0, cap).forEach((id, i) => {
     const ing = ING[id];
-    const m = (typeof specialPiece === 'function' && ['roll','tendon','frog','crab'].includes(ing.shape)) ? specialPiece(ing) : sph(0.05, ing.color);
+    const m = pieceMesh(ing, 0.9);
     const layer = Math.floor(i / per), k = i % per;
     const ang = (k / per) * Math.PI * 2 + layer * 0.7;
     const rad = k === 0 ? 0 : 0.13 + (k % 3) * 0.08;
@@ -1062,7 +1068,11 @@ function openBroth() {
 $('servebtn').addEventListener('click', () => {
   if (!G.selBroth || !G.selSpice) { $('brothreq').textContent = 'Pick a broth AND a spice level first!'; return; }
   $('brothmodal').style.display = 'none';
-  $('paymodal').style.display = 'flex'; $('payamount').textContent = fmt(basketPrice() + (G.drink?.price || 0));
+  const wNow = basketWeight();
+  const due = (wNow < minG() ? 0 : basketPrice()) + (G.drink?.price || 0);
+  $('payamount').textContent = fmt(due);
+  $('paysub').textContent = wNow < minG() ? 'Game simulation only. Bowl below shop minimum - no bowl charge.' : 'Game simulation only. No real payment.';
+  $('paymodal').style.display = 'flex';
 });
 function serveGuest() {
   if (G.paid) return; G.paid = true; $('spin').hidden = false; $('spin-result').textContent='A close guess earns a better shot.';
@@ -1251,7 +1261,7 @@ const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.Mesh
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
 const falling=[];
 function animatePick(id){
- const food=['roll','tendon','frog','crab'].includes(ING[id].shape)?specialPiece(ING[id]):sph(0.033,ING[id].color); food.scale.multiplyScalar(0.65);food.position.set(rand(-.15,.15),.55,rand(-.12,.12));heldFood.add(food); falling.push({mesh:food,t:0});
+ const food=pieceMesh(ING[id],0.42); food.scale.multiplyScalar(0.65);food.position.set(rand(-.15,.15),.55,rand(-.12,.12));heldFood.add(food); falling.push({mesh:food,t:0});
  showPrompt(`Tongs + ${ING[id].name}`,650); tongsAnim=.3;
 }
 const oldRenderBasket=renderBasket3D;
