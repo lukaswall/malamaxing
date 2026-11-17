@@ -1405,12 +1405,13 @@ $('voice-start').onclick=()=>{$('voicemodal').style.display='flex';updateVoices(
 let LV = null;
 function lvStatus(t){ $('lv-status').textContent = t; }
 function lvCleanup(msg){
-  if (LV) {
-    try{ LV.proc && LV.proc.disconnect(); }catch(e){}
-    try{ LV.src && LV.src.disconnect(); }catch(e){}
-    try{ LV.stream && LV.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
-    try{ LV.ac && LV.ac.state!=='closed' && LV.ac.close(); }catch(e){}
-    try{ LV.ws && LV.ws.readyState<2 && LV.ws.close(); }catch(e){}
+  const ending = LV; LV = null;
+  if (ending) {
+    try{ ending.proc && ending.proc.disconnect(); }catch(e){}
+    try{ ending.src && ending.src.disconnect(); }catch(e){}
+    try{ ending.stream && ending.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+    try{ ending.ac && ending.ac.state!=='closed' && ending.ac.close(); }catch(e){}
+    try{ ending.ws && ending.ws.readyState<2 && ending.ws.close(); }catch(e){}
     LV = null;
   }
   $('lv-start').disabled=false; $('lv-stop').disabled=true; $('lv-start').textContent=' Start live voice';
@@ -1425,15 +1426,26 @@ function lvCtx(){
 function lvPushCtx(){ if (LV && LV.ws.readyState===1) { try{ LV.ws.send(JSON.stringify(lvCtx())); }catch(e){} } }
 async function lvStart(){
   lvCleanup(); $('lv-start').disabled=true; lvStatus('Connecting…');
+  // Create and resume audio synchronously inside the Start tap, before any await.
+  let ac;
+  try {
+    ac = new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+    if (ac.state === 'suspended') ac.resume().catch(()=>{});
+  } catch(e) { lvCleanup('Audio setup failed on this device.'); return; }
+  const current = {ws:null, stream:null, playAt:0, ac, proc:null, src:null, playNodes:[]};
+  LV = current;
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio:{ channelCount:1, echoCancellation:true, noiseSuppression:true } }); }
-  catch(e){ lvStatus('Microphone unavailable - allow mic access, or use the scripted chat below. On iPhone, open this page in Safari or Chrome directly, not inside WhatsApp.'); $('lv-start').disabled=false; return; }
+  catch(e){ if(LV===current) lvCleanup('Microphone unavailable - allow mic access, or use the scripted chat below. On iPhone, open this page in Safari or Chrome directly, not inside WhatsApp.'); return; }
+  if (LV !== current) { stream.getTracks().forEach(t=>t.stop()); return; }
+  current.stream = stream;
   const ws = new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/voice');
   ws.binaryType='arraybuffer';
-  LV = { ws, stream, playAt:0, ac:null, proc:null, src:null, playNodes:[] };
-  ws.onerror=()=>lvCleanup('Connection failed.');
-  ws.onclose=(e)=>{ if(e.reason==='unauthorized'){ lvCleanup(); $('lv-status').innerHTML='Owner login needed - <a href="/unlock" style="color:#c1502f;font-weight:bold">tap here to unlock</a>.'; return; } lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.')); };
+  current.ws = ws;
+  ws.onerror=()=>{ if(LV===current) lvCleanup('Connection failed.'); };
+  ws.onclose=(e)=>{ if(LV!==current)return; if(e.reason==='unauthorized'){ lvCleanup(); $('lv-status').innerHTML='Owner login needed - <a href="/unlock" style="color:#c1502f;font-weight:bold">tap here to unlock</a>.'; return; } lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.')); };
   ws.onmessage=(ev)=>{
+    if(LV!==current)return;
     if (typeof ev.data==='string'){ try{ const j=JSON.parse(ev.data);
       if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
       if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
@@ -1453,10 +1465,10 @@ async function lvStart(){
     const t0=Math.max(L.ac.currentTime,L.playAt); n.start(t0); L.playAt=t0+buf.duration;
   };
   ws.onopen=()=>{
+    if (LV !== current) { ws.close(); return; }
     try{
-      const ac=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
-      if(ac.state==='suspended')ac.resume();
-      LV.ac=ac; LV.playAt=ac.currentTime;
+      if(ac.state==='suspended') { lvCleanup('Audio is paused on this device. Tap Start again to enable it.'); return; }
+      LV.playAt=ac.currentTime;
       const src=ac.createMediaStreamSource(stream); LV.src=src;
       const proc=ac.createScriptProcessor(4096,1,1); LV.proc=proc;
       proc.onaudioprocess=(e)=>{ if(ws.readyState!==1)return; const f=e.inputBuffer.getChannelData(0); const i16=new Int16Array(f.length); for(let i=0;i<f.length;i++){const v=Math.max(-1,Math.min(1,f[i])); i16[i]=v*32767;} ws.send(i16.buffer); };
