@@ -51,7 +51,7 @@
   #basketitems .chip{cursor:pointer}
   #basketitems .chip:hover{background:#ecc9c0;text-decoration:line-through}
   #ticket,#basketbar,#zoomtools{display:none!important}
-  #bowlhud{position:absolute;top:12px;right:12px;z-index:22;background:var(--paper);border-radius:12px;padding:8px 10px;max-width:46vw;box-shadow:0 4px 14px #0003;font-size:12px}
+  #bowlhud{position:absolute;top:12px;left:12px;z-index:22;background:var(--paper);border-radius:12px;padding:8px 10px;max-width:46vw;box-shadow:0 4px 14px #0003;font-size:12px}
   #bowlhud .bh-line{font-weight:bold;color:var(--terra);white-space:nowrap;font-size:11.5px}
   #bh-items{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;max-height:100px;overflow-y:auto}
   #bh-items .chip{cursor:pointer}
@@ -199,7 +199,7 @@
     <div id="baskethint">One piece per tap. Weights are estimates. Tap to remove before committing.</div></div>
   </div>
 
-  <div id="bowlhud" style="display:none"><div class="bh-line" id="bh-rate"></div><div id="bh-items"></div></div>
+  <div id="bowlhud" style="display:none"><button id="bh-toggle" class="panel-toggle" aria-expanded="true"> Bowl <span>− / +</span></button><div class="panel-content"><div class="bh-line" id="bh-rate"></div><div id="bh-items"></div></div></div>
   <button class="vbtn easy-enter" id="enter-easy" hidden>Enter shop →</button>
   <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">−</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">＋</button></div>
   <button id="receipt-tab" class="vbtn" hidden> Show receipt</button>
@@ -1425,6 +1425,7 @@ $('enter-easy').onclick=()=>enterShop();
 $('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted)window.speechSynthesis?.cancel(); if(!G.muted) blip();};
 $('ticket-toggle').onclick=()=>{const c=$('ticket').classList.toggle('collapsed'); $('ticket-toggle').setAttribute('aria-expanded',!c);};
 $('basket-toggle').onclick=()=>{const c=$('basketbar').classList.toggle('collapsed'); $('basket-toggle').setAttribute('aria-expanded',!c);};
+$('bh-toggle').onclick=()=>{const c=$('bowlhud').classList.toggle('collapsed'); $('bh-toggle').setAttribute('aria-expanded',!c);};
 $('min-receipt').onclick=()=>{$('receipt').style.display='none'; $('receipt-tab').hidden=false;};
 $('receipt-tab').onclick=()=>{$('receipt').style.display='flex'; $('receipt-tab').hidden=true;};
 const DRINKS = [
