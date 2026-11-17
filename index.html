@@ -157,7 +157,7 @@
  #voicemodal label{display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:6px;margin:9px 0}#voicemodal select{max-width:65%;padding:6px;border:1px solid #dac3a4;border-radius:6px;background:white;color:var(--ink)}.chatlog{padding:12px;background:#f1e3cb;border-radius:8px;font-size:13px;line-height:1.5;margin:10px 0}#voice-status{margin-top:12px}#voice-start{margin-top:6px}
  @media(max-width:600px){#views{gap:5px}.vbtn{padding:7px 10px}#zoomtools{bottom:162px}}
  #greeting{position:absolute;top:60px;left:12px;max-width:210px;background:var(--paper);border:1px solid #dfc69f;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;pointer-events:none;z-index:25} @media(orientation:landscape) and (max-height:600px){#greeting{top:72px;max-width:180px;font-size:10px}#title .sign h2{display:none}#title .sign{margin-bottom:3px}#loading{margin-top:4px}#voice-start,#enable-voices{font-size:10px;padding:5px 10px}}
-#music-player{position:fixed;left:12px;bottom:12px;z-index:27;background:var(--paper);border-radius:8px;overflow:hidden;width:200px;box-shadow:0 4px 20px #0004;font-size:11px}#music-player iframe{display:block;border:0}#music-list .opt{width:100%;font-size:12px}#music-list a{color:var(--terra);padding:5px}#music-chip{position:fixed;left:12px;bottom:12px;z-index:27;max-width:180px} @media(max-width:600px){#music-player{top:172px;bottom:auto}#music-chip{top:172px;bottom:auto}#views{max-width:150px}}
+@media(max-width:600px){#views{max-width:150px}}
 #eatpanel{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:26;background:var(--paper);border-radius:12px;padding:12px 16px;width:min(430px,92vw);box-shadow:0 6px 24px #0005;font-size:14px}
 #wheel-wrap{text-align:center;margin:14px 0}#wheel{width:150px;height:150px;border-radius:50%;border:7px solid var(--terra);background:conic-gradient(#f8d795 0 60deg,#c1502f 60deg 120deg,#f8d795 120deg 180deg,#c1502f 180deg 240deg,#f8d795 240deg 300deg,#c1502f 300deg 360deg);position:relative;margin:auto;transition:transform 3s cubic-bezier(.12,.65,.08,1)}#wheel i{position:absolute;left:50%;top:50%;font-style:normal;font-size:9px;transform-origin:0 0;color:white;text-shadow:0 1px 1px #0008}#wheel i:nth-child(1){transform:rotate(30deg) translate(46px,-4px)}#wheel i:nth-child(2){transform:rotate(90deg) translate(42px,-4px)}#wheel i:nth-child(3){transform:rotate(150deg) translate(50px,-4px)}#wheel i:nth-child(4){transform:rotate(210deg) translate(47px,-4px)}#wheel i:nth-child(5){transform:rotate(270deg) translate(50px,-4px)}#wheel i:nth-child(6){transform:rotate(330deg) translate(36px,-4px)}#spin{margin-top:12px}
 </style>
@@ -171,7 +171,7 @@
     <div class="row"><span>Shop rate</span><b id="trate">-</b></div>
     <div class="row"><span>Broth</span><b id="tbroth">-</b></div>
     <div class="row"><span>Spice</span><b id="tspice">-</b></div>
-    <div class="row"><span>Chili oil</span><b id="toil">-</b></div>
+    <div class="row"><span>Sauce 调料</span><b id="toil">-</b></div>
     <div class="req" id="treq"></div></div>
   </div>
 
@@ -180,7 +180,7 @@
   <div id="views">
     <button class="vbtn" id="v-fridge"> Fridge</button>
     <button class="vbtn" id="v-counter"> Counter</button>
-    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open">Music</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-door"> Door</button>
+    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open"> Music off</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-sauce"> Sauce</button><button class="vbtn" id="v-door"> Door</button>
     <button class="vbtn serve" id="v-serve"> Commit &amp; weigh</button>
   </div>
 
@@ -202,10 +202,8 @@
   <div id="joy"><div id="joyknob"></div></div>
 </div>
 
-<div class="modal" id="musicmodal"><div class="card"><h2>Shop music</h2><p class="sub" id="music-status">The shop owner's own track, played directly in the game - no YouTube, no ads. Music starts when you open the shop; some browsers need one tap here. Minimize (–) shrinks the player to a chip; Stop ends playback.</p><div class="optgrid" id="music-list"><button class="opt" id="music-play-track">Play shop music</button></div><button class="vbtn" id="music-close">Close</button></div></div>
-<div id="music-player" hidden><div style="display:flex;justify-content:space-between;padding:5px;gap:4px;align-items:center"><span id="music-title"></span><span style="white-space:nowrap"><button id="music-mute" class="vbtn" title="Mute music"> </button> <button id="music-min" class="vbtn" title="Minimize - music keeps playing">–</button> <button id="music-stop" class="vbtn">Stop ×</button></span></div><div id="music-frame"></div></div>
+<div class="modal" id="saucemodal"><div class="card"><h2>Sauce bar 调料台</h2><p class="sub">Mix your own dipping sauce - free, like at a real malatang shop. Tap to add or remove.</p><div class="optgrid" id="sauceopts" style="grid-template-columns:1fr 1fr 1fr"></div><p class="sub" id="saucemix" style="margin-top:10px"></p><button class="cta" id="sauce-done">Mix my sauce 调好蘸料</button><button class="vbtn" id="sauce-close" style="margin-top:12px">Close</button></div></div>
 <div id="eatpanel" hidden><div id="eatline" style="font-size:15px;min-height:40px"></div><div class="bar" style="margin:8px 0"><i id="eatbar" style="width:0%"></i></div><p class="sub" style="margin:6px 0">Scripted conversation. Tap Talk for voice chat options.</p><button class="cta" id="eat-next">Next bowl →</button> <button class="vbtn" id="eat-skip">Finish ×</button></div>
-<button id="music-chip" class="vbtn" hidden>♪ <span id="music-chip-title"></span> - paused, tap to resume</button>
 <div class="modal" id="exitmodal"><div class="card"><h2>Step outside?</h2><p class="sub">Your basket and current guest stay as they are. This just prevents accidental exits.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="cta" id="exit-cancel">Stay inside</button><button class="vbtn" id="exit-confirm">Exit shop</button></div></div></div>
 <div class="modal" id="guessmodal"><div class="card"><h2>What does your bowl weigh?</h2><p class="sub" id="guess-help">Enter your own estimate before the scale reveals the answer. This locks the basket, even if it is below the shop minimum.</p><label for="guess-input">Your guess, in grams</label><input id="guess-input" type="number" inputmode="numeric" min="1" max="5000" step="1" style="width:100%;padding:14px;margin:12px 0;font-size:20px"><button class="cta" id="lock-guess">Lock guess &amp; weigh</button><button class="vbtn" id="cancel-guess" style="margin-top:12px">Keep picking</button></div></div>
 <div class="modal" id="revealmodal"><div class="card" style="text-align:center"><h2>The scale says... 称重</h2><div id="reveal-weight" style="font-size:44px;font-weight:800;color:#c1502f;margin:14px 0 4px">0 g</div><div id="reveal-price" style="font-size:24px;font-weight:700;margin-bottom:6px"></div><p class="sub" id="reveal-guess"></p><p class="sub" id="reveal-note" style="color:#c1502f"></p><button class="cta" id="reveal-continue">Choose broth &amp; spice →</button></div></div>
@@ -235,7 +233,7 @@
       <div class="blabel"><span>WEIGHT</span><span id="sweight">0</span></div><div class="bar"><i id="bweight"></i></div>
       <div class="blabel"><span>SPEED</span><span id="sspeed">0</span></div><div class="bar"><i id="bspeed"></i></div>
     </div>
-    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="rline"><span>Chili oil</span><b id="roil">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div>
+    <div class="rline"><span>Drink</span><b id="rdrink">-</b></div><div class="rline"><span>Sauce</span><b id="roil">-</b></div><div class="sub" id="rpayment"></div><div class="sub">Prize wheel: <b id="rwheel">—</b></div>
     <div class="rline big"><span>TOTAL EARNED</span><b id="rtotal">-</b></div>
     <div class="sub" id="rcomment" style="text-align:center;margin-top:10px"></div>
     <div id="wheel-wrap"><div id="wheel"><i>Again</i><i>Drink</i><i>5%</i><i>10%</i><i>20%</i><i>Free bowl</i></div><button class="cta" id="spin" hidden>Spin the wheel</button><p class="sub" id="spin-result">Guess close to unlock better odds. Fictional rewards only.</p></div><button class="cta" id="nextguest">Next bowl →</button><button class="cta" id="eatbtn" style="margin-top:8px;background:#8a5f3a">Sit &amp; eat 🍜</button>
@@ -390,6 +388,14 @@ const SPICES = [
   { id:'medium', name:'Medium', cn:'中辣' },
   { id:'extra',  name:'Extra',  cn:'特辣' },
 ];
+const SAUCES = [
+  { id:'coriander',  name:'Coriander',    cn:'香菜' },
+  { id:'springonion',name:'Spring Onion', cn:'葱花' },
+  { id:'soysauce',   name:'Soy Sauce',    cn:'酱油' },
+  { id:'vinegar',    name:'Black Vinegar',cn:'香醋' },
+  { id:'sesameoil',  name:'Sesame Oil',   cn:'香油' },
+  { id:'chilioil',   name:'Chili Oil',    cn:'辣油' },
+];
 const GUEST_NAMES = ['Wei','Lena','Marc','Aisha','Pau','Sofia','Jon','Marta','Chen','Nora','Oriol','Liu','Anna','Ravi','Júlia','Kenji'];
 
 // ---------- renderer ----------
@@ -540,9 +546,9 @@ function drawLCD(weightG, priceE) {
   g.strokeStyle = '#2e5c38'; g.lineWidth = 8; g.strokeRect(6, 6, 500, 180);
   g.fillStyle = '#8dff9a'; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.font = 'bold 74px "Courier New", monospace';
-  g.fillText(weightG == null ? 'GUESS' : `${weightG} g`, 256, 60);
+  g.fillText(weightG == null ? 'GUESS' : weightG < 0 ? '- - -' : `${weightG} g`, 256, 60);
   g.font = 'bold 54px "Courier New", monospace';
-  g.fillText(priceE == null ? 'LOCK TO WEIGH' : `${G.shop.cur}${priceE.toFixed(2)}`, 256, 140);
+  g.fillText(priceE == null ? (weightG < 0 ? 'WEIGHING…' : 'LOCK TO WEIGH') : `${G.shop.cur}${priceE.toFixed(2)}`, 256, 140);
   lcdTex.needsUpdate = true;
 }
 
@@ -652,7 +658,7 @@ function drawLCD(weightG, priceE) {
 
   // sauce pots
   [2.0, 2.45].forEach((x, i) => {
-    const pot = cyl(0.14, 0.11, 0.18, i ? C.terra : 0x8a5f3a); pot.position.set(x, 1.17, 0.1); counter.add(pot);
+    const pot = cyl(0.14, 0.11, 0.18, i ? C.terra : 0x8a5f3a); pot.position.set(x, 1.17, 0.1); clickable(pot, { type: 'sauce' }); counter.add(pot);
   });
 
   // ------- guest NPC -------
@@ -841,7 +847,7 @@ function clampPlayer() {
    ============================================================ */
 const G = {
   started: false, shop: SHOPS[0], area: 'exterior', basket: [], guest: null, guestSince: 0,
-  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, chiliOil:false, muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
+  earnings: 0, served: 0, selBroth: null, selSpice: null, committed:false, paid:false, guess:null, wheel:null, drink:null, chiliOil:false, sauce:[], muted:false, voiceEnabled:false, freeDrink:false, lastBill:null,
 };
 const $ = id => document.getElementById('id'.length ? id : id);
 
@@ -854,7 +860,7 @@ function newGuest() {
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
-  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('v-serve').style.visibility = ''; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false;
+  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('v-serve').style.visibility = ''; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false; G.sauce = [];
   renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
   const npc = window.__guest;
   npc.children[0].material = npc.children[0].material.clone();
@@ -867,11 +873,12 @@ function updateTicket() {
   const sn = id => { const s = SPICES.find(x => x.id === id); return s ? s.name + ' ' + s.cn : 'choose at counter'; };
   $('tbroth').textContent = bn(G.selBroth);
   $('tspice').textContent = sn(G.selSpice);
-  $('toil').textContent = G.chiliOil ? 'Yes 辣油 (free)' : '—';
+  $('toil').textContent = G.sauce && G.sauce.length ? G.sauce.map(id => { const s = SAUCES.find(x => x.id === id); return s ? s.name + ' ' + s.cn : ''; }).join(' + ') : '—';
   $('treq').innerHTML = '<span style="font-size:11px;color:#a08362;width:100%">Your bowl, your rules: pick anything, guess its weight, then commit &amp; weigh.</span>';
 }
 function basketWeight() { return G.basket.reduce((s, id) => s + ING[id].g, 0); }
 function basketPrice() { return basketWeight() / 100 * rate(); }
+function chargePrice() { return Math.max(basketWeight(), minG()) / 100 * rate(); } // owner rule: below-min bowls charge the shop minimum
 function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
   const w = basketWeight(), p = basketPrice();
   $('btotal').textContent = G.committed ? `${w} g · ${fmtDual(p)}` : `${G.basket.length} pieces · weight hidden`;
@@ -881,7 +888,7 @@ function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
     .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('')
     || '<span style="font-size:11px;color:#b09a7c">empty - pick from the fridge</span>';
   $('basketbar').style.display = G.area === 'interior' ? 'block' : 'none';
-  drawLCD(G.committed ? w : null, G.committed ? p : null);
+  drawLCD(G.committed ? w : null, G.committed ? chargePrice() : null);
   if (G.guest) updateTicket();
 }
 function pilePieces(grp, ids, cap) {
@@ -952,9 +959,10 @@ function act(a) {
   else if (a.type === 'chilioil') {
     if (!G.started || G.committed) return;
     if (!G.basket.length) { showPrompt('Pick your bowl first, then add chili oil. 先选菜再加辣油', 2200); return; }
-    if (!G.chiliOil) { G.chiliOil = true; blip(760, 0.08); showPrompt('Chili oil added 加辣油了 - free!', 2200); updateTicket(); }
+    if (!G.chiliOil) { G.chiliOil = true; if (!G.sauce.includes('chilioil')) G.sauce.push('chilioil'); blip(760, 0.08); showPrompt('Chili oil added 加辣油了 - free!', 2200); updateTicket(); }
     else showPrompt('Chili oil already in 辣油已加', 1600);
   }
+  else if (a.type === 'sauce') { if (G.area !== 'interior') return; openSauce(); }
   else if (a.type === 'cashier') { $('voicemodal').style.display='flex'; updateVoices(); lvProbe(); say(cashierLine()); }
   else if (a.type === 'pick') {
     if (G.area !== 'interior') return;
@@ -1024,28 +1032,42 @@ function openServe() {
     const w = basketWeight();
     G.committed = true; updateBasketBar(); heldBowl.visible = false;
     pilePieces(window.__scaleFood, G.basket, 45); window.__scaleBowl.visible = true;
-    flyTo(camPose.counter.pos, camPose.counter.yaw);
+    const sp2 = new THREE.Vector3(); window.__scaleBowl.getWorldPosition(sp2); sp2.y += 0.45;
+    const cp2 = camPose.counter.pos, zk = 0.5;
+    const px = cp2[0] + (sp2.x - cp2[0]) * zk, py = cp2[1] + (sp2.y - cp2[1]) * zk * 0.45, pz = cp2[2] + (sp2.z - cp2[2]) * zk;
+    flyTo([px, py, pz], Math.atan2(sp2.x - px, sp2.z - pz), (sp2.y - py) / Math.hypot(sp2.x - px, sp2.z - pz));
     $('v-serve').textContent = ' Finish order';
-    $('reveal').textContent = `${w} g · ${fmtDual(basketPrice())} · ${w < minG() ? 'BELOW SHOP MINIMUM - rejected bowl' : 'Basket locked. No more picks.'}`;
-    showReveal(w, basketPrice());
+    $('reveal').textContent = `${w} g · ${fmtDual(chargePrice())} · ${w < minG() ? 'Below shop minimum - charged as ' + minG() + ' g' : 'Basket locked. No more picks.'}`;
+    dramaticWeigh(w, chargePrice());
     return;
   }
   openBroth();
+}
+function dramaticWeigh(w, price) {
+  const t0 = performance.now();
+  blip(220, 0.18, 'sawtooth');
+  const flick = setInterval(() => {
+    const el = performance.now() - t0;
+    if (el < 1500) drawLCD(Math.round(w * (0.45 + Math.random() * 0.85)), null);
+    else if (el < 2050) drawLCD(-1, null);
+    else {
+      clearInterval(flick);
+      drawLCD(w, null); blip(660, 0.12);
+      setTimeout(() => { drawLCD(w, price); blip(880, 0.15); setTimeout(() => blip(1174, 0.2), 170); }, 380);
+      setTimeout(() => showReveal(w, price), 1050);
+    }
+  }, 90);
 }
 function showReveal(w, price) {
   $('revealmodal').style.display = 'flex';
   const off = G.guess != null ? Math.abs(G.guess - w) : 0;
   $('reveal-guess').textContent = G.guess != null ? `Your guess: ${G.guess} g · off by ${off} g (${Math.round(off / Math.max(w, 1) * 100)}%)` : '';
-  $('reveal-note').textContent = w < minG() ? 'Below the shop minimum - this bowl gets rejected.' : '';
-  $('reveal-price').textContent = '';
-  const el = $('reveal-weight'), t0 = performance.now(), dur = 1200;
-  const tick = t => {
-    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
-    el.textContent = Math.round(w * e) + ' g';
-    if (k < 1) requestAnimationFrame(tick);
-    else { $('reveal-price').textContent = fmtDual(price); blip(880, 0.12); }
-  };
-  requestAnimationFrame(tick);
+  $('reveal-note').textContent = w < minG() ? 'Below the shop minimum - your bowl stays valid, charged at the ' + minG() + ' g minimum.' : '';
+  $('reveal-price').textContent = fmtDual(price);
+  const el = $('reveal-weight'); el.textContent = w + ' g';
+  el.style.transition = 'none'; el.style.transform = 'scale(1.35)';
+  requestAnimationFrame(() => { el.style.transition = 'transform .3s'; el.style.transform = 'scale(1)'; });
+  blip(988, 0.1);
 }
 function openBroth() {
   $('brothreq').textContent = 'Pick your broth and spice level 选汤底和辣度';
@@ -1069,9 +1091,9 @@ $('servebtn').addEventListener('click', () => {
   if (!G.selBroth || !G.selSpice) { $('brothreq').textContent = 'Pick a broth AND a spice level first!'; return; }
   $('brothmodal').style.display = 'none';
   const wNow = basketWeight();
-  const due = (wNow < minG() ? 0 : basketPrice()) + (G.drink?.price || 0);
+  const due = chargePrice() + (G.drink?.price || 0);
   $('payamount').textContent = fmt(due);
-  $('paysub').textContent = wNow < minG() ? 'Game simulation only. Bowl below shop minimum - no bowl charge.' : 'Game simulation only. No real payment.';
+  $('paysub').textContent = wNow < minG() ? 'Game simulation only. Bowl below the shop minimum - charged at the ' + minG() + ' g minimum.' : 'Game simulation only. No real payment.';
   $('paymodal').style.display = 'flex';
 });
 function serveGuest() {
@@ -1088,7 +1110,7 @@ function serveGuest() {
   const priceC = cents(price);
   const tipC = 0;
   const tip = Math.round(tipC) / 100;
-  const bowlC = w < minG() ? 0 : priceC;
+  const bowlC = Math.round(Math.max(w, minG()) / 100 * rate() * 100);
   const drinkC = Math.round((G.drink?.price || 0) * 100);
   const earned = (bowlC + drinkC + Math.round(tipC)) / 100;
   G.earnings += earned; G.served++;
@@ -1099,13 +1121,13 @@ function serveGuest() {
   $('rerror').textContent = '±' + wErr + ' g vs your guess';
   $('rprice').textContent = fmtDual(bowlC / 100);
   $('rdrink').textContent = (G.drink ? G.drink.name + ' · ' : '') + fmt(drinkC / 100);
-  $('roil').textContent = G.chiliOil ? 'Yes 辣油 · free' : '—';
+  $('roil').textContent = G.sauce.length ? G.sauce.map(id => SAUCES.find(s => s.id === id).name).join(' + ') + ' · free' : '—';
   $('rpayment').textContent = G.payment === 'cash' ? 'Cash (simulated)' : 'Card approved (simulated)';
   $('rtotal').textContent = fmt(earned);
   $('sorder').textContent = order; $('border').style.width = order + '%';
   $('sweight').textContent = weightS; $('bweight').style.width = weightS + '%';
   $('sspeed').textContent = speed; $('bspeed').style.width = speed + '%';
-  $('rstamp').textContent = w < minG() ? 'REJECTED' : over ? 'OVER BUDGET' : 'PAID';
+  $('rstamp').textContent = over ? 'OVER BUDGET' : 'PAID';
   $('rstamp').style.borderColor = $('rstamp').style.color = over ? '#a03030' : '#c1502f';
   $('rwheel').textContent='—';
   $('rcomment').textContent =
@@ -1113,8 +1135,7 @@ function serveGuest() {
     overall >= 70 ? pick(['"Pretty good!" ', '"Nice bowl, thanks!" ', '"Almost perfect!" ']) :
     overall >= 50 ? pick(['"Hmm, not quite my order…" ', '"It\'s okay, I guess." ']) :
     over ? '"This costs more than my budget!" ' : '"This is not what I ordered…" ';
-  applyWheel(); if (w < minG()) { $('rwheel').textContent='—';
-  $('rcomment').textContent = 'Below shop minimum. Bowl rejected, no bowl charge.'; $('sweight').textContent = '0'; $('bweight').style.width = '0%'; }
+  applyWheel(); if (w < minG()) { $('rcomment').textContent = 'Small bowl, still yours! Charged at the ' + minG() + ' g shop minimum. '; }
   $('receipt').style.display = 'flex';
   blip(523, 0.12); setTimeout(() => blip(659, 0.12), 120); setTimeout(() => blip(overall >= 50 ? 784 : 392, 0.25), 240);
 }
@@ -1150,6 +1171,12 @@ function sitAndEat() {
     ef.add(pm2);
   });
   eb2.userData.food = ef; eb2.add(ef);
+  const gar = new THREE.Group();
+  const greens = (G.sauce.includes('coriander') ? 4 : 0) + (G.sauce.includes('springonion') ? 4 : 0);
+  for (let i = 0; i < greens; i++) { const lf = sph(0.018, i % 2 ? 0x3f8a3f : 0x57a84f, { cast: false }); const a = i * 0.9, r = 0.04 + (i % 3) * 0.05; lf.position.set(Math.cos(a) * r, 0.14, Math.sin(a) * r); lf.scale.y = 0.35; gar.add(lf); }
+  if (G.sauce.includes('soysauce') || G.sauce.includes('vinegar') || G.sauce.includes('sesameoil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0x4a2c14, { cast: false }); const a = i * 1.7 + 0.4, r = 0.05 + (i % 2) * 0.06; d.position.set(Math.cos(a) * r, 0.135, Math.sin(a) * r); gar.add(d); }
+  if (G.sauce.includes('chilioil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0xd92b0f, { cast: false }); const a = i * 1.9 + 1.1, r = 0.06 + (i % 2) * 0.05; d.position.set(Math.cos(a) * r, 0.135, Math.sin(a) * r); gar.add(d); }
+  ef.add(gar);
   window.__eatBowl.visible = true;
   const npc = window.__guest, wfrom = npc.position.clone(), wto = new THREE.Vector3(2.72, 0, 0.62);
   const t0 = performance.now();
@@ -1233,14 +1260,14 @@ function dolly(delta) {
   player.x = Math.max(-3.5, Math.min(3.5, player.x + Math.sin(player.yaw) * delta));
   player.z = Math.max(-2.9, Math.min(10, nextZ)); applyFreeCam();
 }
-renderer.domElement.addEventListener('wheel', e => { e.preventDefault(); dolly(-Math.sign(e.deltaY)*0.28); }, {passive:false});
+renderer.domElement.addEventListener('wheel', e => { e.preventDefault(); dolly(-Math.sign(e.deltaY)*0.4); }, {passive:false});
 let pinchDistance = null;
 renderer.domElement.addEventListener('touchstart', e => { if(e.touches.length===2) { dragging=false; pinchDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); } },{passive:true});
-renderer.domElement.addEventListener('touchmove',e=>{ if(e.touches.length===2 && pinchDistance!=null){ e.preventDefault(); dragging=false; const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); dolly((d-pinchDistance)*0.012); pinchDistance=d; } },{passive:false});
+renderer.domElement.addEventListener('touchmove',e=>{ if(e.touches.length===2 && pinchDistance!=null){ e.preventDefault(); dragging=false; const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); dolly((d-pinchDistance)*0.02); pinchDistance=d; } },{passive:false});
 renderer.domElement.addEventListener('touchend',()=>{pinchDistance=null;dragging=false;},{passive:true});
-$('zoom-in').onclick=()=>dolly(0.35); $('zoom-out').onclick=()=>dolly(-0.35);
+$('zoom-in').onclick=()=>dolly(0.6); $('zoom-out').onclick=()=>dolly(-0.6);
 $('enter-easy').onclick=()=>enterShop();
-$('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted){window.speechSynthesis?.cancel();if(musicEl)musicEl.muted=true;} else if(musicEl&&!musicMuted)musicEl.muted=false; if(!G.muted) blip();};
+$('sound').onclick=()=>{G.muted=!G.muted; $('sound').textContent=G.muted?'Sound off':'Sound on'; if(G.muted)window.speechSynthesis?.cancel(); if(!G.muted) blip();};
 $('ticket-toggle').onclick=()=>{const c=$('ticket').classList.toggle('collapsed'); $('ticket-toggle').setAttribute('aria-expanded',!c);};
 $('basket-toggle').onclick=()=>{const c=$('basketbar').classList.toggle('collapsed'); $('basket-toggle').setAttribute('aria-expanded',!c);};
 $('min-receipt').onclick=()=>{$('receipt').style.display='none'; $('receipt-tab').hidden=false;};
@@ -1252,6 +1279,20 @@ const DRINKS = [
  ['Chrysanthemum tea','菊花茶','',2.5],['Pear juice','梨汁','',2.8],['Lychee drink','荔枝汁','',2.8],
  ['Grass jelly drink','仙草蜜','',2.8],['Bubble milk tea','珍珠奶茶','',4],['Water','水','',1.5]
 ];
+function openSauce(){
+  const grid = $('sauceopts'); grid.innerHTML = '';
+  SAUCES.forEach(s => {
+    const d = document.createElement('div'); d.className = 'opt' + (G.sauce.includes(s.id) ? ' sel' : '');
+    d.innerHTML = `${s.name}<small>${s.cn}</small>`;
+    d.onclick = () => { const i = G.sauce.indexOf(s.id); if (i >= 0) G.sauce.splice(i, 1); else G.sauce.push(s.id); blip(700, 0.05, 'triangle'); openSauce(); };
+    grid.appendChild(d);
+  });
+  $('saucemix').textContent = G.sauce.length ? 'My sauce: ' + G.sauce.map(id => SAUCES.find(s => s.id === id).name).join(' + ') : 'Nothing picked yet - mix your own!';
+  $('saucemodal').style.display = 'flex';
+}
+$('v-sauce').onclick = () => { if (G.area === 'interior') openSauce(); };
+$('sauce-done').onclick = () => { G.chiliOil = G.sauce.includes('chilioil'); updateTicket(); $('saucemodal').style.display = 'none'; if (G.sauce.length) showPrompt('Sauce mixed: ' + G.sauce.map(id => SAUCES.find(s => s.id === id).cn).join('·') + ' ', 2400); blip(760, 0.08); };
+$('sauce-close').onclick = () => { $('saucemodal').style.display = 'none'; };
 $('v-drinks').onclick=()=>{if(!G.paid){$('drinkmodal').style.display='flex'; renderDrinks();}};
 $('close-drinks').onclick=()=>{$('drinkmodal').style.display='none';};
 function renderDrinks(){
@@ -1386,15 +1427,20 @@ async function lvStart(){
   catch(e){ lvStatus('Microphone unavailable - allow mic access, or use the scripted chat below.'); $('lv-start').disabled=false; return; }
   const ws = new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/voice');
   ws.binaryType='arraybuffer';
-  LV = { ws, stream, playAt:0, ac:null, proc:null, src:null };
+  LV = { ws, stream, playAt:0, ac:null, proc:null, src:null, playNodes:[] };
   ws.onerror=()=>lvCleanup('Connection failed.');
   ws.onclose=(e)=>lvCleanup(e.reason==='budget'?'The voice budget is used up for now.':e.reason==='busy'?'The line is busy - try again shortly.':e.reason==='unauthorized'?'Owner login needed: open /unlock on this same site first.':(e.reason&&e.reason!=='origin'?'Session ended ('+e.reason+').':'Session ended.'));
   ws.onmessage=(ev)=>{
-    if (typeof ev.data==='string'){ try{ const j=JSON.parse(ev.data); const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
+    if (typeof ev.data==='string'){ try{ const j=JSON.parse(ev.data);
+      if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
+      if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
+      if(j.type==='AgentAudioDone'){ lvStatus('Live. Just talk - interrupt any time.'); return; }
+      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
     const L=LV; if(!L||!L.ac)return; const i16=new Int16Array(ev.data); const f=new Float32Array(i16.length);
     for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
     const buf=L.ac.createBuffer(1,f.length,16000); buf.copyToChannel(f,0);
     const n=L.ac.createBufferSource(); n.buffer=buf; n.connect(L.ac.destination);
+    L.playNodes.push(n); n.onended=()=>{ const ix = L.playNodes ? L.playNodes.indexOf(n) : -1; if (ix >= 0) L.playNodes.splice(ix, 1); };
     const t0=Math.max(L.ac.currentTime,L.playAt); n.start(t0); L.playAt=t0+buf.duration;
   };
   ws.onopen=()=>{
@@ -1422,27 +1468,17 @@ $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
 $('reveal-continue').onclick=()=>{$('revealmodal').style.display='none';openBroth();};
 
 // ---- Shop music: owner-supplied track, native playback only (no YouTube) ----
-let musicEl = null, musicMuted = false;
-const MUSIC_VOLUME = 0.35; // background level: softer than effects
+let musicEl = null;
+const MUSIC_VOLUME = 0.1; // way quieter per owner request
 function musicEnsure(){ if(!musicEl){ musicEl = new Audio('./3-audio-ff3ef5ef.mp3'); musicEl.loop = true; musicEl.volume = MUSIC_VOLUME; musicEl.preload = 'auto'; } return musicEl; }
-function playTrack(){
- $('musicmodal').style.display='none';$('music-player').hidden=false;$('music-chip').hidden=true;
- $('music-title').textContent='Shop music';
- const a = musicEnsure(); a.play().catch(()=>{ $('music-title').textContent='Shop music - tap play'; });
-}
-function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; playTrack(); }
-$('music-open').onclick=()=>{ $('musicmodal').style.display='flex'; };
-$('music-close').onclick=()=>{ $('musicmodal').style.display='none'; };
-$('music-play-track').onclick=()=>playTrack();
-$('music-stop').onclick=()=>{ if(musicEl)musicEl.pause(); $('music-player').hidden=true; $('music-chip').hidden=true; };
-$('music-mute').onclick=()=>{ musicMuted=!musicMuted; if(musicEl)musicEl.muted=musicMuted; $('music-mute').textContent=musicMuted?' ':' '; };
-$('music-min').onclick=()=>{ if(musicEl)musicEl.pause(); $('music-player').hidden=true; $('music-chip-title').textContent=$('music-title').textContent; $('music-chip').hidden=false; };
-$('music-chip').onclick=()=>{ $('music-chip').hidden=true; $('music-player').hidden=false; if(musicEl)musicEl.play().catch(()=>{}); };
+function musicUi(on){ $('music-open').textContent = on ? ' Music on' : ' Music off'; }
+function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; const a=musicEnsure(); a.play().then(()=>musicUi(true)).catch(()=>musicUi(false)); }
+$('music-open').onclick=()=>{ const a=musicEnsure(); if(a.paused){ a.play().then(()=>musicUi(true)).catch(()=>musicUi(false)); } else { a.pause(); musicUi(false); } };
 
 
 function applyWheel(){
  const spin=$('spin');if(!spin)return;
- const w=basketWeight();if(w<minG()){spin.hidden=true;$('spin-result').textContent='Rejected bowls do not spin the wheel.';return;}
+ const w=basketWeight();
  const err=Math.abs(G.guess-w);const weights=[15,20,25,30,5,5];
  const cut=err<=5?weights:err<=25?[30,25,20,15,7,3]:err<=60?[35,25,20,12,7,1]:[55,20,15,8,2,0];
  const total=cut.reduce((a,b)=>a+b,0);let n=Math.random()*total,i=0;while(n>cut[i]&&i<cut.length-1){n-=cut[i];i++;}
@@ -1487,7 +1523,7 @@ function loop() {
     if (m > 0.05) {
       G.moveTarget = null; // manual control cancels tap-to-walk
       if (m > 1) { mx /= m; mz /= m; }
-      const sp = 3.4 * dt;
+      const sp = 4.1 * dt;
       const sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
       player.x += (sin * mz + cos * mx) * sp;
       player.z += (cos * mz - sin * mx) * sp;
