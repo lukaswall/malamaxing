@@ -1461,7 +1461,7 @@ $('tap-card').onclick=()=>finishPayment('card'); $('pay-cash').onclick=()=>finis
 let tongsAnim=0;
 const heldBowl = new THREE.Group(); camera.add(heldBowl); scene.add(camera);
 heldBowl.position.set(0,-0.52,-1.1); heldBowl.visible=false;
-const tongs=new THREE.Group();camera.add(tongs);tongs.position.set(-.25,-.23,-.68);tongs.rotation.z=.16;
+const tongs=new THREE.Group();camera.add(tongs);tongs.position.set(-.21,-.18,-.68);tongs.rotation.z=.16;
 const metal=new THREE.MeshStandardMaterial({color:0xe8eaee,metalness:.3,roughness:.45});
 [-.016,.016].forEach(x=>{const a=box(.012,.34,.016,0,{metal:.3,rough:.45});a.material=metal;a.position.set(x,-.04,0);a.rotation.z=x>0?-.1:.1;tongs.add(a);});
 [-.02,.02].forEach(x=>{const tip=box(.055,.09,.012,0,{metal:.3,rough:.45});tip.material=metal;tip.position.set(x,-.27,-.02);tip.rotation.x=.32;tip.rotation.z=x>0?.14:-.14;tongs.add(tip);});
