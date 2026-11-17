@@ -59,7 +59,7 @@
   #baskethint{font-size:10.5px;color:#a08362;margin-top:4px}
 
   /* prompt + view buttons */
-  #prompt{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);
+  #prompt{position:absolute;left:50%;bottom:calc(6px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
     background:rgba(90,59,40,.85);color:#fdf6e9;font-size:14px;padding:8px 18px;
     border-radius:24px;display:none;pointer-events:auto;cursor:pointer;white-space:nowrap}
   #views{position:absolute;right:14px;top:64px;display:none;flex-direction:column;gap:8px;pointer-events:auto}
