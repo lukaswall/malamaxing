@@ -722,44 +722,167 @@ function drawLCD(weightG, priceE) {
 }
 
 
-function specialPiece(ing){
- const g=new THREE.Group();
- if(ing.shape==='roll'){
-   const m=cyl(.065,.065,.16,ing.color,16);m.rotation.z=Math.PI/2;g.add(m);
-   for(const x of [-.082,.082]){const fat=new THREE.Mesh(new THREE.TorusGeometry(.042,.012,6,16,Math.PI*1.8),new THREE.MeshStandardMaterial({color:0xf6d4c0}));fat.rotation.y=Math.PI/2;fat.position.x=x;g.add(fat);}
- } else if(ing.shape==='tendon'){
-   const m=cyl(.04,.065,.16,ing.color,7,{transparent:true,opacity:.83});m.rotation.z=1.2;g.add(m);const b=box(.1,.055,.07,0xead8b5);b.position.x=.06;g.add(b);
- } else if(ing.shape==='frog'){
-   for(const a of [-.6,.6]){const thigh=cyl(.025,.045,.15,ing.color,8);thigh.rotation.z=a;thigh.position.x=a*.055;g.add(thigh);const bone=cyl(.012,.012,.09,0xf6e9cf,8);bone.position.set(a*.1,-.1,0);g.add(bone);}
- } else if(ing.shape==='crab'){
-   const claw=sph(.075,ing.color);claw.scale.set(1.5,.6,1);g.add(claw);for(const a of [-1,1]){const leg=cyl(.012,.018,.18,0xe49d68,8);leg.rotation.z=a*.85;leg.position.set(a*.06,-.04,0);g.add(leg);}
- }return g;
+function buildPiece(ing) {
+  const g = new THREE.Group();
+  const id = ing.id, c = ing.color;
+  const A = m => { g.add(m); return m; };
+  switch (ing.shape) {
+    case 'ball': {
+      if (id === 'shrimp') { // curved shrimp: ring-segment body, tail fan, shell bands
+        const body = new THREE.Mesh(new THREE.TorusGeometry(.05, .024, 10, 14, 3.9), new THREE.MeshStandardMaterial({ color: c, roughness: .5 })); body.rotation.x = Math.PI / 2; A(body);
+        const tail = new THREE.Mesh(new THREE.ConeGeometry(.02, .05, 8), new THREE.MeshStandardMaterial({ color: 0xe86a3a, roughness: .55 })); tail.position.set(.055, .005, -.04); tail.rotation.z = -1.1; A(tail);
+        for (let i = 0; i < 3; i++) { const seg = new THREE.Mesh(new THREE.TorusGeometry(.05, .005, 6, 14, 3.9), new THREE.MeshStandardMaterial({ color: 0xd96a42, roughness: .6 })); seg.rotation.x = Math.PI / 2; seg.scale.setScalar(1 - i * .12); seg.position.y = (i - 1) * .006; A(seg); }
+      } else if (id === 'clam' || id === 'mussel') { // bivalve shell with hinge lip
+        const mus = id === 'mussel';
+        const sh = sph(.055, c, { rough: mus ? .25 : .7 }); sh.scale.set(1, mus ? .42 : .48, mus ? .6 : .85); A(sh);
+        const lip = sph(.05, mus ? 0x3a4a5a : 0xa8927a, { rough: .6, cast: false }); lip.scale.set(.95, .3, .78); lip.position.y = .018; A(lip);
+        for (let i = -1; i <= 1; i++) { const ridge = new THREE.Mesh(new THREE.TorusGeometry(.042, .004, 6, 12, Math.PI), new THREE.MeshStandardMaterial({ color: 0x000000, transparent: true, opacity: .18, roughness: .9 })); ridge.rotation.x = Math.PI / 2; ridge.position.set(i * .018, .02, 0); A(ridge); }
+      } else if (id === 'broccoli') { // florets on a stem
+        const stem = cyl(.018, .026, .06, 0x9fbf7a, 8); stem.position.y = -.025; A(stem);
+        [[0, 0, 0], [.034, 0, .012], [-.03, .004, .02], [.006, .008, -.034], [-.02, -.004, -.022]].forEach(p => { const f = sph(.031, 0x2f6b2a, { rough: .95 }); f.position.set(p[0], .035 + p[1], p[2]); A(f); });
+      } else if (id === 'quail' || id === 'egg') { // egg shape, quail egg speckled
+        const e = sph(.05 * (id === 'quail' ? .8 : 1.1), c, { rough: .45 }); e.scale.set(.82, 1, .82); A(e);
+        if (id === 'quail') for (let i = 0; i < 4; i++) { const d = sph(.008, 0x8a6a4a, { cast: false }); const a = i * 1.7; d.position.set(Math.cos(a) * .03, (i - 1.5) * .015, Math.sin(a) * .03); A(d); }
+      } else if (id === 'roeball') { // golden fortune bag with tied top
+        const p = sph(.055, c, { rough: .5 }); p.scale.set(1, 1.05, 1); A(p);
+        const knot = cyl(.016, .028, .032, 0xd98a3a, 8); knot.position.y = .06; A(knot);
+      } else { // fish / beef / cuttle / tofu balls
+        const b = sph(.055, c, { rough: id === 'beefball' ? .95 : .5 }); b.scale.y = .92; A(b);
+        if (id === 'beefball') for (let i = 0; i < 3; i++) { const d = sph(.012, 0x8a5a42, { cast: false }); const a = i * 2.1; d.position.set(Math.cos(a) * .045, .02, Math.sin(a) * .045); A(d); }
+      }
+      break;
+    }
+    case 'cube': {
+      if (id === 'fishtofu') { // golden fried base, pale top
+        const b1 = box(.09, .035, .09, 0xe0a44e, { rough: .6 }); b1.position.y = -.017; A(b1);
+        const b2 = box(.09, .035, .09, c, { rough: .55 }); b2.position.y = .018; A(b2);
+      } else if (id === 'duckblood') { const b = box(.08, .06, .08, c, { rough: .3 }); b.rotation.y = rand(0, 3); A(b); }
+      else if (id === 'tofupuff') { const p = box(.085, .07, .085, c, { rough: .5 }); p.rotation.y = rand(0, 3); A(p); const d = sph(.02, 0xd9a44a, { cast: false }); d.position.y = .04; A(d); }
+      else if (ing.pack) { // wrapped noodle pack with label band
+        const pk = box(.12, .05, .09, c, { rough: .6 }); A(pk);
+        const band = box(.125, .02, .045, 0xfdf6e9, { rough: .7, cast: false }); A(band);
+      } else { const b = box(.085, .07, .085, c, { rough: id === 'frozentofu' ? 1 : .6 }); b.rotation.y = rand(0, 3); A(b); }
+      break;
+    }
+    case 'stick': {
+      if (id === 'corn') { // corn wheel cut: yellow cob, pale core, husk leaf
+        const cob = cyl(.055, .055, .05, 0xf2c14e, 14, { rough: .6 }); A(cob);
+        const core = cyl(.02, .02, .052, 0xe8a83a, 10, { rough: .7, cast: false }); A(core);
+        const husk = box(.012, .09, .05, 0x5a8a3a, { cast: false, rough: .8 }); husk.position.set(0, -.02, .052); husk.rotation.x = .3; A(husk);
+      } else if (id === 'crab') { // crab stick: white body, red sleeve
+        const st = cyl(.022, .022, .15, 0xf8f2e8, 10); st.rotation.z = Math.PI / 2 + rand(-.15, .15); A(st);
+        const sl = cyl(.024, .024, .05, 0xe0522a, 10, { rough: .5 }); sl.rotation.z = st.rotation.z; sl.position.x = .04; A(sl);
+      } else if (id === 'sausage') { // capsule with tied ends
+        const body = cyl(.026, .026, .13, c, 12, { rough: .55 }); body.rotation.z = Math.PI / 2; A(body);
+        const e1 = sph(.026, c, { rough: .55 }); e1.position.x = .065; A(e1);
+        const e2 = sph(.026, c, { rough: .55 }); e2.position.x = -.065; A(e2);
+        const k1 = cyl(.01, .015, .022, 0x8a3a2c, 8, { cast: false }); k1.rotation.z = Math.PI / 2; k1.position.x = .09; A(k1);
+        const k2 = cyl(.015, .01, .022, 0x8a3a2c, 8, { cast: false }); k2.rotation.z = Math.PI / 2; k2.position.x = -.09; A(k2);
+      } else if (id === 'enoki') { // enoki bundle: thin stalks with caps
+        for (let i = 0; i < 4; i++) { const a = i * 1.6, r = .013; const st = cyl(.006, .007, .13, 0xf5efdd, 6, { cast: false }); st.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); st.rotation.z = rand(-.08, .08); A(st); const cap = sph(.013, 0xf8f2e2, { cast: false }); cap.position.set(Math.cos(a) * r, .07, Math.sin(a) * r); A(cap); }
+      } else if (id === 'squid') { // squid tube with fins and tentacles
+        const tube = cyl(.03, .036, .09, c, 10, { rough: .5 }); tube.rotation.x = Math.PI / 2; A(tube);
+        const fin = box(.008, .05, .04, 0xe8d8cd, { cast: false, rough: .6 }); fin.position.set(0, .012, -.05); A(fin);
+        for (let i = 0; i < 4; i++) { const t = cyl(.006, .009, .07, c, 6, { cast: false }); t.rotation.x = Math.PI / 2 + (i - 1.5) * .12; t.position.set((i - 1.5) * .014, 0, .078); A(t); }
+      } else if (id === 'ricecake') { const rc = cyl(.028, .028, .11, c, 12, { rough: .65 }); rc.rotation.z = Math.PI / 2 + rand(-.2, .2); A(rc); }
+      else { const st = cyl(.03, .03, .18, c, 8); st.rotation.z = Math.PI / 2 + rand(-.3, .3); A(st); }
+      break;
+    }
+    case 'slice': {
+      if (id === 'lotus') { // lotus root disc with holes
+        const disc = cyl(.065, .065, .022, c, 18, { rough: .7 }); A(disc);
+        for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; const hole = cyl(.008, .008, .024, 0x9a8668, 8, { cast: false }); hole.position.set(Math.cos(a) * .033, 0, Math.sin(a) * .033); A(hole); }
+        const hc = cyl(.009, .009, .024, 0x9a8668, 8, { cast: false }); A(hc);
+      } else if (id === 'beef' || id === 'pork') { // marbled meat slice
+        const sl = cyl(.06, .06, .014, c, 16, { rough: .6 }); sl.rotation.x = rand(-.15, .15); A(sl);
+        for (let i = 0; i < 2; i++) { const fat = box(.07, .004, .012, 0xf6e2d8, { cast: false }); fat.position.set(rand(-.01, .01), .009, (i - .5) * .032); fat.rotation.y = rand(-.4, .4); A(fat); }
+      } else if (id === 'tripe') { // fringed tripe
+        const base = cyl(.06, .06, .014, c, 14, { rough: .85 }); A(base);
+        for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2; const fr = box(.02, .006, .012, 0xd8c4a4, { cast: false }); fr.position.set(Math.cos(a) * .055, .008, Math.sin(a) * .055); fr.rotation.y = -a; A(fr); }
+      } else if (id === 'kelp') { // dark ribbon sheets
+        const r1 = box(.11, .01, .05, c, { rough: .75 }); r1.rotation.y = rand(0, 3); A(r1);
+        const r2 = box(.09, .01, .04, c, { rough: .75, cast: false }); r2.position.y = .009; r2.rotation.y = rand(0, 3); A(r2);
+      } else if (id === 'tofuskin') { // folded tofu sheets
+        const s1 = box(.09, .006, .06, c, { rough: .7 }); s1.rotation.z = .12; A(s1);
+        const s2 = box(.08, .006, .05, c, { rough: .7, cast: false }); s2.position.y = .008; s2.rotation.z = -.1; s2.rotation.y = .5; A(s2);
+      } else if (id === 'luncheon') { const l = box(.085, .024, .06, c, { rough: .6 }); l.rotation.y = rand(0, 3); A(l); }
+      else if (id === 'fillet' || id === 'fishslice') { const f = sph(.06, c, { rough: .35 }); f.scale.set(1.25, .22, .7); f.rotation.y = rand(0, 3); A(f); }
+      else if (id === 'bamboo') { const w = box(.07, .02, .045, c, { rough: .7 }); w.rotation.y = rand(0, 3); A(w); }
+      else { const d = cyl(.06, .06, .024, c, 16, { rough: .7 }); d.rotation.x = rand(-.2, .2); A(d); }
+      break;
+    }
+    case 'leaf': {
+      if (id === 'bokchoy') { // pale bulb + green leaves
+        const bulb = sph(.035, 0xeef2e0, { rough: .55 }); bulb.scale.set(.8, 1.1, .8); A(bulb);
+        for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2; const lf = sph(.045, c, { rough: .7 }); lf.scale.set(.7, .25, 1); lf.position.set(Math.cos(a) * .04, .045, Math.sin(a) * .04); lf.rotation.y = -a; lf.rotation.z = .4; A(lf); }
+      } else if (id === 'napa') { // long pale leaf with white rib
+        const rib = box(.03, .02, .11, 0xeef2e0, { rough: .6 }); A(rib);
+        const leaf = sph(.06, c, { rough: .75 }); leaf.scale.set(.75, .3, 1.25); leaf.position.y = .02; A(leaf);
+      } else if (id === 'woodear') { // dark wavy ear
+        const e = sph(.055, c, { rough: .9 }); e.scale.set(1, .22, .8); e.rotation.y = rand(0, 3); A(e);
+        const inner = sph(.04, 0x6a5244, { rough: .9, cast: false }); inner.scale.set(1, .15, .7); inner.position.y = .008; inner.rotation.y = e.rotation.y; A(inner);
+      } else { const lf = sph(.06, c, { rough: .75 }); lf.scale.set(1, .3, 1.3); lf.rotation.y = rand(0, 3); A(lf); }
+      break;
+    }
+    case 'nest': {
+      if (id === 'glass') { // translucent sweet-potato noodle loops
+        for (let i = 0; i < 3; i++) { const nd = new THREE.Mesh(new THREE.TorusGeometry(.05 - i * .008, .012, 8, 18), new THREE.MeshStandardMaterial({ color: c, roughness: .35, transparent: true, opacity: .55 })); nd.rotation.x = Math.PI / 2 + rand(-.3, .3); nd.rotation.z = rand(0, 3); nd.position.y = i * .012; nd.castShadow = true; A(nd); }
+      } else if (id === 'instant') { // wavy instant-noodle block
+        const blk = box(.11, .05, .11, c, { rough: .8 }); A(blk);
+        for (let i = 0; i < 4; i++) { const w = box(.012, .008, .1, 0xd9b45e, { cast: false }); w.position.set((i - 1.5) * .026, .028, 0); w.rotation.y = .12; A(w); }
+      } else { // ribbon noodles (ramen / knife-cut)
+        for (let i = 0; i < 4; i++) { const rb = box(.1, .012, .02, c, { rough: .7 }); rb.position.y = i * .012; rb.rotation.y = i * .5 + rand(-.1, .1); A(rb); }
+      }
+      break;
+    }
+    case 'roll': {
+      if (id === 'bellroll') { // fried beancurd roll with ridges
+        const roll = cyl(.05, .05, .13, c, 14, { rough: .55 }); roll.rotation.z = Math.PI / 2; A(roll);
+        for (const x of [-.04, 0, .04]) { const r = new THREE.Mesh(new THREE.TorusGeometry(.052, .006, 6, 16), new THREE.MeshStandardMaterial({ color: 0xb98434, roughness: .7 })); r.rotation.y = Math.PI / 2; r.position.x = x; A(r); }
+      } else { // lamb roll: meat tube with fat ring and pale ends
+        const meat = cyl(.05, .05, .13, c, 14); meat.rotation.z = Math.PI / 2; A(meat);
+        const fat = new THREE.Mesh(new THREE.TorusGeometry(.05, .011, 8, 18), new THREE.MeshStandardMaterial({ color: 0xf6d4c0, roughness: .7 })); fat.rotation.y = Math.PI / 2; A(fat);
+        const e1 = cyl(.034, .034, .006, 0xf6d4c0, 12, { cast: false }); e1.rotation.z = Math.PI / 2; e1.position.x = .066; A(e1);
+        const e2 = e1.clone(); e2.position.x = -.066; A(e2);
+      }
+      break;
+    }
+    case 'tendon': {
+      const m = cyl(.04, .065, .16, c, 7, { transparent: true, opacity: .83 }); m.rotation.z = 1.2; A(m);
+      const b = box(.1, .055, .07, 0xead8b5); b.position.x = .06; A(b);
+      break;
+    }
+    case 'frog': {
+      for (const a of [-.6, .6]) { const thigh = cyl(.025, .045, .15, c, 8); thigh.rotation.z = a; thigh.position.x = a * .055; A(thigh); const bone = cyl(.012, .012, .09, 0xf6e9cf, 8); bone.position.set(a * .1, -.1, 0); A(bone); }
+      break;
+    }
+    case 'crab': { // crab piece: domed shell, 6 legs, 2 claws
+      const shell = sph(.06, c, { rough: .6 }); shell.scale.set(1.15, .55, .95); shell.position.y = .02; A(shell);
+      for (const side of [-1, 1]) for (let i = 0; i < 3; i++) { const leg = cyl(.008, .012, .11, 0xe49d68, 6); leg.rotation.z = side * 1.15; leg.rotation.y = (i - 1) * .5; leg.position.set(side * .07, -.01, (i - 1) * .035); A(leg); }
+      for (const side of [-1, 1]) { const claw = sph(.028, c, { rough: .55 }); claw.scale.set(1.3, .7, .9); claw.position.set(side * .075, .01, .07); A(claw); }
+      break;
+    }
+    default: { const d = sph(.055, c); A(d); }
+  }
+  return g;
 }
 
-
 function pieceMesh(ing, s = 1) {
-  if (['roll','tendon','frog','crab'].includes(ing.shape)) { const g = specialPiece(ing); g.scale.multiplyScalar(s); return g; }
-  let m;
-  if (ing.shape === 'ball') m = sph(0.055 * s, ing.color);
-  else if (ing.shape === 'cube') m = box(0.09 * s, 0.07 * s, 0.09 * s, ing.color);
-  else if (ing.shape === 'stick') { m = cyl(0.03 * s, 0.03 * s, 0.2 * s, ing.color, 8); m.rotation.z = Math.PI / 2 + rand(-0.3, 0.3); }
-  else if (ing.shape === 'slice') { m = cyl(0.07 * s, 0.07 * s, 0.025 * s, ing.color, 14); m.rotation.x = rand(-0.4, 0.4); }
-  else if (ing.shape === 'nest') { m = new THREE.Mesh(new THREE.TorusGeometry(0.07 * s, 0.028 * s, 8, 16), new THREE.MeshStandardMaterial({ color: ing.color, roughness: 0.8 })); m.rotation.x = Math.PI / 2 + rand(-0.3, 0.3); m.castShadow = true; }
-  else { m = sph(0.06 * s, ing.color); m.scale.set(1, 1.5, 1); } // leaf-ish oval
-  return m;
+  const g = buildPiece(ing);
+  g.scale.multiplyScalar(s);
+  return g;
 }
 
 function addPile(group, ing) {
-  const n = 7;
+  const n = 5;
   for (let i = 0; i < n; i++) {
-    const s = rand(1.05, 1.45);
+    const s = rand(0.95, 1.3);
     const m = pieceMesh(ing, s);
-    m.position.set(rand(-0.3, 0.3), 0.03 + i * 0.022, rand(-0.16, 0.16));
+    m.position.set(rand(-0.28, 0.28), 0.03 + i * 0.024, rand(-0.15, 0.15));
     m.rotation.y = rand(0, Math.PI * 2);
     group.add(m);
   }
 }
-
 /* ============================================================
    PLAYER / CAMERA / MOVEMENT
    ============================================================ */
@@ -893,19 +1016,18 @@ function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
 }
 function pilePieces(grp, ids, cap) {
   while (grp.children.length) grp.remove(grp.children[0]);
-  const per = 9;
+  const per = 8;
   ids.slice(0, cap).forEach((id, i) => {
     const ing = ING[id];
-    const m = pieceMesh(ing, 0.9);
+    const m = pieceMesh(ing, rand(0.78, 1.0));
     const layer = Math.floor(i / per), k = i % per;
-    const ang = (k / per) * Math.PI * 2 + layer * 0.7;
-    const rad = k === 0 ? 0 : 0.13 + (k % 3) * 0.08;
-    m.position.set(Math.cos(ang) * rad + rand(-0.015, 0.015), 0.035 + layer * 0.07, Math.sin(ang) * rad * 0.62 + rand(-0.015, 0.015));
+    const ang = (k / per) * Math.PI * 2 + layer * 0.9;
+    const rad = k === 0 ? 0 : 0.1 + (k % 3) * 0.065;
+    m.position.set(Math.cos(ang) * rad + rand(-0.02, 0.02), 0.035 + layer * 0.055, Math.sin(ang) * rad * 0.62 + rand(-0.02, 0.02));
     m.rotation.y = ang * 1.7;
     grp.add(m);
   });
-}
-function renderBasket3D() { pilePieces(window.__basket3d.userData.itemsGroup, G.basket, 45); }
+}function renderBasket3D() { pilePieces(window.__basket3d.userData.itemsGroup, G.basket, 45); }
 
 // audio blips
 let AC = null;
@@ -1158,26 +1280,36 @@ function sitAndEat() {
   if (!window.__eatBowl) {
     const eb = new THREE.Group(); eb.position.set(3.4, 0.86, 0.2);
     eb.add(cyl(0.24, 0.14, 0.18, 0xfdf6e9, 28));
-    const soup = cyl(0.2, 0.2, 0.04, 0xb23a1e, 24, { emissive: 0x5a1400, emissiveIntensity: 0.3 }); soup.position.y = 0.08; eb.add(soup);
+    const ebrim = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.012, 8, 40), new THREE.MeshStandardMaterial({ color: 0xe8ddc8, roughness: .6 })); ebrim.rotation.x = Math.PI / 2; ebrim.position.y = 0.09; eb.add(ebrim);
+    const soup = cyl(0.215, 0.215, 0.035, 0xb23a1e, 24, { emissive: 0x5a1400, emissiveIntensity: 0.3 }); soup.position.y = 0.06; soup.name = 'soup'; eb.add(soup);
     eb.visible = false; scene.add(eb); window.__eatBowl = eb;
   }
   const eb2 = window.__eatBowl;
+  const soupMesh = eb2.getObjectByName('soup');
+  const brothCol = { red: 0xb23a1e, tomato: 0xd4552a, bone: 0xd9b36a, dry: 0x7a4020 }[G.selBroth] || 0xb23a1e;
+  soupMesh.material.color.setHex(brothCol);
+  soupMesh.scale.setScalar(G.selBroth === 'dry' ? 0.8 : 1);
+  soupMesh.position.y = G.selBroth === 'dry' ? 0.04 : 0.06;
   if (eb2.userData.food) { eb2.remove(eb2.userData.food); eb2.userData.food = null; }
   const ef = new THREE.Group();
-  G.basket.slice(0, 14).forEach((id, i) => {
-    const pm2 = pieceMesh(ING[id], 0.55);
-    const ang = (i / Math.max(1, Math.min(14, G.basket.length))) * Math.PI * 2 + (i % 3) * 0.5;
-    const rad = i === 0 ? 0 : 0.05 + (i % 3) * 0.045;
-    pm2.position.set(Math.cos(ang) * rad, 0.105 + (i % 2) * 0.012, Math.sin(ang) * rad);
+  for (let i = 0; i < 5; i++) { // noodle bed under everything
+    const nd = new THREE.Mesh(new THREE.TorusGeometry(0.09 - i * 0.008, 0.016, 8, 20), new THREE.MeshStandardMaterial({ color: 0xf3e2b0, roughness: .55 }));
+    nd.rotation.x = Math.PI / 2 + rand(-.2, .2); nd.rotation.z = rand(0, 3); nd.position.set(rand(-.03, .03), 0.08 + i * 0.012, rand(-.03, .03)); nd.castShadow = true; ef.add(nd);
+  }
+  G.basket.slice(0, 16).forEach((id, i) => {
+    const pm2 = pieceMesh(ING[id], 0.62);
+    const ang = (i / Math.max(1, Math.min(16, G.basket.length))) * Math.PI * 2 + (i % 3) * 0.5;
+    const rad = i === 0 ? 0 : 0.055 + (i % 3) * 0.05;
+    pm2.position.set(Math.cos(ang) * rad, 0.1 + (i % 3) * 0.018, Math.sin(ang) * rad);
     pm2.rotation.y = ang * 1.3;
     ef.add(pm2);
   });
   eb2.userData.food = ef; eb2.add(ef);
   const gar = new THREE.Group();
   const greens = (G.sauce.includes('coriander') ? 4 : 0) + (G.sauce.includes('springonion') ? 4 : 0);
-  for (let i = 0; i < greens; i++) { const lf = sph(0.018, i % 2 ? 0x3f8a3f : 0x57a84f, { cast: false }); const a = i * 0.9, r = 0.04 + (i % 3) * 0.05; lf.position.set(Math.cos(a) * r, 0.14, Math.sin(a) * r); lf.scale.y = 0.35; gar.add(lf); }
-  if (G.sauce.includes('soysauce') || G.sauce.includes('vinegar') || G.sauce.includes('sesameoil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0x4a2c14, { cast: false }); const a = i * 1.7 + 0.4, r = 0.05 + (i % 2) * 0.06; d.position.set(Math.cos(a) * r, 0.135, Math.sin(a) * r); gar.add(d); }
-  if (G.sauce.includes('chilioil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0xd92b0f, { cast: false }); const a = i * 1.9 + 1.1, r = 0.06 + (i % 2) * 0.05; d.position.set(Math.cos(a) * r, 0.135, Math.sin(a) * r); gar.add(d); }
+  for (let i = 0; i < greens; i++) { const lf = sph(0.018, i % 2 ? 0x3f8a3f : 0x57a84f, { cast: false }); const a = i * 0.9, r = 0.04 + (i % 3) * 0.05; lf.position.set(Math.cos(a) * r, 0.155, Math.sin(a) * r); lf.scale.y = 0.35; gar.add(lf); }
+  if (G.sauce.includes('soysauce') || G.sauce.includes('vinegar') || G.sauce.includes('sesameoil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0x4a2c14, { cast: false }); const a = i * 1.7 + 0.4, r = 0.05 + (i % 2) * 0.06; d.position.set(Math.cos(a) * r, 0.145, Math.sin(a) * r); gar.add(d); }
+  if (G.sauce.includes('chilioil')) for (let i = 0; i < 4; i++) { const d = sph(0.014, 0xd92b0f, { cast: false }); const a = i * 1.9 + 1.1, r = 0.06 + (i % 2) * 0.05; d.position.set(Math.cos(a) * r, 0.145, Math.sin(a) * r); gar.add(d); }
   ef.add(gar);
   window.__eatBowl.visible = true;
   const npc = window.__guest, wfrom = npc.position.clone(), wto = new THREE.Vector3(2.72, 0, 0.62);
@@ -1317,8 +1449,14 @@ const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.8}); heldBowl.
 const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
 const falling=[];
+function bowlSlot(i){ const per=7, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.055+(k%2)*.04; return {x:Math.cos(ang)*rad, y:-.06+layer*.05, z:Math.sin(ang)*rad*.8}; }
 function animatePick(id){
- const food=pieceMesh(ING[id],0.42); food.scale.multiplyScalar(0.65);food.position.set(rand(-.15,.15),.55,rand(-.12,.12));heldFood.add(food); falling.push({mesh:food,t:0});
+ if(heldFood.children.length<26){
+  const slot=bowlSlot(heldFood.children.length);
+  const food=pieceMesh(ING[id],0.5);
+  food.position.set(rand(-.15,.15),.55,rand(-.12,.12));
+  heldFood.add(food); falling.push({mesh:food,t:0,tx:slot.x,ty:slot.y,tz:slot.z});
+ }
  showPrompt(`Tongs + ${ING[id].name}`,650); tongsAnim=.3;
 }
 const oldRenderBasket=renderBasket3D;
@@ -1489,12 +1627,33 @@ $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
 $('reveal-continue').onclick=()=>{$('revealmodal').style.display='none';openBroth();};
 
 // ---- Shop music: owner-supplied track, native playback only (no YouTube) ----
-let musicEl = null;
-const MUSIC_VOLUME = 0.1; // way quieter per owner request
-function musicEnsure(){ if(!musicEl){ musicEl = new Audio('./3-audio-ff3ef5ef.mp3'); musicEl.loop = true; musicEl.volume = MUSIC_VOLUME; musicEl.preload = 'auto'; } return musicEl; }
+let musicEl = null, musicAC = null, musicBuf = null, musicSrc = null, musicGain = null, musicLoading = null, musicOn = false;
+const MUSIC_VOLUME = 0.06; // super low per owner request; Web Audio gain because iOS ignores HTMLAudio.volume
+async function musicPlay(){
+  try {
+    musicAC = musicAC || new (window.AudioContext || window.webkitAudioContext)();
+    if (musicAC.state === 'suspended') await musicAC.resume();
+    if (!musicBuf) {
+      musicLoading = musicLoading || fetch('./3-audio-ff3ef5ef.mp3').then(r => { if (!r.ok) throw new Error('music ' + r.status); return r.arrayBuffer(); }).then(ab => musicAC.decodeAudioData(ab));
+      musicBuf = await musicLoading;
+    }
+    musicGain = musicAC.createGain(); musicGain.gain.value = MUSIC_VOLUME; musicGain.connect(musicAC.destination);
+    musicSrc = musicAC.createBufferSource(); musicSrc.buffer = musicBuf; musicSrc.loop = true; musicSrc.connect(musicGain); musicSrc.start();
+    musicOn = true; musicUi(true); return;
+  } catch (e) {
+    try { if (!musicEl) { musicEl = new Audio('./3-audio-ff3ef5ef.mp3'); musicEl.loop = true; musicEl.volume = MUSIC_VOLUME; } await musicEl.play(); musicOn = true; musicUi(true); return; } catch (e2) {}
+  }
+  musicOn = false; musicUi(false);
+}
+function musicStop(){
+  if (musicSrc) { try { musicSrc.stop(); } catch (e) {} try { musicSrc.disconnect(); } catch (e) {} musicSrc = null; }
+  if (musicGain) { try { musicGain.disconnect(); } catch (e) {} musicGain = null; }
+  if (musicEl) musicEl.pause();
+  musicOn = false; musicUi(false);
+}
 function musicUi(on){ $('music-open').textContent = on ? ' Music on' : ' Music off'; }
-function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; const a=musicEnsure(); a.play().then(()=>musicUi(true)).catch(()=>musicUi(false)); }
-$('music-open').onclick=()=>{ const a=musicEnsure(); if(a.paused){ a.play().then(()=>musicUi(true)).catch(()=>musicUi(false)); } else { a.pause(); musicUi(false); } };
+function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; musicPlay(); }
+$('music-open').onclick=()=>{ if(musicOn){ musicStop(); } else { G.musicStarted=true; musicPlay(); } };
 
 
 function applyWheel(){
@@ -1580,8 +1739,8 @@ function loop() {
   if (window.__guest) window.__guest.position.y = Math.sin(now / 480) * 0.02;
 
   heldBowl.visible = G.started && G.area === 'interior' && !G.committed; tongs.visible=heldBowl.visible; tongsAnim=Math.max(0,(tongsAnim||0)-dt); const pinch=tongsAnim?Math.sin((tongsAnim/.3)*Math.PI):0; tongs.children[0].rotation.z=.1+pinch*.18;tongs.children[1].rotation.z=-.1-pinch*.18;tongs.children[2].position.x=-.02-pinch*.03;tongs.children[3].position.x=.02+pinch*.03;tongs.position.y=-.23-pinch*.16;
-  for(let i=falling.length-1;i>=0;i--){const a=falling[i];a.t+=dt;a.mesh.position.y=Math.max(0.1,0.55-a.t*1.5);if(a.t>0.3)falling.splice(i,1);}
-  while(heldFood.children.length>G.basket.length)heldFood.remove(heldFood.children[0]);
+  for(let i=falling.length-1;i>=0;i--){const a=falling[i];a.t+=dt*2;const k=Math.min(1,a.t),e=k*k;a.mesh.position.x+=(a.tx-a.mesh.position.x)*Math.min(1,dt*8);a.mesh.position.z+=(a.tz-a.mesh.position.z)*Math.min(1,dt*8);a.mesh.position.y=.55+(a.ty-.55)*e;if(k>=1){a.mesh.position.set(a.tx,a.ty,a.tz);falling.splice(i,1);}}
+  while(heldFood.children.length>G.basket.length)heldFood.remove(heldFood.children[heldFood.children.length-1]);
   const bowlTarget=G.committed?0.9:-1.1; window.__basket3d.position.x+=(bowlTarget-window.__basket3d.position.x)*Math.min(1,dt*3); window.__basket3d.position.y=1.08+(G.committed?0.15:0);
   renderer.render(scene, camera);
 }
