@@ -50,6 +50,12 @@
   #basketitems{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;max-height:64px;overflow-y:auto}
   #basketitems .chip{cursor:pointer}
   #basketitems .chip:hover{background:#ecc9c0;text-decoration:line-through}
+  #ticket,#basketbar,#zoomtools{display:none!important}
+  #bowlhud{position:absolute;top:12px;right:12px;z-index:22;background:var(--paper);border-radius:12px;padding:8px 10px;max-width:46vw;box-shadow:0 4px 14px #0003;font-size:12px}
+  #bowlhud .bh-line{font-weight:bold;color:var(--terra);white-space:nowrap;font-size:11.5px}
+  #bh-items{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;max-height:100px;overflow-y:auto}
+  #bh-items .chip{cursor:pointer}
+  #bh-items .chip:hover{background:#ecc9c0;text-decoration:line-through}
   #baskethint{font-size:10.5px;color:#a08362;margin-top:4px}
 
   /* prompt + view buttons */
@@ -180,7 +186,7 @@
   <div id="views">
     <button class="vbtn" id="v-fridge"> Fridge</button>
     <button class="vbtn" id="v-counter"> Counter</button>
-    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open"> Music off</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-sauce"> Sauce</button><button class="vbtn" id="v-door"> Door</button>
+    <button class="vbtn" id="v-ingredients">＋ Ingredients</button><button class="vbtn" id="music-open"> Music off</button><button class="vbtn" id="voice-open"> Talk</button><button class="vbtn" id="v-drinks"> Drinks</button><button class="vbtn" id="v-sauce"> Sauce</button><button class="vbtn" id="v-door"> Door</button><button class="vbtn" id="sound"> Sound on</button>
     <button class="vbtn serve" id="v-serve"> Commit &amp; weigh</button>
   </div>
 
@@ -193,8 +199,9 @@
     <div id="baskethint">One piece per tap. Weights are estimates. Tap to remove before committing.</div></div>
   </div>
 
+  <div id="bowlhud" style="display:none"><div class="bh-line" id="bh-rate"></div><div id="bh-items"></div></div>
   <button class="vbtn easy-enter" id="enter-easy" hidden>Enter shop →</button>
-  <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">−</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">＋</button><button class="vbtn" id="sound"> Sound on</button></div>
+  <div id="zoomtools" hidden><button class="vbtn" id="zoom-out" aria-label="Zoom out">−</button><button class="vbtn" id="zoom-in" aria-label="Zoom in">＋</button></div>
   <button id="receipt-tab" class="vbtn" hidden> Show receipt</button>
   <div id="ingredient-drawer" hidden><button id="close-ingredients" class="vbtn">Close ingredients ×</button><div id="ingredient-list"></div></div>
   <div id="greeting" hidden></div><div id="prompt"></div>
@@ -259,7 +266,7 @@
   <div class="optgrid" id="shopopts" style="width:min(420px,90vw)"></div>
   <p style="font-size:10.5px;color:#b09a7c;margin:2px 0 14px">Rates from real shops: YGF Barcelona €2.19/100 g · Yangguofu Berlin €3.19/100 g · YGF NYC $15/lb · Bone Soup Toronto CA$3.50/100 g</p>
   <button class="cta" id="startbtn">Open the shop </button>
-  <p style="font-size:12px;margin-top:16px;color:#b0906c">Tap Enter shop and Ingredients for easy controls. Drag to look, pinch / scroll or ± to zoom. Rotate your phone for landscape.</p>
+  <p style="font-size:12px;margin-top:16px;color:#b0906c">Tap Enter shop and Ingredients for easy controls. Drag to look, pinch or scroll to zoom. Rotate your phone for landscape.</p>
   <p style="font-size:12px;margin:6px 0">Xiaotong is the manager. Lukas / 卢卡斯 is your cashier.<br>Turn up your volume for optional voices.</p><button class="vbtn" id="enable-voices">Enable voices &amp; welcome</button><button class="vbtn" id="voice-start"> Voice &amp; language</button><div id="loading">loading…</div>
 </div>
 
@@ -1011,6 +1018,10 @@ function updateBasketBar() { if (typeof lvPushCtx==='function') lvPushCtx();
     .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('')
     || '<span style="font-size:11px;color:#b09a7c">empty - pick from the fridge</span>';
   $('basketbar').style.display = G.area === 'interior' ? 'block' : 'none';
+  $('bh-rate').textContent = `${fmt(rate())}/100 g · min ${minG()} g`;
+  $('bh-items').innerHTML = Object.entries(counts)
+    .map(([id, n]) => `<span class="chip" data-ing="${id}">${ING[id].name}${n > 1 ? ' ×' + n : ''}</span>`).join('');
+  $('bowlhud').style.display = G.area === 'interior' ? 'block' : 'none';
   drawLCD((G.committed && G.weighLocked) ? w : null, (G.committed && G.weighLocked) ? p : null);
   if (G.guest) updateTicket();
 }
@@ -1354,6 +1365,12 @@ $('basketitems').addEventListener('click', e => {
   const i = G.basket.indexOf(id);
   if (i >= 0) { G.basket.splice(i, 1); blip(330, 0.09, 'triangle'); renderBasket3D(); updateBasketBar(); }
 });
+$('bh-items').addEventListener('click', e => {
+  const id = e.target.dataset && e.target.dataset.ing;
+  if (!id || G.committed) return;
+  const i = G.basket.indexOf(id);
+  if (i >= 0) { G.basket.splice(i, 1); blip(330, 0.09, 'triangle'); renderBasket3D(); updateBasketBar(); }
+});
 
 /* ============================================================
    START / LOOP
@@ -1448,15 +1465,15 @@ const metal=new THREE.MeshStandardMaterial({color:0xd5d7db,metalness:.75,roughne
 [-.016,.016].forEach(x=>{const a=box(.014,.32,.018,0,{metal:.75,rough:.25});a.material=metal;a.position.set(x,-.06,0);a.rotation.z=x>0?-.1:.1;tongs.add(a);});
 [-.02,.02].forEach(x=>{const pincer=box(.055,.075,.025,0,{metal:.75,rough:.25});pincer.material=metal;pincer.position.set(x,-.25,-.035);pincer.rotation.x=.25;tongs.add(pincer);});
 const spring=sph(.033,0x9b0e0e);spring.position.set(0,.13,0);tongs.add(spring);
-const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.8}); heldBowl.add(hb);
+const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.5}); heldBowl.add(hb);
 const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
 const falling=[];
-function bowlSlot(i){ const per=6, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.06+(k%2)*.045; return {x:Math.cos(ang)*rad, y:-.055+layer*.048, z:Math.sin(ang)*rad*.8}; }
+function bowlSlot(i){ const per=6, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.06+(k%2)*.045; return {x:Math.cos(ang)*rad, y:0.0+layer*.05, z:Math.sin(ang)*rad*.8}; }
 function animatePick(id){
  if(heldFood.children.length<26){
   const slot=bowlSlot(heldFood.children.length);
-  const food=pieceMesh(ING[id],0.62);
+  const food=pieceMesh(ING[id],0.7);
   food.position.set(rand(-.15,.15),.55,rand(-.12,.12));
   heldFood.add(food); falling.push({mesh:food,t:0,tx:slot.x,ty:slot.y,tz:slot.z});
  }
@@ -1629,40 +1646,31 @@ $('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.i
 $('cancel-guess').onclick=()=>{$('guessmodal').style.display='none';};
 $('reveal-continue').onclick=()=>{$('revealmodal').style.display='none';openBroth();};
 
-// ---- Shop music: owner-supplied track, native playback only (no YouTube) ----
-let musicEl = null, musicAC = null, musicBuf = null, musicSrc = null, musicGain = null, musicLoading = null, musicOn = false, musicStarting = false;
-const MUSIC_VOLUME = 0.06; // super low per owner request; Web Audio gain because iOS ignores HTMLAudio.volume
+// ---- Shop music: owner-supplied track, pre-attenuated file (about 10% loudness) ----
+// iOS ignores HTMLAudio.volume (Apple doc) and silences Web Audio when the Ring/Silent
+// switch is on, so quietness lives in the file itself and playback uses one plain element.
+let musicEl = null, musicOn = false, musicStarting = false;
 async function musicPlay(){
-  if (musicOn || musicStarting) return; // no double path: one source at a time
+  if (musicOn || musicStarting) return; // one source at a time, no double path
   musicStarting = true;
   try {
-    musicAC = musicAC || new (window.AudioContext || window.webkitAudioContext)();
-    if (musicAC.state === 'suspended') await musicAC.resume();
-    if (!musicBuf) {
-      musicLoading = musicLoading || fetch('./3-audio-ff3ef5ef.mp3').then(r => { if (!r.ok) throw new Error('music ' + r.status); return r.arrayBuffer(); }).then(ab => musicAC.decodeAudioData(ab));
-      musicBuf = await musicLoading;
+    if (!musicEl) {
+      const b64 = await (await fetch('./music-quiet.b64')).text();
+      const bin = atob(b64.trim()); const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      musicEl = new Audio(URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })));
+      musicEl.loop = true; musicEl.volume = 1;
     }
-    musicGain = musicAC.createGain(); musicGain.gain.value = MUSIC_VOLUME; musicGain.connect(musicAC.destination);
-    musicSrc = musicAC.createBufferSource(); musicSrc.buffer = musicBuf; musicSrc.loop = true; musicSrc.connect(musicGain); musicSrc.start();
-    musicOn = true; musicUi(true); window.__music = { on: true, engine: 'webaudio', gain: MUSIC_VOLUME, acState: musicAC.state };
-    musicStarting = false; return;
-  } catch (e) {
-    musicLoading = null; // don't cache a rejected load
-    try {
-      if (!musicEl) { musicEl = new Audio('./3-audio-ff3ef5ef.mp3'); musicEl.loop = true; musicEl.volume = MUSIC_VOLUME; }
-      await musicEl.play();
-      musicOn = true; musicUi(true); window.__music = { on: true, engine: 'element', gain: MUSIC_VOLUME };
-      musicStarting = false; return;
-    } catch (e2) {}
-  }
-  musicOn = false; musicUi(false); window.__music = { on: false };
+    await musicEl.play();
+    musicOn = true;
+  } catch (e) { musicOn = false; }
+  musicUi(musicOn);
+  window.__music = { on: musicOn, engine: 'element-quietfile', volume: musicEl ? musicEl.volume : null, paused: musicEl ? musicEl.paused : null, src: musicEl ? musicEl.currentSrc : null };
   musicStarting = false;
 }
 function musicStop(){
-  if (musicSrc) { try { musicSrc.stop(); } catch (e) {} try { musicSrc.disconnect(); } catch (e) {} musicSrc = null; }
-  if (musicGain) { try { musicGain.disconnect(); } catch (e) {} musicGain = null; }
   if (musicEl) musicEl.pause();
-  musicOn = false; musicUi(false); window.__music = { on: false };
+  musicOn = false; musicUi(false); window.__music = { on: false, engine: 'element-quietfile' };
 }
 function musicUi(on){ $('music-open').textContent = on ? ' Music on' : ' Music off'; }
 function startMusicDefault(){ if(G.musicStarted)return; G.musicStarted=true; musicPlay(); }
