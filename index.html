@@ -242,16 +242,16 @@
 
 <div class="modal" id="drinkmodal"><div class="card"><h2>Drinks fridge</h2><p class="sub">Representative Chinese favorites. Fictional game prices, charged separately. No bowl weight.</p><div id="drinkopts" class="optgrid"></div><button class="vbtn" id="close-drinks">Close ×</button></div></div>
 <div class="modal" id="paymodal"><div class="card"><h2>Checkout</h2><p class="sub" id="paysub">Game simulation only. No real payment.</p><div class="terminal">XIAOTONG<br><strong id="payamount"></strong><br>CONTACTLESS READY ◉</div><button class="cta" id="tap-card"> Tap game card</button><button class="vbtn" id="pay-cash">Pay game cash</button></div></div>
-<div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Optional speech in English or Chinese. Your browser may send microphone audio to its speech provider. This game does not record or store audio. Voice availability depends on your device. State-aware scripted conversation, not open-ended AI chat. Ask for recommendations, hear the guest order, or say an ingredient name.</p>
+<div class="modal" id="voicemodal"><div class="card"><h2>Talk to Lukas / 卢卡斯</h2><p class="sub">Choose live conversation below, or open the separate scripted controls. No real orders or payments.</p>
 <div id="livevoice" hidden style="background:#fff3d6;border:1px solid #e0b84f;border-radius:8px;padding:8px;margin:8px 0">
-<b style="font-size:13px">Live AI voice</b>
-<p class="sub" style="margin:4px 0">A real AI conversation with Lukas: your microphone streams to Deepgram through our server and replies are AI-generated speech. It knows your current bowl and order stage and remembers this session. It cannot see the hidden weight before you commit. Sessions cap at 3 minutes; the game does not store audio.</p>
-<button class="cta" id="lv-start"> Start live voice</button> <button class="vbtn" id="lv-stop" disabled>End session ×</button>
-<p class="sub" id="lv-status" style="margin:4px 0"></p>
+<b style="font-size:16px">Live conversation</b>
+<p class="sub" style="margin:8px 0">Start once, keep talking, and interrupt naturally in English or Chinese. Microphone audio goes to Deepgram for AI-generated replies. It knows your bowl, but not its weight before the scale locks. Sessions last up to 3 minutes. This game does not store audio.</p>
+<div style="display:grid;gap:10px;margin-top:12px"><button class="cta" id="lv-start" style="width:100%;margin:0">Start live voice</button><button class="vbtn" id="lv-stop" style="width:100%;margin:0;min-height:40px" disabled>End session</button></div>
+<p class="sub" id="lv-status" style="margin:10px 0 0" aria-live="polite"></p><p class="chatlog" id="livechatlog" hidden></p>
 </div>
-<label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">中文普通话</option></select></label>
+<details style="margin-top:18px;border-top:1px solid #dac3a4;padding-top:14px"><summary style="cursor:pointer;font-size:14px;font-weight:bold">Scripted controls &amp; typed commands</summary><p class="sub" style="margin-top:10px">Separate from live AI: fixed game replies and one-command speech. Your browser may send microphone audio to its speech provider. Installed device voices are used for playback.</p><label>Language <select id="voice-lang"><option value="en-US">English</option><option value="zh-CN">中文普通话</option></select></label>
 <label>Guest voice <select id="guest-voice"></select></label><label>Lukas / 卢卡斯 voice <select id="cashier-voice"></select></label>
-<p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "两个鱼丸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / 输入指令" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div><button class="vbtn" id="voice-close">Close ×</button></div></div>
+<p class="sub" id="voice-status"></p><button class="vbtn" id="hear-guest">Hear guest order</button><button class="vbtn" id="hear-cashier">Talk to Lukas</button><p id="chatlog" class="chatlog">Welcome! Say or type an ingredient name, e.g. "two fish balls" / "两个鱼丸". Other commands: order, drinks, weigh, hello.</p><button class="cta" id="mic"> Talk (one command)</button><div style="display:flex;gap:6px;margin:14px 0"><input id="command-text" placeholder="Type a command / 输入指令" style="width:100%;min-width:0;padding:10px"><button id="command-send" class="vbtn">Send</button></div></details><button class="vbtn" id="voice-close" style="width:100%;margin-top:18px;min-height:40px">Close</button></div></div>
 <div id="title">
   <div class="sign"><h1>Xiaotong Malatang</h1><h2>麻 辣 烫</h2></div>
   <p>Guess the bowl weight, one piece at a time. Fill the basket without seeing the grams. Commit to the scale, choose broth and spice, then pay at the terminal.</p>
@@ -1450,13 +1450,13 @@ async function lvStart(){
       if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
       if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
       if(j.type==='AgentAudioDone'){ lvStatus('Live. Just talk - interrupt any time.'); return; }
-      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
+      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t){$('livechatlog').hidden=false;$('livechatlog').textContent='Live: '+t;} }catch(x){} return; }
     const b0=new Uint8Array(ev.data);
     if(b0[0]===0x7b){ try{ const j=JSON.parse(new TextDecoder().decode(b0));
       if(j.type==='UserStartedSpeaking'&&LV&&LV.ac){ (LV.playNodes||[]).forEach(n=>{try{n.stop();}catch(e){}}); LV.playNodes=[]; LV.playAt=LV.ac.currentTime; lvStatus('Listening - Lukas stops when you speak.'); return; }
       if(j.type==='AgentStartedSpeaking'){ lvStatus('Lukas is speaking - talk over him any time to interrupt.'); return; }
       if(j.type==='AgentAudioDone'){ lvStatus('Live. Just talk - interrupt any time.'); return; }
-      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t)$('chatlog').textContent='卢卡斯 (live AI): '+t; }catch(x){} return; }
+      const t=j.content||j.text||(j.message&&(j.message.content||j.message.text)); if(t){$('livechatlog').hidden=false;$('livechatlog').textContent='Live: '+t;} }catch(x){} return; }
     const L=LV; if(!L||!L.ac)return; const i16=new Int16Array(ev.data); const f=new Float32Array(i16.length);
     for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
     const buf=L.ac.createBuffer(1,f.length,16000); buf.copyToChannel(f,0);
@@ -1481,7 +1481,7 @@ async function lvStart(){
   };
 }
 $('lv-start').onclick=lvStart; $('lv-stop').onclick=()=>lvCleanup('Session ended.');
-function lvProbe(){ fetch('/health',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{ $('livevoice').hidden = !(j && j.voice); }).catch(()=>{ $('livevoice').hidden = true; }); }
+function lvProbe(){ fetch('/health',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{ $('livevoice').hidden = !(j && j.voice); if(!(j&&j.voice))$('voicemodal').querySelector('details').open=true; }).catch(()=>{ $('livevoice').hidden = true; $('voicemodal').querySelector('details').open=true; }); }
 $('voice-close').onclick=()=>{if(recognizer)recognizer.abort();lvCleanup();window.speechSynthesis?.cancel();$('voicemodal').style.display='none';};
 
 $('lock-guess').onclick=()=>{const n=Number($('guess-input').value);if(!Number.isInteger(n)||n<1||n>5000){$('guess-help').textContent='Enter a whole-number guess from 1 to 5000 g.';return;}G.guess=n;$('guessmodal').style.display='none';openServe();};
@@ -1589,4 +1589,4 @@ loop();
 
 </script>
 </body>
-                                         </html>
+  </html>
