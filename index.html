@@ -854,7 +854,7 @@ function newGuest() {
   const budget = Math.round((targetW / 100 * rate()) * (1.12 + Math.random() * 0.35) * 2) / 2;
   G.guest = { name: pick(GUEST_NAMES), req, targetW, budget, broth: pick(BROTHS), spice: pick(SPICES) };
   G.guestSince = performance.now();
-  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false;
+  G.committed = false; G.paid = false; G.guess=null; G.wheel=null; G.drink = null; $('receipt-tab').hidden = true; $('v-serve').textContent = ' Commit & weigh'; $('v-serve').style.visibility = ''; $('drinkchoice').textContent='No drink selected. Drinks are optional extras.'; G.basket = []; G.selBroth = null; G.selSpice = null; G.chiliOil = false;
   renderBasket3D(); updateTicket(); updateBasketBar(); drawLCD(null, null);
   const npc = window.__guest;
   npc.children[0].material = npc.children[0].material.clone();
@@ -1129,7 +1129,7 @@ const EAT_LINES = [
 ];
 let eatIv = null;
 function sitAndEat() {
-  $('receipt').style.display = 'none'; $('receipt-tab').hidden = true;
+  $('receipt').style.display = 'none'; $('receipt-tab').hidden = true; $('v-serve').style.visibility = 'hidden';
   const ecx = 4.85, ecy = 1.95, ecz = 0.75;
   flyTo([ecx, ecy, ecz], Math.atan2(3.4 - ecx, 0.2 - ecz), (0.95 - ecy) / Math.hypot(3.4 - ecx, 0.2 - ecz));
   if (!window.__eatBowl) {
