@@ -1449,11 +1449,11 @@ const hb=cyl(0.25,0.14,0.19,C.pink,32,{transparent:true,opacity:0.8}); heldBowl.
 const rim=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.016,8,40),new THREE.MeshStandardMaterial({color:0xf4a2b8}));rim.rotation.x=Math.PI/2;rim.position.y=0.1;heldBowl.add(rim);
 const heldFood = new THREE.Group(); heldBowl.add(heldFood);
 const falling=[];
-function bowlSlot(i){ const per=7, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.055+(k%2)*.04; return {x:Math.cos(ang)*rad, y:-.06+layer*.05, z:Math.sin(ang)*rad*.8}; }
+function bowlSlot(i){ const per=6, layer=Math.floor(i/per), k=i%per; const ang=k/per*Math.PI*2+layer*.9; const rad=k===0?0:.06+(k%2)*.045; return {x:Math.cos(ang)*rad, y:-.055+layer*.048, z:Math.sin(ang)*rad*.8}; }
 function animatePick(id){
  if(heldFood.children.length<26){
   const slot=bowlSlot(heldFood.children.length);
-  const food=pieceMesh(ING[id],0.5);
+  const food=pieceMesh(ING[id],0.62);
   food.position.set(rand(-.15,.15),.55,rand(-.12,.12));
   heldFood.add(food); falling.push({mesh:food,t:0,tx:slot.x,ty:slot.y,tz:slot.z});
  }
