@@ -617,10 +617,11 @@ function drawLCD(weightG, priceE) {
       addPile(pile, ing);
       const labTex = textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' });
       const lab = planeWith(labTex, 0.78, 0.33); lab.position.set(tx, sy - 0.02, 0.12 + trayD / 2 + 0.045); lab.rotation.x = -0.25; fridge.add(lab);
-      const hit = box(trayW, 0.55, trayD + 0.1, 0xffffff, { cast:false, receive:false });
-      hit.material.visible = false; hit.position.set(tx, sy + 0.2, 0.12); fridge.add(hit);
+      const hit = box(trayW, 0.34, trayD + 0.1, 0xffffff, { cast:false, receive:false });
+      hit.material.visible = false; hit.position.set(tx, sy + 0.1, 0.12); fridge.add(hit);
       clickable(hit, { type: 'pick', ing: ing.id });
       clickable(tray, { type: 'pick', ing: ing.id });
+      clickable(lab, { type: 'pick', ing: ing.id });
     });
   });
 
@@ -698,8 +699,8 @@ function drawLCD(weightG, priceE) {
     const pack = box(0.34, 0.12, 0.26, ing.color); pack.position.set(nx, 0.97, nz); nt.add(pack);
     const plab = planeWith(textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' }), 0.52, 0.22);
     plab.position.set(nx, 1.04, nz + 0.18); plab.rotation.x = -0.5; nt.add(plab);
-    const nhit = box(0.42, 0.4, 0.36, 0xffffff, { cast:false, receive:false }); nhit.material.visible = false; nhit.position.set(nx, 1.06, nz); nt.add(nhit);
-    clickable(nhit, { type: 'pick', ing: ing.id }); clickable(pack, { type: 'pick', ing: ing.id });
+    const nhit = box(0.42, 0.24, 0.36, 0xffffff, { cast:false, receive:false }); nhit.material.visible = false; nhit.position.set(nx, 1.0, nz); nt.add(nhit);
+    clickable(nhit, { type: 'pick', ing: ing.id }); clickable(pack, { type: 'pick', ing: ing.id }); clickable(plab, { type: 'pick', ing: ing.id });
     TRAYPOS[ing.id] = new THREE.Vector3(-3.75 + nx, 1.12, -1.1 + nz);
   });
 
