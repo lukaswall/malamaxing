@@ -615,8 +615,8 @@ function drawLCD(weightG, priceE) {
       TRAYPOS[ing.id] = new THREE.Vector3(tx, sy + 0.15, -3.95 + 0.12);
       const pile = new THREE.Group(); pile.position.set(tx, sy + trayH / 2, 0.12); fridge.add(pile);
       addPile(pile, ing);
-      const labTex = textTexture([ing.name, ing.cn], { w: 256, h: 110, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 40px "Trebuchet MS"', small: '30px "Trebuchet MS"' });
-      const lab = planeWith(labTex, 0.78, 0.33); lab.position.set(tx, sy - 0.02, 0.12 + trayD / 2 + 0.045); lab.rotation.x = -0.25; fridge.add(lab);
+      const labTex = textTexture([ing.name, ing.cn], { w: 256, h: 64, bg: '#fdf6e9', fg: '#5a3b28', font: 'bold 30px "Trebuchet MS"', small: '20px "Trebuchet MS"' });
+      const lab = planeWith(labTex, 0.78, 0.2); lab.position.set(tx, sy + 0.03, 0.12 + trayD / 2 + 0.045); lab.rotation.x = -0.25; fridge.add(lab);
       const hit = box(trayW, 0.34, trayD + 0.1, 0xffffff, { cast:false, receive:false });
       hit.material.visible = false; hit.position.set(tx, sy + 0.1, 0.12); fridge.add(hit);
       clickable(hit, { type: 'pick', ing: ing.id });
